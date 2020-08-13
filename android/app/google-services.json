@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "140723111579",
+    "firebase_url": "https://nextdoorpartner.firebaseio.com",
+    "project_id": "nextdoorpartner",
+    "storage_bucket": "nextdoorpartner.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140723111579:android:5525f2046e712cd32de83e",
+        "android_client_info": {
+          "package_name": "co.nextdoor.nextdoorpartner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "140723111579-r0c7404get0rf3gqpf1vbnerr9mq7eu2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAENNHe1iVTiI-F9pErBfInRVHNNkJ7-EU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140723111579-r0c7404get0rf3gqpf1vbnerr9mq7eu2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
