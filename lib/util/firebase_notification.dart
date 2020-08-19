@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:nextdoorpartner/util/local_notification.dart';
+import 'package:nextdoorpartner/util/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FirebaseNotifications {
   FirebaseMessaging _firebaseMessaging;
@@ -10,14 +12,15 @@ class FirebaseNotifications {
   void setUpFirebase(LocalNotifications localNotifications) {
     this.localNotifications = localNotifications;
     _firebaseMessaging = FirebaseMessaging();
-    firebaseCloudMessaging_Listeners();
+    firebaseCloudMessagingListeners();
   }
 
-  void firebaseCloudMessaging_Listeners() {
-    if (Platform.isIOS) iOS_Permission();
+  void firebaseCloudMessagingListeners() {
+    if (Platform.isIOS) iOSPermission();
 
     _firebaseMessaging.getToken().then((token) {
-      print(token);
+      SharedPreferencesManager.getInstance().then((value) =>
+          {value.setString(SharedPreferencesManager.firebaseToken, token)});
     });
 
     _firebaseMessaging.configure(
@@ -51,7 +54,7 @@ class FirebaseNotifications {
     // Or do other work.
   }
 
-  void iOS_Permission() {
+  void iOSPermission() {
     _firebaseMessaging.requestNotificationPermissions(
         IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.onIosSettingsRegistered

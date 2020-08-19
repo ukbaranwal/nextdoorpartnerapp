@@ -1,21 +1,21 @@
 import 'dart:async';
-import 'dart:ui';
+import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nextdoorpartner/models/walkthrough_model.dart';
-import 'package:nextdoorpartner/ui/forgot_password.dart';
+import 'package:nextdoorpartner/ui/dashboard.dart';
 import 'package:nextdoorpartner/ui/get_started.dart';
+import 'package:nextdoorpartner/ui/logged_in_unverified.dart';
+import 'package:nextdoorpartner/ui/splash_screen.dart';
 import 'package:nextdoorpartner/ui/walkthrough.dart';
-import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/database.dart';
 import 'package:nextdoorpartner/util/firebase_notification.dart';
 import 'package:nextdoorpartner/util/local_notification.dart';
-import 'package:nextdoorpartner/util/strings_en.dart';
-
-import 'login.dart';
+import 'package:nextdoorpartner/util/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   ///manage for IOS
@@ -35,23 +35,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<WalkThroughModel> walkThroughModelList;
   LocalNotifications localNotifications = LocalNotifications();
-  void loadWalkThrough() {
-    walkThroughModelList = List<WalkThroughModel>();
-    walkThroughModelList.add(WalkThroughModel(
-        AppTheme.primary_color,
-        Strings.supportLocalBusiness,
-        Strings.orderDailyEssentials,
-        'walkthrough_1.png'));
-    walkThroughModelList.add(WalkThroughModel(
-        AppTheme.walkthrough_color_2,
-        Strings.bookAppointments,
-        Strings.listAppointments,
-        'walkthrough_2.png'));
-    walkThroughModelList.add(WalkThroughModel(AppTheme.walkthrough_color_3,
-        Strings.bookServices, Strings.listServices, 'walkthrough_3.png'));
-  }
+  SharedPreferences sharedPreferences;
+  bool isVerified;
 
   @override
   void initState() {
@@ -61,7 +47,18 @@ class _MyAppState extends State<MyApp> {
     localNotifications.configureSelectNotificationSubject(context);
     localNotifications.requestIOSPermissions();
     FirebaseNotifications().setUpFirebase(localNotifications);
-    loadWalkThrough();
+  }
+
+  Future<bool> getIsLoggedIn() async {
+    final sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn =
+        sharedPreferences.getBool(SharedPreferencesManager.isLoggedIn) ?? false;
+    isVerified =
+        sharedPreferences.getBool(SharedPreferencesManager.isVerified) ?? false;
+    if (!isLoggedIn) {
+      sharedPreferences.setBool(SharedPreferencesManager.isLoggedIn, false);
+    }
+    return isLoggedIn;
   }
 
   @override
@@ -72,18 +69,26 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
+    ));
     return MaterialApp(
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'nunito',
       ),
-      home: Scaffold(
-        resizeToAvoidBottomPadding: false,
-        backgroundColor: Colors.white,
-//        body: WalkThrough(
-//          walkThroughModelList: walkThroughModelList,
-//        ),
-        body: GetStarted(),
+      home: FutureBuilder(
+        future: getIsLoggedIn(),
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Splashscreen();
+          } else {
+            return snapshot.data
+                ? (!isVerified ? Dashboard() : UnverifiedLoggedIn())
+                : WalkThrough();
+          }
+        },
       ),
     );
   }

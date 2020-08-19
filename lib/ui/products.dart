@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fswitch/fswitch.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/product.dart';
+import 'package:nextdoorpartner/ui/product_category.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/strings_en.dart';
 
 class Products extends StatefulWidget {
   @override
@@ -12,226 +15,235 @@ class Products extends StatefulWidget {
 class _ProductsState extends State<Products> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: Container(
-        margin: EdgeInsets.only(bottom: 20),
-        height: 60,
-        width: 60,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(35)),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                offset: const Offset(2, 4.0),
-                blurRadius: 1.0),
-          ],
-        ),
-        child: FloatingActionButton(
-          onPressed: () {
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButton: Container(
+          margin: EdgeInsets.only(bottom: 20),
+          height: 60,
+          width: 60,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(35)),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  offset: const Offset(2, 4.0),
+                  blurRadius: 1.0),
+            ],
+          ),
+          child: FloatingActionButton(
+            onPressed: () {
 //            Navigator.push(
 //              context,
 //              MaterialPageRoute(
 //                builder: (context) => Products(),
 //              ),
 //            );
-          },
-          elevation: 10,
-          backgroundColor: Colors.white,
-          child: Icon(
-            Icons.tune,
-            color: AppTheme.secondary_color,
-            size: 32,
+            },
+            elevation: 10,
+            backgroundColor: Colors.white,
+            child: Icon(
+              Icons.tune,
+              color: AppTheme.secondary_color,
+              size: 32,
+            ),
           ),
         ),
-      ),
-      backgroundColor: AppTheme.background_grey,
-      appBar: CustomAppBar(
-        isDashboard: false,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              elevation: 10,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10))),
-              child: Container(
-                padding: EdgeInsets.all(18),
+        backgroundColor: AppTheme.background_grey,
+        appBar: CustomAppBar(),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Card(
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Container(
+                  padding: EdgeInsets.all(18),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductCategory(),
+                              ));
+                        },
+                        child: Text(
+                          Strings.addNewProduct,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 22),
+                        ),
+                      ),
+                      Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      )
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                      color: AppTheme.green,
+                      borderRadius: BorderRadius.all(Radius.circular(10))),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 15),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      'add a new product',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 22),
-                    ),
                     Icon(
-                      Icons.add,
-                      color: Colors.white,
+                      Icons.search,
+                      color: AppTheme.grey,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: TextFormField(
+                        cursorColor: AppTheme.secondary_color,
+                        onFieldSubmitted: (value) => {},
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.secondary_color,
+                            fontSize: 18),
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            hintStyle: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.grey,
+                                fontSize: 18),
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.only(
+                                left: 10, bottom: 11, top: 11, right: 10),
+                            hintText: Strings.search),
+                        onEditingComplete: () {},
+                      ),
+                    ),
+                    Expanded(
+                      child: Icon(
+                        Icons.highlight_off,
+                        color: AppTheme.grey,
+                      ),
                     )
                   ],
                 ),
                 decoration: BoxDecoration(
-                    color: AppTheme.green,
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(50))),
               ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              padding: EdgeInsets.symmetric(horizontal: 15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.search,
-                    color: AppTheme.grey,
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    child: TextFormField(
-                      cursorColor: AppTheme.secondary_color,
-                      onFieldSubmitted: (value) => {},
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.secondary_color,
-                          fontSize: 18),
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          hintStyle: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.grey,
-                              fontSize: 18),
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.only(
-                              left: 10, bottom: 11, top: 11, right: 10),
-                          hintText: 'search'),
-                      onEditingComplete: () {},
-                    ),
-                  ),
-                  Expanded(
-                    child: Icon(
-                      Icons.highlight_off,
-                      color: AppTheme.grey,
-                    ),
-                  )
-                ],
-              ),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(50))),
-            ),
-            ProductWidget(
-              inStockSwitch: FSwitch(
-                width: 40,
-                height: 20,
-                openColor: AppTheme.green,
-                open: true,
-                onChanged: (value) {
-                  setState(() {
+              ProductWidget(
+                inStockSwitch: FSwitch(
+                  width: 40,
+                  height: 20,
+                  openColor: AppTheme.green,
+                  open: true,
+                  onChanged: (value) {
+                    setState(() {
 //                              isSwitchedOn = value;
-                  });
-                },
+                    });
+                  },
+                ),
               ),
-            ),
-            ProductWidget(
-              inStockSwitch: FSwitch(
-                width: 40,
-                height: 20,
-                openColor: AppTheme.green,
-                open: true,
-                onChanged: (value) {
-                  setState(() {
+              ProductWidget(
+                inStockSwitch: FSwitch(
+                  width: 40,
+                  height: 20,
+                  openColor: AppTheme.green,
+                  open: true,
+                  onChanged: (value) {
+                    setState(() {
 //                              isSwitchedOn = value;
-                  });
-                },
+                    });
+                  },
+                ),
               ),
-            ),
-            ProductWidget(
-              inStockSwitch: FSwitch(
-                width: 40,
-                height: 20,
-                openColor: AppTheme.green,
-                open: true,
-                onChanged: (value) {
-                  setState(() {
+              ProductWidget(
+                inStockSwitch: FSwitch(
+                  width: 40,
+                  height: 20,
+                  openColor: AppTheme.green,
+                  open: true,
+                  onChanged: (value) {
+                    setState(() {
 //                              isSwitchedOn = value;
-                  });
-                },
+                    });
+                  },
+                ),
               ),
-            ),
-            ProductWidget(
-              inStockSwitch: FSwitch(
-                width: 40,
-                height: 20,
-                openColor: AppTheme.green,
-                open: true,
-                onChanged: (value) {
-                  setState(() {
+              ProductWidget(
+                inStockSwitch: FSwitch(
+                  width: 40,
+                  height: 20,
+                  openColor: AppTheme.green,
+                  open: true,
+                  onChanged: (value) {
+                    setState(() {
 //                              isSwitchedOn = value;
-                  });
-                },
+                    });
+                  },
+                ),
               ),
-            ),
-            ProductWidget(
-              inStockSwitch: FSwitch(
-                width: 40,
-                height: 20,
-                openColor: AppTheme.green,
-                open: true,
-                onChanged: (value) {
-                  setState(() {
+              ProductWidget(
+                inStockSwitch: FSwitch(
+                  width: 40,
+                  height: 20,
+                  openColor: AppTheme.green,
+                  open: true,
+                  onChanged: (value) {
+                    setState(() {
 //                              isSwitchedOn = value;
-                  });
-                },
+                    });
+                  },
+                ),
               ),
-            ),
-            ProductWidget(
-              inStockSwitch: FSwitch(
-                width: 40,
-                height: 20,
-                openColor: AppTheme.green,
-                open: true,
-                onChanged: (value) {
-                  setState(() {
+              ProductWidget(
+                inStockSwitch: FSwitch(
+                  width: 40,
+                  height: 20,
+                  openColor: AppTheme.green,
+                  open: true,
+                  onChanged: (value) {
+                    setState(() {
 //                              isSwitchedOn = value;
-                  });
-                },
+                    });
+                  },
+                ),
               ),
-            ),
-            ProductWidget(
-              inStockSwitch: FSwitch(
-                width: 40,
-                height: 20,
-                openColor: AppTheme.green,
-                open: true,
-                onChanged: (value) {
-                  setState(() {
+              ProductWidget(
+                inStockSwitch: FSwitch(
+                  width: 40,
+                  height: 20,
+                  openColor: AppTheme.green,
+                  open: true,
+                  onChanged: (value) {
+                    setState(() {
 //                              isSwitchedOn = value;
-                  });
-                },
+                    });
+                  },
+                ),
               ),
-            ),
-            ProductWidget(
-              inStockSwitch: FSwitch(
-                width: 40,
-                height: 20,
-                openColor: AppTheme.green,
-                open: true,
-                onChanged: (value) {
-                  setState(() {
+              ProductWidget(
+                inStockSwitch: FSwitch(
+                  width: 40,
+                  height: 20,
+                  openColor: AppTheme.green,
+                  open: true,
+                  onChanged: (value) {
+                    setState(() {
 //                              isSwitchedOn = value;
-                  });
-                },
-              ),
-            )
-          ],
+                    });
+                  },
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -414,7 +426,7 @@ class ProductWidget extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    'in stock',
+                    Strings.inStock,
                     style: TextStyle(
                         fontSize: 14,
                         color: AppTheme.green,

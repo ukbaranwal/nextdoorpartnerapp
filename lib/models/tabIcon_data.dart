@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:nextdoorpartner/util/strings_en.dart';
 
 class TabIconData {
   TabIconData(
@@ -22,24 +23,24 @@ class TabIconData {
         index: 0,
         isSelected: true,
         animationController: null,
-        text: 'products'),
+        text: Strings.products),
     TabIconData(
         icon: Icons.textsms,
         index: 1,
         isSelected: false,
         animationController: null,
-        text: 'reviews'),
+        text: Strings.products),
     TabIconData(
         icon: Icons.credit_card,
         index: 2,
         isSelected: false,
         animationController: null,
-        text: 'payments'),
+        text: Strings.payments),
     TabIconData(
         icon: Icons.apps,
         index: 3,
         isSelected: false,
         animationController: null,
-        text: 'menu'),
+        text: Strings.menu),
   ];
 }

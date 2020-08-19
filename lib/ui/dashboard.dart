@@ -1,10 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:nextdoorpartner/models/tabIcon_data.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/bottom_bar_view.dart';
+import 'package:nextdoorpartner/ui/product_category.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/database.dart';
+import 'package:nextdoorpartner/util/strings_en.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -13,6 +20,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   List<TabIconData> tabIconsList = TabIconData.tabIconsList;
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   Widget tabBody = Container(
     color: AppTheme.background_grey,
   );
@@ -22,7 +30,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   TextStyle textStyleStats = TextStyle(
       fontWeight: FontWeight.w800,
-      fontSize: 22,
+      fontSize: 18,
       color: AppTheme.secondary_color);
 
   AnimationController animationController;
@@ -36,6 +44,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     tabIconsList[0].isSelected = true;
     animationController = AnimationController(
         duration: const Duration(milliseconds: 600), vsync: this);
+    initDb('next_door.db');
   }
 
   Widget bottomBar() {
@@ -69,219 +78,541 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: Container(
-        margin: EdgeInsets.only(bottom: 80),
-        height: 70,
-        width: 70,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(35)),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                offset: const Offset(2, 4.0),
-                blurRadius: 1.0),
-          ],
-        ),
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Products(),
-              ),
-            );
-          },
-          elevation: 10,
-          backgroundColor: AppTheme.secondary_color,
-          child: Transform.rotate(
-            child: Icon(
-              Icons.notifications_active,
-              size: 32,
+    return SafeArea(
+      child: Scaffold(
+        key: scaffoldKey,
+        endDrawer: Drawer(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset(
+                        'assets/images/a.jpg',
+                        height: 100,
+                        width: 100,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'RS Stores',
+                            style: TextStyle(
+                                color: AppTheme.secondary_color,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 18),
+                          ),
+                          Text('B14/172 Kalyani',
+                              style: TextStyle(
+                                  color: AppTheme.secondary_color,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 18)),
+                          Text('ukbaranwal@gmail.com',
+                              style: TextStyle(
+                                  color: AppTheme.secondary_color,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16)),
+                          Text('+91 7355972739',
+                              style: TextStyle(
+                                  color: AppTheme.secondary_color,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16))
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                RatingBarIndicator(
+                  rating: 5,
+                  itemSize: 22,
+                  direction: Axis.horizontal,
+                  itemCount: 5,
+                  itemBuilder: (context, _) => Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                        margin: EdgeInsets.only(top: 5),
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                            color: AppTheme.green,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(25))),
+                        child: Icon(
+                          Icons.power_settings_new,
+                          color: Colors.white,
+                          size: 28,
+                        )),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      Strings.online,
+                      style: TextStyle(
+                          color: AppTheme.green,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Divider(
+                  color: AppTheme.background_grey,
+                  thickness: 2,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    Strings.home,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    Strings.products,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    Strings.addNewProduct,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    Strings.orders,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    Strings.payments,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    Strings.accountHealth,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    Strings.help,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    Strings.sellerSupport,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    Strings.signOut,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ),
+                Expanded(
+                  child: Center(
+                    child: Text('${Strings.sellingSince}\n13 January 2020',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.secondary_color)),
+                  ),
+                ),
+              ],
             ),
-            angle: 345,
           ),
         ),
-      ),
-      backgroundColor: AppTheme.background_grey,
-      appBar: CustomAppBar(
-        isDashboard: true,
-      ),
-      body: Stack(
-        children: <Widget>[
-          SingleChildScrollView(
-            child: Container(
-              color: AppTheme.background_grey,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Row(
+        floatingActionButton: Container(
+          margin: EdgeInsets.only(bottom: 80),
+          height: 70,
+          width: 70,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(35)),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  offset: const Offset(2, 4.0),
+                  blurRadius: 1.0),
+            ],
+          ),
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Products(),
+                ),
+              );
+            },
+            elevation: 10,
+            backgroundColor: AppTheme.secondary_color,
+            child: Transform.rotate(
+              child: Icon(
+                Icons.notifications_active,
+                size: 32,
+              ),
+              angle: 345,
+            ),
+          ),
+        ),
+        backgroundColor: AppTheme.background_grey,
+        appBar: CustomAppBar(),
+        body: Stack(
+          children: <Widget>[
+            SingleChildScrollView(
+              child: Container(
+                color: AppTheme.background_grey,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.50 - 15,
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Column(
-                            children: [
-                              Text(
-                                'monthly sales',
-                                style: textStyleStats,
+                        DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            items: [
+                              DropdownMenuItem(
+                                child: DropDownTextWidget(Strings.lifeTime),
                               ),
-                              Text('(january 2020)', style: textStyleStats),
-                              Text('Rs. 99999', style: textStyleStats)
+                              DropdownMenuItem(
+                                child: DropDownTextWidget(Strings.today),
+                              ),
+                              DropdownMenuItem(
+                                child: DropDownTextWidget(Strings.yesterday),
+                              ),
+                              DropdownMenuItem(
+                                child: DropDownTextWidget(Strings.lastWeek),
+                              ),
+                              DropdownMenuItem(
+                                child: DropDownTextWidget(Strings.lastMonth),
+                              )
                             ],
+                            icon: Icon(Icons.keyboard_arrow_down),
+                            onChanged: (value) {},
                           ),
-                          decoration: boxDecoration,
                         ),
                         SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.50 - 15,
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Column(
-                            children: [
-                              Text(
-                                'sales today',
-                                style: textStyleStats,
-                              ),
-                              Text('13 jan 2020', style: textStyleStats),
-                              Text('Rs. 99999', style: textStyleStats)
-                            ],
-                          ),
-                          decoration: boxDecoration,
+                          width: 5,
                         )
                       ],
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     ),
-                  ),
-                  RatingCardDashboard(
-                    boxDecoration: boxDecoration,
-                    totalRatings: 20,
-                    avgRating: 3.6,
-                  ),
-                  Container(
-                    decoration: boxDecoration,
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    margin: EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      children: [
-                        Text(
-                          'recent orders',
-                          style: textStyleStats,
-                        ),
-                        Divider(
-                          color: AppTheme.background_grey,
-                          thickness: 2,
-                          indent: 30,
-                          endIndent: 30,
-                        ),
-                        RecentOrderWidget(
-                          orderNo: 1973,
-                          orderValue: 1920,
-                          units: 10,
-                          discount: 200,
-                          date: '13/01/2020 13:20',
-                          isPaid: true,
-                          name: 'Utkarsh Baranwal',
-                          address: 'B14/172 Kalyani',
-                        ),
-                        RecentOrderWidget(
-                          orderNo: 1974,
-                          orderValue: 1920,
-                          units: 10,
-                          discount: 200,
-                          date: '13/01/2020 13:20',
-                          isPaid: false,
-                          name: 'Utkarsh Baranwal',
-                          address: 'B14/172 Kalyani',
-                        ),
-                        RecentOrderWidget(
-                          orderNo: 1973,
-                          orderValue: 1920,
-                          units: 10,
-                          discount: 200,
-                          date: '13/01/2020 13:20',
-                          isPaid: true,
-                          name: 'Utkarsh Baranwal',
-                          address: 'B14/172 Kalyani',
-                        ),
-                        RecentOrderWidget(
-                          orderNo: 1973,
-                          orderValue: 1920,
-                          units: 10,
-                          discount: 200,
-                          date: '13/01/2020 13:20',
-                          isPaid: true,
-                          name: 'Utkarsh Baranwal',
-                          address: 'B14/172 Kalyani',
-                        ),
-                        RecentOrderWidget(
-                          orderNo: 1973,
-                          orderValue: 1920,
-                          units: 10,
-                          discount: 200,
-                          date: '13/01/2020 13:20',
-                          isPaid: true,
-                          name: 'Utkarsh Baranwal',
-                          address: 'B14/172 Kalyani',
-                        ),
-                        RecentOrderWidget(
-                          orderNo: 1973,
-                          orderValue: 1920,
-                          units: 10,
-                          discount: 200,
-                          date: '13/01/2020 13:20',
-                          isPaid: true,
-                          name: 'Utkarsh Baranwal',
-                          address: 'B14/172 Kalyani',
-                        ),
-                        RecentOrderWidget(
-                          orderNo: 1973,
-                          orderValue: 1920,
-                          units: 10,
-                          discount: 200,
-                          date: '13/01/2020 13:20',
-                          isPaid: true,
-                          name: 'Utkarsh Baranwal',
-                          address: 'B14/172 Kalyani',
-                        ),
-                        RecentOrderWidget(
-                          orderNo: 1973,
-                          orderValue: 1920,
-                          units: 10,
-                          discount: 200,
-                          date: '13/01/2020 13:20',
-                          isPaid: true,
-                          name: 'Utkarsh Baranwal',
-                          address: 'B14/172 Kajhgfdghjfdxcggfghjhgjhjghlyani',
-                        ),
-                        RecentOrderWidget(
-                          orderNo: 1973,
-                          orderValue: 1920,
-                          units: 10,
-                          discount: 200,
-                          date: '13/01/2020 13:20',
-                          isPaid: true,
-                          name: 'Utkarsh Baranwal',
-                          address: 'B14/172 Kalyani',
-                        ),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              scaffoldKey.currentState.openEndDrawer();
+                            },
+                            child: Container(
+                              width:
+                                  MediaQuery.of(context).size.width * 0.50 - 15,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    Strings.orders,
+                                    style: textStyleStats,
+                                  ),
+                                  Text('99999', style: textStyleStats)
+                                ],
+                              ),
+                              decoration: boxDecoration,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductCategory(),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width:
+                                  MediaQuery.of(context).size.width * 0.50 - 15,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    Strings.revenue,
+                                    style: textStyleStats,
+                                  ),
+                                  Text('Rs. 99999', style: textStyleStats)
+                                ],
+                              ),
+                              decoration: boxDecoration,
+                            ),
+                          )
+                        ],
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 95,
-                  )
-                ],
+                    RatingCardDashboard(
+                      boxDecoration: boxDecoration,
+                      totalRatings: 20,
+                      avgRating: 3.6,
+                    ),
+                    Container(
+                      decoration: boxDecoration,
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  Strings.activeOrders,
+                                  style: textStyleStats,
+                                ),
+                                Row(
+                                  children: [
+                                    ActiveOrderOptionWidget(
+                                      text: 'All',
+                                      isSelected: true,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5),
+                                      child: ActiveOrderOptionWidget(
+                                        text: 'Pending',
+                                        isSelected: false,
+                                      ),
+                                    ),
+                                    ActiveOrderOptionWidget(
+                                      text: 'Accepted',
+                                      isSelected: false,
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Divider(
+                            color: AppTheme.background_grey,
+                            thickness: 2,
+                            indent: 30,
+                            endIndent: 30,
+                          ),
+                          RecentOrderWidget(
+                            orderNo: 1973,
+                            orderValue: 1920,
+                            units: 10,
+                            discount: 200,
+                            date: '13/01/2020 13:20',
+                            isPaid: true,
+                            name: 'Utkarsh Baranwal',
+                            address: 'B14/172 Kalyani',
+                          ),
+                          RecentOrderWidget(
+                            orderNo: 1974,
+                            orderValue: 1920,
+                            units: 10,
+                            discount: 200,
+                            date: '13/01/2020 13:20',
+                            isPaid: false,
+                            name: 'Utkarsh Baranwal',
+                            address: 'B14/172 Kalyani',
+                          ),
+                          RecentOrderWidget(
+                            orderNo: 1973,
+                            orderValue: 1920,
+                            units: 10,
+                            discount: 200,
+                            date: '13/01/2020 13:20',
+                            isPaid: true,
+                            name: 'Utkarsh Baranwal',
+                            address: 'B14/172 Kalyani',
+                          ),
+                          RecentOrderWidget(
+                            orderNo: 1973,
+                            orderValue: 1920,
+                            units: 10,
+                            discount: 200,
+                            date: '13/01/2020 13:20',
+                            isPaid: true,
+                            name: 'Utkarsh Baranwal',
+                            address: 'B14/172 Kalyani',
+                          ),
+                          RecentOrderWidget(
+                            orderNo: 1973,
+                            orderValue: 1920,
+                            units: 10,
+                            discount: 200,
+                            date: '13/01/2020 13:20',
+                            isPaid: true,
+                            name: 'Utkarsh Baranwal',
+                            address: 'B14/172 Kalyani',
+                          ),
+                          RecentOrderWidget(
+                            orderNo: 1973,
+                            orderValue: 1920,
+                            units: 10,
+                            discount: 200,
+                            date: '13/01/2020 13:20',
+                            isPaid: true,
+                            name: 'Utkarsh Baranwal',
+                            address: 'B14/172 Kalyani',
+                          ),
+                          RecentOrderWidget(
+                            orderNo: 1973,
+                            orderValue: 1920,
+                            units: 10,
+                            discount: 200,
+                            date: '13/01/2020 13:20',
+                            isPaid: true,
+                            name: 'Utkarsh Baranwal',
+                            address: 'B14/172 Kalyani',
+                          ),
+                          RecentOrderWidget(
+                            orderNo: 1973,
+                            orderValue: 1920,
+                            units: 10,
+                            discount: 200,
+                            date: '13/01/2020 13:20',
+                            isPaid: true,
+                            name: 'Utkarsh Baranwal',
+                            address: 'B14/172 Kajhgfdghjfdxcggfghjhgjhjghlyani',
+                          ),
+                          RecentOrderWidget(
+                            orderNo: 1973,
+                            orderValue: 1920,
+                            units: 10,
+                            discount: 200,
+                            date: '13/01/2020 13:20',
+                            isPaid: true,
+                            name: 'Utkarsh Baranwal',
+                            address: 'B14/172 Kalyani',
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 95,
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-          bottomBar(),
-        ],
+            bottomBar(),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class ActiveOrderOptionWidget extends StatelessWidget {
+  final String text;
+  final bool isSelected;
+  final Function callback;
+
+  ActiveOrderOptionWidget({this.text, this.isSelected, this.callback});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Text(
+          text,
+          style: TextStyle(
+              color: isSelected ? Colors.white : AppTheme.secondary_color,
+              fontSize: 14,
+              fontWeight: FontWeight.w700),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        decoration: BoxDecoration(
+            color: isSelected
+                ? AppTheme.secondary_color
+                : AppTheme.background_grey,
+            borderRadius: BorderRadius.all(Radius.circular(10))));
+  }
+}
+
+class DropDownTextWidget extends StatelessWidget {
+  final String text;
+
+  DropDownTextWidget(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: TextStyle(
+          color: AppTheme.secondary_color,
+          fontWeight: FontWeight.w700,
+          fontSize: 14),
     );
   }
 }
@@ -311,7 +642,7 @@ class RatingCardDashboard extends StatelessWidget {
                     fontSize: 26,
                     fontWeight: FontWeight.w700),
               ),
-              Text('Average\nRating',
+              Text(Strings.averageRating,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: AppTheme.secondary_color,
@@ -363,7 +694,7 @@ class RatingCardDashboard extends StatelessWidget {
                     fontSize: 26,
                     fontWeight: FontWeight.w700),
               ),
-              Text('Ratings',
+              Text(Strings.ratings,
                   style: TextStyle(
                       color: AppTheme.secondary_color,
                       fontSize: 18,
@@ -419,7 +750,7 @@ class RecentOrderWidget extends StatelessWidget {
                       color: AppTheme.secondary_color),
                 ),
                 Text(
-                  'order value:\nRs. $orderValue',
+                  '${Strings.orderValue}:\nRs. $orderValue',
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -434,14 +765,14 @@ class RecentOrderWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'total units: $units',
+                  '${Strings.totalUnits}: $units',
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppTheme.secondary_color),
                 ),
                 Text(
-                  'total discount:\nRs. $discount',
+                  '${Strings.totalDiscount}:\nRs. $discount',
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -468,7 +799,7 @@ class RecentOrderWidget extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
                       margin: EdgeInsets.only(left: 3),
                       child: Text(
-                        isPaid ? 'paid' : 'cod',
+                        isPaid ? Strings.paid : Strings.cod,
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.w700),
                       ),

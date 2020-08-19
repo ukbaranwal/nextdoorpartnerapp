@@ -87,7 +87,7 @@ class ForgotPassword extends StatelessWidget {
                       ),
                       SignUpInputCard(
                         icon: Icons.email,
-                        hintText: 'Email',
+                        hintText: Strings.email,
                       ),
                       Align(
                         alignment: Alignment.centerRight,
@@ -103,7 +103,7 @@ class ForgotPassword extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 30),
                             child: Text(
-                              'Already requested a pin?',
+                              Strings.alreadyRequestedAPin,
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.white,
@@ -120,7 +120,7 @@ class ForgotPassword extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: Text(
-                              'Back to Login',
+                              Strings.backToLogin,
                               style: TextStyle(
                                   fontSize: 20,
                                   color: Colors.white,

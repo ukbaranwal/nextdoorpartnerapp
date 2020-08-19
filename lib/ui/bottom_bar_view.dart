@@ -2,16 +2,23 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/strings_en.dart';
 import '../models/tabIcon_data.dart';
 
 class BottomBarView extends StatefulWidget {
   const BottomBarView(
-      {Key key, this.tabIconsList, this.changeIndex, this.addClick})
+      {Key key,
+      this.tabIconsList,
+      this.changeIndex,
+      this.addClick,
+      this.scaffoldKey})
       : super(key: key);
 
   final Function(int index) changeIndex;
   final Function addClick;
   final List<TabIconData> tabIconsList;
+  final GlobalKey<ScaffoldState> scaffoldKey;
+
   @override
   _BottomBarViewState createState() => _BottomBarViewState();
 }
@@ -28,6 +35,12 @@ class _BottomBarViewState extends State<BottomBarView>
     );
     animationController.forward();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -172,7 +185,7 @@ class _BottomBarViewState extends State<BottomBarView>
                                 height: 1,
                               ),
                               Text(
-                                'orders',
+                                Strings.orders,
                                 style: TextStyle(
                                     color: AppTheme.secondary_color,
                                     fontSize: 12,
@@ -267,11 +280,8 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
                       SizedBox(
                         height: 5,
                       ),
-                      Icon(
-                        widget.tabIconData.icon,
-                        size: 32,
-                        color: AppTheme.secondary_color,
-                      ),
+                      Icon(widget.tabIconData.icon,
+                          size: 32, color: AppTheme.secondary_color),
                       Text(
                         widget.tabIconData.text,
                         style: TextStyle(
@@ -296,7 +306,7 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: AppTheme.walkthrough_color_2,
+                        color: AppTheme.walk_through_color_2,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -317,7 +327,7 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
                       width: 4,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AppTheme.walkthrough_color_2,
+                        color: AppTheme.walk_through_color_2,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -338,7 +348,7 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: AppTheme.walkthrough_color_2,
+                        color: AppTheme.walk_through_color_2,
                         shape: BoxShape.circle,
                       ),
                     ),

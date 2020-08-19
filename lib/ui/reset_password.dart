@@ -69,11 +69,11 @@ class ResetPassword extends StatelessWidget {
                       ),
                       SignUpInputCard(
                         icon: Icons.fiber_pin,
-                        hintText: 'Reset Pin',
+                        hintText: Strings.resetPin,
                       ),
                       SignUpInputCard(
                         icon: Icons.lock,
-                        hintText: 'New Password',
+                        hintText: Strings.newPassword,
                       ),
                       Expanded(child: SizedBox()),
                       Row(
@@ -82,7 +82,7 @@ class ResetPassword extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: Text(
-                              'Back to Login',
+                              Strings.backToLogin,
                               style: TextStyle(
                                   fontSize: 20,
                                   color: Colors.white,

@@ -1,0 +1,3 @@
+class BlocInterface {
+  void dispose() {}
+}
