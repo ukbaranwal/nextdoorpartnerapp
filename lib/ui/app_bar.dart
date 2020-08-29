@@ -6,6 +6,10 @@ import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
+  final bool hideShadow;
+
+  CustomAppBar({this.hideShadow = false});
+
   @override
   _CustomAppBarState createState() => _CustomAppBarState();
 
@@ -19,16 +23,22 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-                blurRadius: 5,
-                color: Colors.black.withOpacity(0.4),
-                offset: Offset(0, 2))
-          ],
+          boxShadow: widget.hideShadow
+              ? []
+              : [
+                  BoxShadow(
+                      blurRadius: 5,
+                      color: Colors.black.withOpacity(0.4),
+                      offset: Offset(0, 2))
+                ],
           color: Colors.white,
-          borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20))),
+          borderRadius: widget.hideShadow
+              ? BorderRadius.only(
+                  bottomLeft: Radius.circular(0),
+                  bottomRight: Radius.circular(0))
+              : BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20))),
       padding: const EdgeInsets.only(top: 10),
       child: Column(
         children: <Widget>[

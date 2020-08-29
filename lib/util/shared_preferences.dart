@@ -2,7 +2,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesManager {
   static SharedPreferences _sharedPreferences;
-  static String _authorisationKey;
   static String email = 'email';
   static String shopName = 'shopName';
   static String phone = 'phone';
@@ -33,12 +32,8 @@ class SharedPreferencesManager {
   static Future<SharedPreferences> getInstance() async {
     if (_sharedPreferences == null) {
       _sharedPreferences = await SharedPreferences.getInstance();
-      _authorisationKey =
-          _sharedPreferences.getString(authorisationToken) ?? '';
       return _sharedPreferences;
     }
     return _sharedPreferences;
   }
-
-  static String get authorisationKey => _authorisationKey;
 }

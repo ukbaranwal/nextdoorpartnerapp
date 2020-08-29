@@ -12,8 +12,7 @@ class UnverifiedLoggedIn extends StatelessWidget {
   void signOut(BuildContext context) async {
     SharedPreferences sharedPreferences =
         await SharedPreferencesManager.getInstance();
-    sharedPreferences.remove(SharedPreferencesManager.isLoggedIn);
-    sharedPreferences.remove(SharedPreferencesManager.isVerified);
+    sharedPreferences.clear();
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
       builder: (context) {
         return Login();

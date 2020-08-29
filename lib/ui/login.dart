@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nextdoorpartner/bloc/login_bloc.dart';
+import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/forgot_password.dart';
 import 'package:nextdoorpartner/ui/logged_in_unverified.dart';
@@ -44,11 +45,12 @@ class _LoginState extends State<Login> {
     print(androidDeviceInfo.id);
     loginBloc.doLogin(emailTextEditingController.text,
         passwordTextEditingController.text, androidDeviceInfo.id);
-    loginBloc.signUpStream.listen((data) {
+    loginBloc.loginStream.listen((data) {
       print(data.message);
       dismissProgressDialog();
       CustomToast.show(data.message, context);
       if (data.status == Status.SUCCESSFUL) {
+        data.data.storeInSharedPreferences();
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(

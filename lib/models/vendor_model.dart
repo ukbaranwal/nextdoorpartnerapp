@@ -22,6 +22,9 @@ class VendorModel {
   String _closingTime;
   int _deliveryBoy;
   String _authorisationToken;
+  int _noOfRatings;
+  double _rating;
+  List<int> _ratingStars;
 
   VendorModel.fromJson(Map<String, dynamic> parsedJson) {
     _authorisationToken = parsedJson['token'];

@@ -1,4 +1,5 @@
 class Strings {
+  static const String hostUrl = 'http://192.168.0.2:3003/';
   static const String supportLocalBusiness =
       'Support your nearby Local Businesses:';
   static const String orderDailyEssentials =
@@ -59,7 +60,7 @@ class Strings {
   static const String brand = 'Brand';
   static const String description = 'Description';
   static const String mrp = 'MRP';
-  static const String discount = 'Discount(%)';
+  static const String discount = 'Discount(0-100%)';
   static const String tags = 'Tags';
   static const String standardQuantityOfSelling =
       'Standard quantity of selling';
@@ -82,4 +83,8 @@ class Strings {
   static const String yesterday = 'Yesterday';
   static const String lastWeek = 'Last Week';
   static const String lastMonth = 'Last Month';
+  static const String chooseProductCategory = 'Choose a Product Category';
+  static const String longPressToSelectCategory =
+      'Long Press to Select a Category';
+  static const String proceed = 'Proceed';
 }

@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
             return Splashscreen();
           } else {
             return snapshot.data
-                ? (!isVerified ? Dashboard() : UnverifiedLoggedIn())
+                ? (isVerified ? Dashboard() : UnverifiedLoggedIn())
                 : WalkThrough();
           }
         },

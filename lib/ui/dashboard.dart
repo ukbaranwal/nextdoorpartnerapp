@@ -7,11 +7,19 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:nextdoorpartner/models/tabIcon_data.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/bottom_bar_view.dart';
+import 'package:nextdoorpartner/ui/login.dart';
+import 'package:nextdoorpartner/ui/new_order.dart';
+import 'package:nextdoorpartner/ui/notifications.dart';
+import 'package:nextdoorpartner/ui/pending_order.dart';
 import 'package:nextdoorpartner/ui/product_category.dart';
 import 'package:nextdoorpartner/ui/products.dart';
+import 'package:nextdoorpartner/ui/seller_support.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/database.dart';
+import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -34,6 +42,18 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       color: AppTheme.secondary_color);
 
   AnimationController animationController;
+
+  void signOut() async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    sharedPreferences.clear();
+    CustomToast.show('You have successfully logged out', context);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+      builder: (context) {
+        return Login();
+      },
+    ), (route) => false);
+  }
 
   @override
   void initState() {
@@ -249,24 +269,39 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         color: AppTheme.secondary_color),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    Strings.sellerSupport,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.secondary_color),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SellerSupport(),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      Strings.sellerSupport,
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.secondary_color),
+                    ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    Strings.signOut,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.secondary_color),
+                InkWell(
+                  onTap: () {
+                    signOut();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      Strings.signOut,
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.secondary_color),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -301,7 +336,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Products(),
+                  builder: (context) => Notifications(),
                 ),
               );
             },
@@ -433,9 +468,19 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  Strings.activeOrders,
-                                  style: textStyleStats,
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => NewOrder(),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    Strings.activeOrders,
+                                    style: textStyleStats,
+                                  ),
                                 ),
                                 Row(
                                   children: [
@@ -466,15 +511,21 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                             indent: 30,
                             endIndent: 30,
                           ),
-                          RecentOrderWidget(
-                            orderNo: 1973,
-                            orderValue: 1920,
-                            units: 10,
-                            discount: 200,
-                            date: '13/01/2020 13:20',
-                            isPaid: true,
-                            name: 'Utkarsh Baranwal',
-                            address: 'B14/172 Kalyani',
+                          InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => PendingOrder()));
+                            },
+                            child: RecentOrderWidget(
+                              orderNo: 1973,
+                              orderValue: 1920,
+                              units: 10,
+                              discount: 200,
+                              date: '13/01/2020 13:20',
+                              isPaid: true,
+                              name: 'Utkarsh Baranwal',
+                              address: 'B14/172 Kalyani',
+                            ),
                           ),
                           RecentOrderWidget(
                             orderNo: 1974,

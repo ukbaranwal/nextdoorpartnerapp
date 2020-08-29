@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:nextdoorpartner/ui/orders.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 import '../models/tabIcon_data.dart';
@@ -169,6 +170,8 @@ class _BottomBarViewState extends State<BottomBarView>
                           focusColor: Colors.transparent,
                           onTap: () {
                             widget.addClick();
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => Orders()));
                           },
                           child: Column(
                             children: [
