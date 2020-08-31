@@ -23,18 +23,6 @@ class ProductBloc implements BlocInterface {
   Stream<DbResponse<ProductCategoryModel>> get productCategoryStream =>
       _productCategoryFetcher.stream;
 
-  insertProduct(ProductModel productModel) async {
-    _productFetcher.sink.add(DbResponse.loading('Checking'));
-    _productFetcher = PublishSubject<DbResponse<ProductModel>>();
-    try {
-      await _repository.insertProduct(productModel);
-      _productFetcher.sink.add(DbResponse.successful('Done'));
-    } catch (e) {
-      print(e.toString());
-      _productFetcher.sink.add(DbResponse.error(e.toString()));
-    }
-  }
-
   addProduct(ProductModel productModel, List<File> files) async {
     _productApiFetcher = PublishSubject<ApiResponse<ProductModel>>();
     try {
@@ -61,30 +49,6 @@ class ProductBloc implements BlocInterface {
     }
   }
 
-  updateProduct(ProductModel productModel) async {
-    _productFetcher = PublishSubject<DbResponse<ProductModel>>();
-    try {
-      _productFetcher.sink.add(DbResponse.loading('Checking'));
-      await _repository.updateProduct(productModel);
-      _productFetcher.sink.add(DbResponse.successful('Done'));
-    } catch (e) {
-      print(e.toString());
-      _productFetcher.sink.add(DbResponse.error(e.toString()));
-    }
-  }
-
-  deleteProduct(int id) async {
-    _productFetcher = PublishSubject<DbResponse<ProductModel>>();
-    try {
-      _productFetcher.sink.add(DbResponse.loading('Checking'));
-      await _repository.deleteProduct(id);
-      _productFetcher.sink.add(DbResponse.successful('Done'));
-    } catch (e) {
-      print(e.toString());
-      _productFetcher.sink.add(DbResponse.error(e.toString()));
-    }
-  }
-
   getProductCategory(int id) async {
     _productCategoryFetcher =
         PublishSubject<DbResponse<ProductCategoryModel>>();
@@ -92,26 +56,12 @@ class ProductBloc implements BlocInterface {
       _productCategoryFetcher.sink.add(DbResponse.loading('Checking'));
       ProductCategoryModel productCategoryModel =
           await _repository.getProductCategory(id);
+      print(productCategoryModel.name.toString());
       _productCategoryFetcher.sink
           .add(DbResponse.successful('Done', data: productCategoryModel));
     } catch (e) {
       print(e.toString());
       _productCategoryFetcher.sink.add(DbResponse.error(e.toString()));
-    }
-  }
-
-  Future<bool> deleteProductImage(int productId, String imageUrl) async {
-    try {
-      Response response =
-          await _repository.deleteProductImage(productId, imageUrl);
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      print(e.toString());
-      return false;
     }
   }
 

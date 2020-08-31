@@ -24,20 +24,19 @@ class Repository {
   Future<Response> resetPassword(String email, String pin, String password) =>
       vendorApiProvider.resetPassword(email, pin, password);
 
-  Future<List<ProductModel>> getProducts() =>
-      vendorDatabaseProvider.getProducts();
+  Future<Response> syncProductCategories(int vendorType) =>
+      vendorApiProvider.syncProductCategories(vendorType);
 
-  Future<ProductModel> insertProduct(ProductModel productModel) =>
-      vendorDatabaseProvider.insertProduct(productModel);
+  Future<bool> insertProductCategories(
+          List<ProductCategoryModel> productCategoryModelList) =>
+      vendorDatabaseProvider.insertProductCategories(productCategoryModelList);
+
+  Future<Response> getProducts(int noOfProductsAlreadyFetched) =>
+      vendorApiProvider.getProducts(noOfProductsAlreadyFetched);
 
   Future<StreamedResponse> addProduct(
           ProductModel productModel, List<File> files) =>
       vendorApiProvider.addProduct(productModel, files);
-
-  Future<int> updateProduct(ProductModel productModel) =>
-      vendorDatabaseProvider.updateProduct(productModel);
-
-  Future<int> deleteProduct(int id) => vendorDatabaseProvider.deleteProduct(id);
 
   Future<ProductCategoryModel> getProductCategory(int id) =>
       vendorDatabaseProvider.getProductCategory(id);

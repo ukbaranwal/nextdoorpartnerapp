@@ -11,6 +11,7 @@ import 'package:nextdoorpartner/ui/get_started.dart';
 import 'package:nextdoorpartner/ui/logged_in_unverified.dart';
 import 'package:nextdoorpartner/ui/splash_screen.dart';
 import 'package:nextdoorpartner/ui/walkthrough.dart';
+import 'package:nextdoorpartner/util/background_sync.dart';
 import 'package:nextdoorpartner/util/database.dart';
 import 'package:nextdoorpartner/util/firebase_notification.dart';
 import 'package:nextdoorpartner/util/local_notification.dart';
@@ -19,7 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   ///manage for IOS
-  Crashlytics.instance.enableInDevMode = true;
+  Crashlytics.instance.enableInDevMode = false;
 
   // Pass all uncaught errors to Crashlytics.
   FlutterError.onError = Crashlytics.instance.recordFlutterError;

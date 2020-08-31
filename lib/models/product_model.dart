@@ -22,7 +22,6 @@ class ProductModel {
   List<SizeVariant> sizeVariants;
   List<ColorVariant> colorVariants;
   List<int> relatedProducts;
-  final String mapId = 'product_id';
   final String mapName = 'name';
   final String mapBrand = 'brand';
   final String mapDescription = 'description';
@@ -41,7 +40,8 @@ class ProductModel {
   final String mapColorVariants = 'color_variants';
   final String mapProductCategoryId = 'product_category_id';
   final String mapInSync = 'in_sync';
-  final String columnId = '_id';
+  final String mapId = 'id';
+  final String mapImageUrl = 'image_url';
 
   ProductModel(
       this.id,
@@ -65,23 +65,27 @@ class ProductModel {
       this.colorVariants,
       this.relatedProducts);
 
-  ProductModel.fromMap(Map<String, dynamic> parsedJson) {
+  ProductModel.fromJson(Map<String, dynamic> parsedJson) {
     productId = parsedJson[mapId];
     name = parsedJson[mapName];
     brand = parsedJson[mapBrand];
     productCategoryId = parsedJson[mapProductCategoryId];
     description = parsedJson[mapDescription];
-    standardQuantityOfSelling = parsedJson[mapStandardQuantitySelling];
-    mrp = parsedJson[mapMrp];
-    images = mapToImages(parsedJson[mapImages]);
+    standardQuantityOfSelling =
+        convertIntToDouble(parsedJson[mapStandardQuantitySelling]);
+    mrp = convertIntToDouble(parsedJson[mapMrp]);
+    images = List<Images>();
+    for (var i in parsedJson[mapImages]) {
+      images.add(Images(i[mapImageUrl]));
+    }
     discountPercentage = parsedJson[mapDiscountPercentage];
-    inStock = parsedJson[mapInStock] == 1 ? true : false;
+    inStock = parsedJson[mapInStock];
     tags = parsedJson[mapTags];
     views = parsedJson[mapViews];
     unitsSold = parsedJson[mapUnitsSold];
     noOfRatings = parsedJson[mapNoOfRatings];
-    templateUsed = parsedJson[mapTemplateUsed] == 1 ? true : false;
-    isPrimary = parsedJson[mapIsPrimary] == 1 ? true : false;
+    templateUsed = parsedJson[mapTemplateUsed];
+    isPrimary = parsedJson[mapIsPrimary];
     List<SizeVariant> tempSizeVariants = List<SizeVariant>();
 //    for (var i in parsedJson[mapSizeVariants]) {
 //      tempSizeVariants.add(SizeVariant.fromJson(i));
@@ -94,56 +98,8 @@ class ProductModel {
     colorVariants = tempColorVariants;
   }
 
-  parseImages(dynamic tempImages) {
-    List<Images> temp = List<Images>();
-    for (var image in tempImages) {
-      temp.add(Images.fromJson(image));
-    }
-    images = temp;
-  }
-
-  String imagesToMap() {
-    String temp = '';
-    for (Images image in images) {
-      temp = temp + image.imageUrl + '|';
-    }
-    return temp.substring(0, temp.length - 1);
-  }
-
-  List<Images> mapToImages(String imagesString) {
-    List<String> temp = imagesString.split('|');
-    List<Images> tempImages = List<Images>();
-    for (String i in temp) {
-      tempImages.add(Images(i));
-    }
-    return tempImages;
-  }
-
-  Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{
-      mapId: productId,
-      mapName: name,
-      mapBrand: brand,
-      mapDescription: description,
-      mapProductCategoryId: productCategoryId,
-      mapStandardQuantitySelling: standardQuantityOfSelling,
-      mapMrp: mrp,
-      mapImages: imagesToMap(),
-      mapDiscountPercentage: discountPercentage,
-      mapInStock: inStock ? 1 : 0,
-      mapTags: tags,
-      mapViews: views,
-      mapUnitsSold: unitsSold,
-      mapNoOfRatings: noOfRatings,
-      mapTemplateUsed: templateUsed ? 1 : 0,
-      mapIsPrimary: isPrimary ? 1 : 0,
-      mapSizeVariants: sizeVariants.toString(),
-      mapColorVariants: colorVariants.toString()
-    };
-    if (id != null) {
-      map[columnId] = id;
-    }
-    return map;
+  double convertIntToDouble(int value) {
+    return double.parse(value.toString());
   }
 }
 

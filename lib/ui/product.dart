@@ -176,7 +176,7 @@ class _ProductState extends State<Product> {
         productModel.productId = event.data['product_id'];
 
         ///Need to parse the data type after retrieval
-        productModel.parseImages(event.data['images']);
+//        productModel.parseImages(event.data['images']);
 
         insertInDb(productModel);
 //        Navigator.pop(context);
@@ -193,7 +193,7 @@ class _ProductState extends State<Product> {
   }
 
   void insertInDb(ProductModel productModel) {
-    productBloc.insertProduct(productModel);
+//    productBloc.insertProduct(productModel);
     productBloc.productStream.listen((event) {
       print(event.toString());
       if (event.status == DBStatus.SUCCESSFUL) {
@@ -316,6 +316,7 @@ class _ProductState extends State<Product> {
             stream: productBloc.productCategoryStream,
             builder: (context,
                 AsyncSnapshot<DbResponse<ProductCategoryModel>> snapshot) {
+              print(snapshot.toString());
               if (snapshot.connectionState != ConnectionState.waiting) {
                 productCategoryModel = snapshot.data.data;
                 print(snapshot.data.data);

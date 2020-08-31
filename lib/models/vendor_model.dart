@@ -34,6 +34,8 @@ class VendorModel {
     _vendorType = parsedJson['vendor_type'];
     _imageUrl = parsedJson['image_url'];
     _name = parsedJson['name'];
+    _email = parsedJson['email'];
+    _phone = parsedJson['phone'];
     _address = parsedJson['address'];
     _city = parsedJson['city'];
     _shopOpen = parsedJson['shop_open'];
@@ -45,12 +47,13 @@ class VendorModel {
     _openingTime = parsedJson['opening_time'];
     _closingTime = parsedJson['closing_time'];
     _deliveryBoy = parsedJson['delivery_boy'];
-    storeInSharedPreferences();
   }
 
   void storeInSharedPreferences() async {
     SharedPreferences sharedPreferences =
         await SharedPreferencesManager.getInstance();
+    print(_vendorType);
+    print(_email);
     sharedPreferences.setInt(SharedPreferencesManager.id, _id);
     sharedPreferences.setInt(SharedPreferencesManager.vendorType, _vendorType);
     sharedPreferences.setString(SharedPreferencesManager.imageUrl, _imageUrl);

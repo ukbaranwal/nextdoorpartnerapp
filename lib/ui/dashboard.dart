@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:nextdoorpartner/models/tabIcon_data.dart';
+import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/bottom_bar_view.dart';
 import 'package:nextdoorpartner/ui/login.dart';
@@ -15,6 +17,7 @@ import 'package:nextdoorpartner/ui/product_category.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/ui/seller_support.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/background_sync.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/database.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
@@ -58,6 +61,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    runIsolate();
     tabIconsList.forEach((TabIconData tab) {
       tab.isSelected = false;
     });
@@ -65,6 +69,14 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     animationController = AnimationController(
         duration: const Duration(milliseconds: 600), vsync: this);
     initDb('next_door.db');
+  }
+
+  void runIsolate() async {
+    VendorDatabaseProvider vendorDatabaseProvider = VendorDatabaseProvider();
+    print(await vendorDatabaseProvider.getProductCategoriesParentId(0));
+    BackgroundSync backgroundSync = BackgroundSync();
+    SendPort sendPort = await backgroundSync.initializeIsolate();
+    sendPort.send('This Works');
   }
 
   Widget bottomBar() {
@@ -75,7 +87,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         ),
         BottomBarView(
           tabIconsList: tabIconsList,
-          addClick: () {},
+          addClick: () {
+            print(5);
+          },
+          scaffoldKey: scaffoldKey,
           changeIndex: (int index) {
             if (index == 0 || index == 2) {
               animationController.reverse().then<dynamic>((data) {
@@ -451,10 +466,20 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       ),
                     ),
-                    RatingCardDashboard(
-                      boxDecoration: boxDecoration,
-                      totalRatings: 20,
-                      avgRating: 3.6,
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Products(),
+                          ),
+                        );
+                      },
+                      child: RatingCardDashboard(
+                        boxDecoration: boxDecoration,
+                        totalRatings: 20,
+                        avgRating: 3.6,
+                      ),
                     ),
                     Container(
                       decoration: boxDecoration,

@@ -29,7 +29,7 @@ class TabIconData {
         index: 1,
         isSelected: false,
         animationController: null,
-        text: Strings.products),
+        text: Strings.reviews),
     TabIconData(
         icon: Icons.credit_card,
         index: 2,

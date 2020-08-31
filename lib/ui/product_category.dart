@@ -230,11 +230,8 @@ class Label extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 10),
-          Divider(
-            thickness: 2,
-            height: 5,
-            color: AppTheme.background_grey,
+          SizedBox(
+            height: 10,
           )
         ],
       ),
@@ -267,7 +264,12 @@ class CategoryLabelList extends StatefulWidget {
 class _CategoryLabelListState extends State<CategoryLabelList> {
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return ListView.separated(
+      separatorBuilder: (BuildContext context, int index) => Divider(
+        thickness: 2,
+        height: 5,
+        color: AppTheme.background_grey,
+      ),
       shrinkWrap: true,
       itemCount: widget.productCategoryModelList.length,
       scrollDirection: Axis.vertical,

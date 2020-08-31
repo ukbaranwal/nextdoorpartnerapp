@@ -37,7 +37,7 @@ class ProductCategoryModel {
   );
 
   ProductCategoryModel.fromJson(Map<String, dynamic> parsedJson) {
-    productCategoryId = parsedJson[mapId];
+    productCategoryId = parsedJson['id'];
     name = parsedJson[mapName];
     parentId = parsedJson[mapParentId];
     tags = parsedJson[mapTags];

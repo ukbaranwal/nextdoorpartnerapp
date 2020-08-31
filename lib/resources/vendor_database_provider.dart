@@ -64,7 +64,6 @@ class VendorDatabaseProvider {
   final String mapReceivedAt = 'received_at';
 
   final String productCategoryTable = 'product_category';
-  final String productTable = 'product';
   final String orderTable = 'orders';
   final String notificationTable = 'notification';
 
@@ -87,29 +86,10 @@ class VendorDatabaseProvider {
           ' $mapName text not null,$mapParentId integer not null, $mapTags text not null, $mapQuantityByWeight integer not null, '
           '$mapQuantityByPiece integer not null, $mapImageUrl text, $mapHaveColorVariants integer not null, '
           '$mapHaveSizeVariants integer not null, $mapNoOfPhotos integer not null )');
-      await db.execute(
-          'create table $productTable ($columnId integer primary key autoincrement, $mapId integer not null, $mapImages text not null,'
-          ' $mapName text not null, $mapBrand text, $mapDescription text not null,$mapProductCategoryId integer not null, $mapStandardQuantitySelling real not null,'
-          ' $mapMrp real not null, $mapDiscountPercentage integer not null, $mapInStock integer not null, $mapTags text not null, '
-          '$mapViews integer not null, $mapUnitsSold integer not null, $mapNoOfRatings integer not null, $mapTemplateUsed integer not null, '
-          '$mapIsPrimary integer, $mapSizeVariants text, $mapColorVariants text )');
 
       await db.execute(
           'create table $notificationTable ($columnId integer primary key autoincrement, $mapTitle text not null, $mapBody text not null, $mapReceivedAt text not null)');
     });
-  }
-
-  void initiate() async {
-    if (db == null) {
-      await open();
-    }
-    await db.execute('drop table $productTable');
-    await db.execute(
-        'create table $productTable ($columnId integer primary key autoincrement, $mapId integer not null, $mapImages text not null,'
-        ' $mapName text not null, $mapBrand text, $mapDescription text not null,$mapProductCategoryId integer not null, $mapStandardQuantitySelling real not null,'
-        ' $mapMrp real not null, $mapDiscountPercentage integer not null, $mapInStock integer not null, $mapTags text not null, '
-        '$mapViews integer not null, $mapUnitsSold integer not null, $mapNoOfRatings integer not null, $mapTemplateUsed integer not null, '
-        '$mapIsPrimary integer, $mapSizeVariants text, $mapColorVariants text )');
   }
 
   initiateNotification() async {
@@ -152,6 +132,26 @@ class VendorDatabaseProvider {
     return productCategoryModel;
   }
 
+  Future<bool> insertProductCategories(
+      List<ProductCategoryModel> productCategoryModelList) async {
+    if (db == null) {
+      await open();
+    }
+    await db.rawQuery('DROP table if exists $productCategoryTable');
+    await db.execute(
+
+        ///TODO change mapId to mapProductCategoryId
+        'create table $productCategoryTable ($columnId integer primary key autoincrement, $mapId integer not null,'
+        ' $mapName text not null,$mapParentId integer not null, $mapTags text not null, $mapQuantityByWeight integer not null, '
+        '$mapQuantityByPiece integer not null, $mapImageUrl text, $mapHaveColorVariants integer not null, '
+        '$mapHaveSizeVariants integer not null, $mapNoOfPhotos integer not null )');
+    for (ProductCategoryModel productCategoryModel
+        in productCategoryModelList) {
+      await db.insert(productCategoryTable, productCategoryModel.toMap());
+    }
+    return true;
+  }
+
   Future<List<ProductCategoryModel>> getProductCategoriesParentId(
       int parentId) async {
     if (db == null) {
@@ -179,40 +179,6 @@ class VendorDatabaseProvider {
       productCategoryModelList.add(ProductCategoryModel.fromMap(map));
     }
     return productCategoryModelList;
-  }
-
-  Future<ProductModel> insertProduct(ProductModel productModel) async {
-    if (db == null) {
-      await open();
-    }
-    productModel.id = await db.insert(productTable, productModel.toMap());
-    return productModel;
-  }
-
-  Future<int> updateProduct(ProductModel productModel) async {
-    if (db == null) {
-      await open();
-    }
-    return await db.update(productTable, productModel.toMap(),
-        where: '$columnId = ?', whereArgs: [productModel.id]);
-  }
-
-  Future<int> deleteProduct(int id) async {
-    return await db
-        .delete(productTable, where: '$columnId = ?', whereArgs: [id]);
-  }
-
-  Future<List<ProductModel>> getProducts() async {
-    if (db == null) {
-      await open();
-    }
-    List<Map> maps = await db.query(productTable);
-    List<ProductModel> productModelList = List<ProductModel>();
-    for (var map in maps) {
-      productModelList.add(ProductModel.fromMap(map));
-    }
-    print(productModelList.toString());
-    return productModelList;
   }
 
   Future<int> truncateProductCategory() async {

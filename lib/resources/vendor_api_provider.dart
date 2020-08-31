@@ -94,6 +94,41 @@ class VendorApiProvider {
     return response;
   }
 
+  Future<Response> syncProductCategories(int vendorType) async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+    };
+    var response;
+    try {
+      response = await client.get(
+          '$_baseUrl/productCategory?vendor_type=$vendorType',
+          headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> getProducts(int noOfProductsAlreadyFetched) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken
+    };
+    var response;
+    try {
+      response = await client.get(
+          '$_baseUrl/products?offset=$noOfProductsAlreadyFetched',
+          headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
   Future<StreamedResponse> addProduct(
       ProductModel productModel, List<File> files) async {
     Map<String, String> data = {

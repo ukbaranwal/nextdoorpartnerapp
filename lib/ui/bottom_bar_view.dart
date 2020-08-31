@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:nextdoorpartner/ui/orders.dart';
+import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 import '../models/tabIcon_data.dart';
@@ -75,6 +76,12 @@ class _BottomBarViewState extends State<BottomBarView>
                           children: <Widget>[
                             Expanded(
                               child: TabIcons(
+                                  callback: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                Products()));
+                                  },
                                   tabIconData: widget.tabIconsList[0],
                                   removeAllSelect: () {
                                     setRemoveAllSelection(
@@ -84,6 +91,12 @@ class _BottomBarViewState extends State<BottomBarView>
                             ),
                             Expanded(
                               child: TabIcons(
+                                  callback: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                Products()));
+                                  },
                                   tabIconData: widget.tabIconsList[1],
                                   removeAllSelect: () {
                                     setRemoveAllSelection(
@@ -101,6 +114,12 @@ class _BottomBarViewState extends State<BottomBarView>
                             ),
                             Expanded(
                               child: TabIcons(
+                                  callback: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                Products()));
+                                  },
                                   tabIconData: widget.tabIconsList[2],
                                   removeAllSelect: () {
                                     setRemoveAllSelection(
@@ -110,11 +129,15 @@ class _BottomBarViewState extends State<BottomBarView>
                             ),
                             Expanded(
                               child: TabIcons(
+                                  callback: () {
+                                    widget.scaffoldKey.currentState
+                                        .openEndDrawer();
+                                  },
                                   tabIconData: widget.tabIconsList[3],
                                   removeAllSelect: () {
-                                    setRemoveAllSelection(
-                                        widget.tabIconsList[3]);
-                                    widget.changeIndex(3);
+//                                    setRemoveAllSelection(
+//                                        widget.tabIconsList[3]);
+//                                    widget.changeIndex(3);
                                   }),
                             ),
                           ],
@@ -223,11 +246,13 @@ class _BottomBarViewState extends State<BottomBarView>
 }
 
 class TabIcons extends StatefulWidget {
-  const TabIcons({Key key, this.tabIconData, this.removeAllSelect})
+  const TabIcons(
+      {Key key, this.tabIconData, this.removeAllSelect, this.callback})
       : super(key: key);
 
   final TabIconData tabIconData;
   final Function removeAllSelect;
+  final Function callback;
   @override
   _TabIconsState createState() => _TabIconsState();
 }
@@ -265,6 +290,7 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
           onTap: () {
             if (!widget.tabIconData.isSelected) {
               setAnimation();
+              widget.callback();
             }
           },
           child: IgnorePointer(
