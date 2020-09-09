@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:fswitch/fswitch.dart';
+import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 
@@ -42,29 +43,17 @@ class _CustomAppBarState extends State<CustomAppBar> {
       padding: const EdgeInsets.only(top: 10),
       child: Column(
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  'RS STORES',
-                  style: TextStyle(
-                      color: AppTheme.secondary_color,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800),
-                ),
-              ),
-              Icon(
-                Icons.keyboard_arrow_down,
+          Text(
+            vendorModelGlobal.shopName,
+            style: TextStyle(
                 color: AppTheme.secondary_color,
-                size: 20,
-              )
-            ],
+                fontSize: 22,
+                fontWeight: FontWeight.w800),
           ),
-          Text(Strings.online,
+          Text(vendorModelGlobal.shopOpen ? Strings.online : 'Offline',
               style: TextStyle(
-                  color: AppTheme.green,
+                  color:
+                      vendorModelGlobal.shopOpen ? AppTheme.green : Colors.red,
                   fontSize: 18,
                   fontWeight: FontWeight.w800)),
         ],

@@ -19,9 +19,10 @@ class Products extends StatefulWidget {
 
 class _ProductsState extends State<Products> {
   ProductsBloc productsBloc;
-  List<bool> isSwitchedOn = List<bool>();
   ScrollController scrollController;
   bool isEnd = false;
+  String searchQuery = '';
+  TextEditingController searchTextEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -120,8 +121,14 @@ class _ProductsState extends State<Products> {
                       Container(
                         width: MediaQuery.of(context).size.width * 0.7,
                         child: TextFormField(
+                          controller: searchTextEditingController,
                           cursorColor: AppTheme.secondary_color,
                           onFieldSubmitted: (value) => {},
+                          onChanged: (value) {
+                            searchQuery = value;
+                            productsBloc.getProducts(searchQuery);
+                            isEnd = false;
+                          },
                           style: TextStyle(
                               fontWeight: FontWeight.w700,
                               color: AppTheme.secondary_color,
@@ -144,9 +151,19 @@ class _ProductsState extends State<Products> {
                         ),
                       ),
                       Expanded(
-                        child: Icon(
-                          Icons.highlight_off,
-                          color: AppTheme.grey,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.highlight_off,
+                            color: AppTheme.grey,
+                          ),
+                          onPressed: () {
+                            if (searchTextEditingController.text.trim() == '') {
+                              return;
+                            }
+                            searchTextEditingController.clear();
+                            productsBloc.getProducts('');
+                            isEnd = false;
+                          },
                         ),
                       )
                     ],
@@ -166,11 +183,9 @@ class _ProductsState extends State<Products> {
                         child: CircularProgressIndicator(),
                       ));
                     } else {
-                      if (snapshot.data.message == 'end') {
+                      if (snapshot.data.message == 'end' ||
+                          snapshot.data.data.length < 6) {
                         isEnd = true;
-                      }
-                      for (var i in snapshot.data.data) {
-                        isSwitchedOn.add(i.inStock);
                       }
                       return ListView.builder(
                         physics: BouncingScrollPhysics(),
@@ -196,19 +211,7 @@ class _ProductsState extends State<Products> {
                                     )
                               : ProductWidget(
                                   productModel: snapshot.data.data[index],
-                                  index: index + 1,
-                                  inStockSwitch: FSwitch(
-                                    width: 40,
-                                    height: 20,
-                                    openColor: AppTheme.green,
-                                    open: isSwitchedOn[index],
-                                    onChanged: (value) {
-                                      setState(() {
-                                        isSwitchedOn[index] = value;
-                                      });
-                                    },
-                                  ),
-                                );
+                                  index: index + 1);
                         },
                       );
                     }
@@ -226,14 +229,14 @@ class _ProductsState extends State<Products> {
   void initState() {
     super.initState();
     productsBloc = ProductsBloc();
-    productsBloc.getProducts();
+    productsBloc.getProducts(searchQuery);
     scrollController = ScrollController();
     scrollController.addListener(() {
       if (scrollController.offset >=
               scrollController.position.maxScrollExtent &&
           !scrollController.position.outOfRange) {
         if (!isEnd) {
-          productsBloc.getProducts();
+          productsBloc.getProducts(searchQuery);
         }
       }
     });
@@ -247,46 +250,42 @@ class _ProductsState extends State<Products> {
   }
 }
 
-class ProductWidget extends StatefulWidget {
-  final Widget inStockSwitch;
+class ProductWidget extends StatelessWidget {
   final ProductModel productModel;
   final int index;
 
-  ProductWidget({this.inStockSwitch, this.productModel, this.index});
-  @override
-  _ProductWidgetState createState() => _ProductWidgetState();
-}
-
-class _ProductWidgetState extends State<ProductWidget> {
+  ProductWidget({this.productModel, this.index});
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(5))),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          InkWell(
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Product(
-                        isNewProduct: false,
-                        productModel: widget.productModel,
-                        productCategoryId:
-                            widget.productModel.productCategoryId,
-                      )));
-            },
-            child: Row(
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => Product(
+                  isNewProduct: false,
+                  productModel: productModel,
+                  productCategoryId: productModel.productCategoryId,
+                )));
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(5))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image.network(
-                  Strings.hostUrl + widget.productModel.images[0].imageUrl,
+                ClipRRect(
+                  child: Image.network(
+                    Strings.hostUrl + productModel.images[0].imageUrl,
 //                  imageUrl,
-                  height: 80,
-                  width: 80,
+                    height: 80,
+                    width: 80,
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
                 ),
                 SizedBox(
                   width: 5,
@@ -295,7 +294,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.productModel.name,
+                      productModel.name,
 //                      name,
                       style: TextStyle(
                           color: AppTheme.secondary_color,
@@ -303,7 +302,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                           fontSize: 14),
                     ),
                     Text(
-                      widget.productModel.brand,
+                      productModel.brand,
 //                      brand,
                       style: TextStyle(
                           color: AppTheme.grey,
@@ -311,14 +310,14 @@ class _ProductWidgetState extends State<ProductWidget> {
                           fontSize: 14),
                     ),
                     Text(
-                      'MRP: Rs. ${widget.productModel.mrp}',
+                      'MRP: Rs. ${productModel.mrp}',
                       style: TextStyle(
                           color: AppTheme.secondary_color,
                           fontWeight: FontWeight.w700,
                           fontSize: 14),
                     ),
                     Text(
-                      'Selling: Rs. ${(widget.productModel.mrp - (widget.productModel.mrp * widget.productModel.discountPercentage / 100)).toStringAsFixed(1)}',
+                      'Selling: Rs. ${(productModel.mrp - (productModel.mrp * productModel.discountPercentage / 100)).toStringAsFixed(1)}',
                       style: TextStyle(
                           color: AppTheme.secondary_color,
                           fontWeight: FontWeight.w700,
@@ -328,136 +327,129 @@ class _ProductWidgetState extends State<ProductWidget> {
                 )
               ],
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                    margin: EdgeInsets.symmetric(horizontal: 2),
-                    decoration: BoxDecoration(
-                        color: AppTheme.background_grey,
-                        borderRadius: BorderRadius.all(Radius.circular(5))),
-                    child: Row(
-                      children: [
-                        Text(
-                          '4',
-                          style: TextStyle(
-                              color: AppTheme.secondary_color,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12),
-                        ),
-                        Icon(
-                          Icons.photo,
-                          size: 12,
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                    margin: EdgeInsets.symmetric(horizontal: 2),
-                    decoration: BoxDecoration(
-                        color: AppTheme.background_grey,
-                        borderRadius: BorderRadius.all(Radius.circular(5))),
-                    child: Row(
-                      children: [
-                        Text(
-                          '180',
-                          style: TextStyle(
-                              color: AppTheme.secondary_color,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12),
-                        ),
-                        Icon(
-                          Icons.shopping_cart,
-                          size: 12,
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                    margin: EdgeInsets.symmetric(horizontal: 2),
-                    decoration: BoxDecoration(
-                        color: AppTheme.background_grey,
-                        borderRadius: BorderRadius.all(Radius.circular(5))),
-                    child: Row(
-                      children: [
-                        Text(
-                          '400',
-                          style: TextStyle(
-                              color: AppTheme.secondary_color,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12),
-                        ),
-                        Icon(
-                          Icons.remove_red_eye,
-                          size: 12,
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                children: [
-                  RatingBarIndicator(
-                    rating: 5,
-                    itemSize: 14,
-                    direction: Axis.horizontal,
-                    itemCount: 5,
-                    itemBuilder: (context, _) => Icon(
-                      Icons.star,
-                      color: Colors.amber,
-                    ),
-                  ),
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5))),
-                    child: Container(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Row(
+                  children: [
+                    Container(
                       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                      child: Text(
-                        '${widget.productModel.discountPercentage}% off',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12),
-                      ),
+                      margin: EdgeInsets.symmetric(horizontal: 2),
                       decoration: BoxDecoration(
-                          color: AppTheme.green,
+                          color: AppTheme.background_grey,
                           borderRadius: BorderRadius.all(Radius.circular(5))),
+                      child: Row(
+                        children: [
+                          Text(
+                            productModel.images.length.toString(),
+                            style: TextStyle(
+                                color: AppTheme.secondary_color,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12),
+                          ),
+                          Icon(
+                            Icons.photo,
+                            size: 12,
+                          )
+                        ],
+                      ),
                     ),
-                  )
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                children: [
-                  Text(
-                    Strings.inStock,
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.green,
-                        fontWeight: FontWeight.w700),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  widget.inStockSwitch
-                ],
-              ),
-            ],
-          )
-        ],
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      margin: EdgeInsets.symmetric(horizontal: 2),
+                      decoration: BoxDecoration(
+                          color: AppTheme.background_grey,
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                      child: Row(
+                        children: [
+                          Text(
+                            productModel.unitsSold.toString(),
+                            style: TextStyle(
+                                color: AppTheme.secondary_color,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12),
+                          ),
+                          Icon(
+                            Icons.shopping_cart,
+                            size: 12,
+                          )
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      margin: EdgeInsets.symmetric(horizontal: 2),
+                      decoration: BoxDecoration(
+                          color: AppTheme.background_grey,
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                      child: Row(
+                        children: [
+                          Text(
+                            productModel.views.toString(),
+                            style: TextStyle(
+                                color: AppTheme.secondary_color,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12),
+                          ),
+                          Icon(
+                            Icons.remove_red_eye,
+                            size: 12,
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Row(
+                  children: [
+                    RatingBarIndicator(
+                      rating: 5,
+                      itemSize: 14,
+                      direction: Axis.horizontal,
+                      itemCount: 5,
+                      itemBuilder: (context, _) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                    ),
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        child: Text(
+                          '${productModel.discountPercentage}% off',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12),
+                        ),
+                        decoration: BoxDecoration(
+                            color: AppTheme.green,
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Text(
+                  productModel.inStock ? Strings.inStock : 'Out of Stock',
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: productModel.inStock ? AppTheme.green : Colors.red,
+                      fontWeight: FontWeight.w700),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

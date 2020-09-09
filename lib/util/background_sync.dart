@@ -18,7 +18,6 @@ class BackgroundSync {
     Completer completer = Completer<SendPort>();
     ReceivePort receivePort = ReceivePort();
     sharedPreferences = await SharedPreferencesManager.getInstance();
-    sharedPreferences == null ? print(1) : print(2);
     await Isolate.spawn(syncData, receivePort.sendPort);
     receivePort.listen((message) {
       if (message is SendPort) {

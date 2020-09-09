@@ -5,7 +5,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:nextdoorpartner/bloc/dashboard_bloc.dart';
+import 'package:nextdoorpartner/models/dashboard_model.dart';
 import 'package:nextdoorpartner/models/tabIcon_data.dart';
+import 'package:nextdoorpartner/models/vendor_model.dart';
+import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/bottom_bar_view.dart';
@@ -36,6 +40,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     color: AppTheme.background_grey,
   );
 
+  DashboardBloc dashboardBloc;
+
   BoxDecoration boxDecoration = BoxDecoration(
       color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5)));
 
@@ -47,36 +53,111 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   AnimationController animationController;
 
   void signOut() async {
-    SharedPreferences sharedPreferences =
-        await SharedPreferencesManager.getInstance();
-    sharedPreferences.clear();
-    CustomToast.show('You have successfully logged out', context);
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-      builder: (context) {
-        return Login();
-      },
-    ), (route) => false);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Confirmation Dialog',
+                style: TextStyle(
+                    color: AppTheme.secondary_color,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18)),
+            content: Text(
+              'Are you sure you want to Sign Out',
+              style: TextStyle(
+                  color: AppTheme.secondary_color,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16),
+            ),
+            actions: [
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel'),
+              ),
+              FlatButton(
+                onPressed: () async {
+                  SharedPreferences sharedPreferences =
+                      await SharedPreferencesManager.getInstance();
+                  sharedPreferences.clear();
+                  CustomToast.show('You have successfully logged out', context);
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                    builder: (context) {
+                      return Login();
+                    },
+                  ), (route) => false);
+                },
+                child: Text('Yes'),
+              )
+            ],
+          );
+        });
+  }
+
+  void changeShopStatus() async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Confirmation Dialog',
+                style: TextStyle(
+                    color: AppTheme.secondary_color,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18)),
+            content: Text(
+              'Are you sure you want to go ${vendorModelGlobal.shopOpen ? 'Offline' : 'Online'}',
+              style: TextStyle(
+                  color: AppTheme.secondary_color,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16),
+            ),
+            actions: [
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel'),
+              ),
+              FlatButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  if (await dashboardBloc.changeShopStatus()) {
+                    setState(() {
+                      vendorModelGlobal.shopOpen = !vendorModelGlobal.shopOpen;
+                    });
+                  }
+                },
+                child: Text('Yes'),
+              )
+            ],
+          );
+        });
   }
 
   @override
   void initState() {
     super.initState();
     runIsolate();
+    dashboardBloc = DashboardBloc();
+    dashboardBloc.getDashboard();
     tabIconsList.forEach((TabIconData tab) {
       tab.isSelected = false;
     });
     tabIconsList[0].isSelected = true;
     animationController = AnimationController(
         duration: const Duration(milliseconds: 600), vsync: this);
+    dashboardBloc.dashboardStream.listen((event) {
+      if (event.showToast) {
+        CustomToast.show(event.message, context);
+      }
+    });
     initDb('next_door.db');
   }
 
   void runIsolate() async {
-    VendorDatabaseProvider vendorDatabaseProvider = VendorDatabaseProvider();
-    print(await vendorDatabaseProvider.getProductCategoriesParentId(0));
     BackgroundSync backgroundSync = BackgroundSync();
-    SendPort sendPort = await backgroundSync.initializeIsolate();
-    sendPort.send('This Works');
+    await backgroundSync.initializeIsolate();
   }
 
   Widget bottomBar() {
@@ -127,8 +208,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        'assets/images/a.jpg',
+                      child: Image.network(
+                        Strings.hostUrl + vendorModelGlobal.imageUrl,
                         height: 100,
                         width: 100,
                       ),
@@ -141,23 +222,23 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'RS Stores',
+                            vendorModelGlobal.shopName,
                             style: TextStyle(
                                 color: AppTheme.secondary_color,
                                 fontWeight: FontWeight.w800,
                                 fontSize: 18),
                           ),
-                          Text('B14/172 Kalyani',
+                          Text(vendorModelGlobal.address,
                               style: TextStyle(
                                   color: AppTheme.secondary_color,
                                   fontWeight: FontWeight.w800,
                                   fontSize: 18)),
-                          Text('ukbaranwal@gmail.com',
+                          Text(vendorModelGlobal.email,
                               style: TextStyle(
                                   color: AppTheme.secondary_color,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16)),
-                          Text('+91 7355972739',
+                          Text(vendorModelGlobal.phone,
                               style: TextStyle(
                                   color: AppTheme.secondary_color,
                                   fontWeight: FontWeight.w600,
@@ -170,42 +251,41 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 SizedBox(
                   height: 5,
                 ),
-                RatingBarIndicator(
-                  rating: 5,
-                  itemSize: 22,
-                  direction: Axis.horizontal,
-                  itemCount: 5,
-                  itemBuilder: (context, _) => Icon(
-                    Icons.star,
-                    color: Colors.amber,
+                InkWell(
+                  onTap: () {
+                    changeShopStatus();
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                          margin: EdgeInsets.only(top: 5),
+                          padding: EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                              color: vendorModelGlobal.shopOpen
+                                  ? AppTheme.green
+                                  : Colors.red,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(25))),
+                          child: Icon(
+                            Icons.power_settings_new,
+                            color: Colors.white,
+                            size: 28,
+                          )),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        vendorModelGlobal.shopOpen ? Strings.online : 'Offline',
+                        style: TextStyle(
+                            color: vendorModelGlobal.shopOpen
+                                ? AppTheme.green
+                                : Colors.red,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18),
+                      )
+                    ],
                   ),
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                        margin: EdgeInsets.only(top: 5),
-                        padding: EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                            color: AppTheme.green,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(25))),
-                        child: Icon(
-                          Icons.power_settings_new,
-                          color: Colors.white,
-                          size: 28,
-                        )),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      Strings.online,
-                      style: TextStyle(
-                          color: AppTheme.green,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18),
-                    )
-                  ],
                 ),
                 SizedBox(
                   height: 5,
@@ -369,279 +449,248 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         backgroundColor: AppTheme.background_grey,
         appBar: CustomAppBar(),
         body: Stack(
-          children: <Widget>[
-            SingleChildScrollView(
-              child: Container(
-                color: AppTheme.background_grey,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                            items: [
-                              DropdownMenuItem(
-                                child: DropDownTextWidget(Strings.lifeTime),
-                              ),
-                              DropdownMenuItem(
-                                child: DropDownTextWidget(Strings.today),
-                              ),
-                              DropdownMenuItem(
-                                child: DropDownTextWidget(Strings.yesterday),
-                              ),
-                              DropdownMenuItem(
-                                child: DropDownTextWidget(Strings.lastWeek),
-                              ),
-                              DropdownMenuItem(
-                                child: DropDownTextWidget(Strings.lastMonth),
-                              )
-                            ],
-                            icon: Icon(Icons.keyboard_arrow_down),
-                            onChanged: (value) {},
-                          ),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        )
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              scaffoldKey.currentState.openEndDrawer();
-                            },
-                            child: Container(
-                              width:
-                                  MediaQuery.of(context).size.width * 0.50 - 15,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    Strings.orders,
-                                    style: textStyleStats,
-                                  ),
-                                  Text('99999', style: textStyleStats)
-                                ],
-                              ),
-                              decoration: boxDecoration,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProductCategory(),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              width:
-                                  MediaQuery.of(context).size.width * 0.50 - 15,
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    Strings.revenue,
-                                    style: textStyleStats,
-                                  ),
-                                  Text('Rs. 99999', style: textStyleStats)
-                                ],
-                              ),
-                              decoration: boxDecoration,
-                            ),
-                          )
-                        ],
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Products(),
-                          ),
-                        );
-                      },
-                      child: RatingCardDashboard(
-                        boxDecoration: boxDecoration,
-                        totalRatings: 20,
-                        avgRating: 3.6,
-                      ),
-                    ),
-                    Container(
-                      decoration: boxDecoration,
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            StreamBuilder<ApiResponse<DashboardModel>>(
+                stream: dashboardBloc.dashboardStream,
+                builder: (context,
+                    AsyncSnapshot<ApiResponse<DashboardModel>> snapshot) {
+                  if (snapshot.connectionState != ConnectionState.waiting) {
+                    return SingleChildScrollView(
+                      child: Container(
+                        color: AppTheme.background_grey,
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => NewOrder(),
+                                DropdownButtonHideUnderline(
+                                  child: DropdownButton(
+                                    items: [
+                                      DropdownMenuItem(
+                                        child: DropDownTextWidget(
+                                            Strings.lifeTime),
                                       ),
-                                    );
-                                  },
-                                  child: Text(
-                                    Strings.activeOrders,
-                                    style: textStyleStats,
+                                      DropdownMenuItem(
+                                        child:
+                                            DropDownTextWidget(Strings.today),
+                                      ),
+                                      DropdownMenuItem(
+                                        child: DropDownTextWidget(
+                                            Strings.yesterday),
+                                      ),
+                                      DropdownMenuItem(
+                                        child: DropDownTextWidget(
+                                            Strings.lastWeek),
+                                      ),
+                                      DropdownMenuItem(
+                                        child: DropDownTextWidget(
+                                            Strings.lastMonth),
+                                      )
+                                    ],
+                                    icon: Icon(Icons.keyboard_arrow_down),
+                                    onChanged: (value) {},
                                   ),
                                 ),
-                                Row(
-                                  children: [
-                                    ActiveOrderOptionWidget(
-                                      text: 'All',
-                                      isSelected: true,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5),
-                                      child: ActiveOrderOptionWidget(
-                                        text: 'Pending',
-                                        isSelected: false,
-                                      ),
-                                    ),
-                                    ActiveOrderOptionWidget(
-                                      text: 'Accepted',
-                                      isSelected: false,
-                                    )
-                                  ],
-                                ),
+                                SizedBox(
+                                  width: 5,
+                                )
                               ],
                             ),
-                          ),
-                          Divider(
-                            color: AppTheme.background_grey,
-                            thickness: 2,
-                            indent: 30,
-                            endIndent: 30,
-                          ),
-                          InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => PendingOrder()));
-                            },
-                            child: RecentOrderWidget(
-                              orderNo: 1973,
-                              orderValue: 1920,
-                              units: 10,
-                              discount: 200,
-                              date: '13/01/2020 13:20',
-                              isPaid: true,
-                              name: 'Utkarsh Baranwal',
-                              address: 'B14/172 Kalyani',
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      scaffoldKey.currentState.openEndDrawer();
+                                    },
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width *
+                                              0.50 -
+                                          15,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            Strings.orders,
+                                            style: textStyleStats,
+                                          ),
+                                          Text(
+                                              snapshot.data.data.noOfOrders
+                                                  .toString(),
+                                              style: textStyleStats)
+                                        ],
+                                      ),
+                                      decoration: boxDecoration,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProductCategory(),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width *
+                                              0.50 -
+                                          15,
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            Strings.revenue,
+                                            style: textStyleStats,
+                                          ),
+                                          Text(
+                                              'Rs. ${snapshot.data.data.revenue}',
+                                              style: textStyleStats)
+                                        ],
+                                      ),
+                                      decoration: boxDecoration,
+                                    ),
+                                  )
+                                ],
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                              ),
                             ),
-                          ),
-                          RecentOrderWidget(
-                            orderNo: 1974,
-                            orderValue: 1920,
-                            units: 10,
-                            discount: 200,
-                            date: '13/01/2020 13:20',
-                            isPaid: false,
-                            name: 'Utkarsh Baranwal',
-                            address: 'B14/172 Kalyani',
-                          ),
-                          RecentOrderWidget(
-                            orderNo: 1973,
-                            orderValue: 1920,
-                            units: 10,
-                            discount: 200,
-                            date: '13/01/2020 13:20',
-                            isPaid: true,
-                            name: 'Utkarsh Baranwal',
-                            address: 'B14/172 Kalyani',
-                          ),
-                          RecentOrderWidget(
-                            orderNo: 1973,
-                            orderValue: 1920,
-                            units: 10,
-                            discount: 200,
-                            date: '13/01/2020 13:20',
-                            isPaid: true,
-                            name: 'Utkarsh Baranwal',
-                            address: 'B14/172 Kalyani',
-                          ),
-                          RecentOrderWidget(
-                            orderNo: 1973,
-                            orderValue: 1920,
-                            units: 10,
-                            discount: 200,
-                            date: '13/01/2020 13:20',
-                            isPaid: true,
-                            name: 'Utkarsh Baranwal',
-                            address: 'B14/172 Kalyani',
-                          ),
-                          RecentOrderWidget(
-                            orderNo: 1973,
-                            orderValue: 1920,
-                            units: 10,
-                            discount: 200,
-                            date: '13/01/2020 13:20',
-                            isPaid: true,
-                            name: 'Utkarsh Baranwal',
-                            address: 'B14/172 Kalyani',
-                          ),
-                          RecentOrderWidget(
-                            orderNo: 1973,
-                            orderValue: 1920,
-                            units: 10,
-                            discount: 200,
-                            date: '13/01/2020 13:20',
-                            isPaid: true,
-                            name: 'Utkarsh Baranwal',
-                            address: 'B14/172 Kalyani',
-                          ),
-                          RecentOrderWidget(
-                            orderNo: 1973,
-                            orderValue: 1920,
-                            units: 10,
-                            discount: 200,
-                            date: '13/01/2020 13:20',
-                            isPaid: true,
-                            name: 'Utkarsh Baranwal',
-                            address: 'B14/172 Kajhgfdghjfdxcggfghjhgjhjghlyani',
-                          ),
-                          RecentOrderWidget(
-                            orderNo: 1973,
-                            orderValue: 1920,
-                            units: 10,
-                            discount: 200,
-                            date: '13/01/2020 13:20',
-                            isPaid: true,
-                            name: 'Utkarsh Baranwal',
-                            address: 'B14/172 Kalyani',
-                          ),
-                        ],
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Products(),
+                                  ),
+                                );
+                              },
+                              child: RatingCardDashboard(
+                                boxDecoration: boxDecoration,
+                                totalRatings: snapshot.data.data.noOfRatings,
+                                avgRating: snapshot.data.data.rating,
+                                ratingStars: snapshot.data.data.ratingStars,
+                              ),
+                            ),
+                            Container(
+                              decoration: boxDecoration,
+                              padding: EdgeInsets.only(top: 10),
+                              margin: EdgeInsets.symmetric(horizontal: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    NewOrder(),
+                                              ),
+                                            );
+                                          },
+                                          child: Text(
+                                            Strings.activeOrders,
+                                            style: textStyleStats,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            ActiveOrderOptionWidget(
+                                              text: 'All',
+                                              isSelected: true,
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5),
+                                              child: ActiveOrderOptionWidget(
+                                                text: 'Pending',
+                                                isSelected: false,
+                                              ),
+                                            ),
+                                            ActiveOrderOptionWidget(
+                                              text: 'Accepted',
+                                              isSelected: false,
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Divider(
+                                    color: AppTheme.background_grey,
+                                    thickness: 2,
+                                    indent: 30,
+                                    endIndent: 30,
+                                  ),
+                                  ListView.builder(
+                                    physics: BouncingScrollPhysics(),
+                                    shrinkWrap: true,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 5, horizontal: 2),
+                                    itemCount: snapshot
+                                        .data.data.orderModelList.length,
+                                    scrollDirection: Axis.vertical,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      ///Return Single Widget
+                                      return RecentOrderWidget(
+                                        orderNo: snapshot.data.data
+                                            .orderModelList[index].orderId,
+                                        orderValue: snapshot.data.data
+                                            .orderModelList[index].amount,
+                                        units: snapshot.data.data
+                                            .orderModelList[index].units,
+                                        discount: snapshot
+                                            .data
+                                            .data
+                                            .orderModelList[index]
+                                            .discountApplied,
+                                        date: snapshot.data.data
+                                            .orderModelList[index].createdAt,
+                                        isPaid: snapshot.data.data
+                                            .orderModelList[index].paid,
+                                        name: 'Utkarsh',
+                                        address: 'B14/172 Kalyani',
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 95,
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 95,
-                    )
-                  ],
-                ),
-              ),
-            ),
+                    );
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                }),
             bottomBar(),
           ],
         ),
@@ -697,8 +746,13 @@ class RatingCardDashboard extends StatelessWidget {
   final BoxDecoration boxDecoration;
   final double avgRating;
   final int totalRatings;
+  final List<int> ratingStars;
 
-  RatingCardDashboard({this.boxDecoration, this.avgRating, this.totalRatings});
+  RatingCardDashboard(
+      {this.boxDecoration,
+      this.avgRating,
+      this.totalRatings,
+      this.ratingStars});
 
   @override
   Widget build(BuildContext context) {
@@ -732,32 +786,32 @@ class RatingCardDashboard extends StatelessWidget {
               RatingBar(
                 rating: '5',
                 color: AppTheme.rating_5,
-                noOfRating: 11,
-                totalRatings: 20,
+                noOfRating: ratingStars[4],
+                totalRatings: totalRatings,
               ),
               RatingBar(
                 rating: '4',
                 color: AppTheme.rating_4,
-                noOfRating: 3,
-                totalRatings: 20,
+                noOfRating: ratingStars[3],
+                totalRatings: totalRatings,
               ),
               RatingBar(
                 rating: '3',
                 color: AppTheme.rating_3,
-                noOfRating: 2,
-                totalRatings: 20,
+                noOfRating: ratingStars[2],
+                totalRatings: totalRatings,
               ),
               RatingBar(
                 rating: '2',
                 color: AppTheme.rating_2,
-                noOfRating: 1,
-                totalRatings: 20,
+                noOfRating: ratingStars[1],
+                totalRatings: totalRatings,
               ),
               RatingBar(
                 rating: '1',
                 color: AppTheme.rating_1,
-                noOfRating: 7,
-                totalRatings: 20,
+                noOfRating: ratingStars[0],
+                totalRatings: totalRatings,
               ),
             ],
           ),

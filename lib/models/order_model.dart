@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:nextdoorpartner/util/date_converter.dart';
+
 class OrderModel {
   int id;
   int orderId;
@@ -21,11 +23,11 @@ class OrderModel {
   String review;
   double rating;
   String address;
-  DateTime packedAt;
-  DateTime shippedAt;
-  DateTime createdAt;
-  DateTime deliveredAt;
-  DateTime expectedDeliveryAt;
+  String packedAt;
+  String shippedAt;
+  String createdAt;
+  String deliveredAt;
+  String expectedDeliveryAt;
   List<OrderProductModel> products;
 
   final String mapId = 'id';
@@ -59,33 +61,40 @@ class OrderModel {
   OrderModel.fromJson(Map<String, dynamic> parsedJson) {
     orderId = parsedJson[mapId];
     paid = parsedJson[mapPaid];
-    amount = parsedJson[mapAmount];
-    amountPaidByWallet = parsedJson[mapAmountPaidByWallet];
-    amountDue = parsedJson[mapAmountDue];
-    discountApplied = parsedJson[mapDiscountApplied];
+    amount = convertIntToDouble(parsedJson[mapAmount]);
+    amountPaidByWallet = convertIntToDouble(parsedJson[mapAmountPaidByWallet]);
+    amountDue = convertIntToDouble(parsedJson[mapAmountDue]);
+    discountApplied = convertIntToDouble(parsedJson[mapDiscountApplied]);
     couponApplied = parsedJson[mapCouponApplied];
     couponId = parsedJson[mapColumnId];
-    couponDiscount = parsedJson[mapCouponDiscount];
+    couponDiscount = convertIntToDouble(parsedJson[mapCouponDiscount]);
     paymentMethod = parsedJson[mapPaymentMethod];
-    cashback = parsedJson[mapCashback];
+    cashback = convertIntToDouble(parsedJson[mapCashback]);
     units = parsedJson[mapUnits];
     transactionId = parsedJson[mapTransactionId];
     instructions = parsedJson[mapInstructions];
     status = parsedJson[mapStatus];
     cancelled = parsedJson[mapCancelled];
     review = jsonEncode(parsedJson[mapReview]);
-    rating = parsedJson[mapRating];
+    rating = convertIntToDouble(parsedJson[mapRating]);
     address = jsonEncode(parsedJson[mapAddress]);
-    packedAt = parsedJson[mapPackedAt];
-    shippedAt = parsedJson[mapShippedAt];
-    createdAt = parsedJson[mapCreatedAt];
-    deliveredAt = parsedJson[mapDeliveredAt];
-    expectedDeliveryAt = parsedJson[mapExpectedDeliveryAt];
+    packedAt = DateConverter.convert(parsedJson[mapPackedAt]);
+    shippedAt = DateConverter.convert(parsedJson[mapShippedAt]);
+    createdAt = DateConverter.convert(parsedJson[mapCreatedAt]);
+    deliveredAt = DateConverter.convert(parsedJson[mapDeliveredAt]);
+    expectedDeliveryAt =
+        DateConverter.convert(parsedJson[mapExpectedDeliveryAt]);
     dynamic tempProducts = parsedJson[mapProducts];
     products = List<OrderProductModel>();
     for (dynamic product in tempProducts) {
       products.add(OrderProductModel.fromJson(product));
     }
+  }
+  double convertIntToDouble(int value) {
+    if (value == null) {
+      return 0.0;
+    }
+    return double.parse(value.toString());
   }
 }
 
@@ -108,9 +117,16 @@ class OrderProductModel {
     productId = parsedJson[mapProductId];
     productName = parsedJson[mapProductName];
     productBrand = parsedJson[mapProductBrand];
-    amount = parsedJson[mapAmount];
-    discountApplied = parsedJson[mapDiscountApplied];
+    amount = convertIntToDouble(parsedJson[mapAmount]);
+    discountApplied = convertIntToDouble(parsedJson[mapDiscountApplied]);
     quantity = parsedJson[quantity];
     image = parsedJson[mapImage];
+  }
+
+  double convertIntToDouble(int value) {
+    if (value == null) {
+      return 0.0;
+    }
+    return double.parse(value.toString());
   }
 }

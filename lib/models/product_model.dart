@@ -2,7 +2,6 @@ import 'dart:convert';
 
 class ProductModel {
   int id;
-  int productId;
   String name;
   int productCategoryId;
   String brand;
@@ -45,7 +44,6 @@ class ProductModel {
 
   ProductModel(
       this.id,
-      this.productId,
       this.name,
       this.productCategoryId,
       this.brand,
@@ -66,7 +64,7 @@ class ProductModel {
       this.relatedProducts);
 
   ProductModel.fromJson(Map<String, dynamic> parsedJson) {
-    productId = parsedJson[mapId];
+    id = parsedJson[mapId];
     name = parsedJson[mapName];
     brand = parsedJson[mapBrand];
     productCategoryId = parsedJson[mapProductCategoryId];
@@ -99,6 +97,9 @@ class ProductModel {
   }
 
   double convertIntToDouble(int value) {
+    if (value == null) {
+      return 0.0;
+    }
     return double.parse(value.toString());
   }
 }

@@ -1,12 +1,9 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:fswitch/fswitch.dart';
-import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextdoorpartner/bloc/product_bloc.dart';
@@ -14,13 +11,12 @@ import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/models/product_category_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/db_operation_response.dart';
-import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
-import 'package:nextdoorpartner/ui/product_category.dart';
+import 'package:nextdoorpartner/ui/products.dart';
+import 'package:nextdoorpartner/ui/sign_up.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
-import 'package:path_provider/path_provider.dart';
 
 class Product extends StatefulWidget {
   final bool isNewProduct;
@@ -34,7 +30,6 @@ class Product extends StatefulWidget {
 }
 
 class _ProductState extends State<Product> {
-  ProductCategoryModel productCategoryModel;
   ProductModel productModel;
   ProductBloc productBloc;
   PickedFile imageFile;
@@ -57,6 +52,7 @@ class _ProductState extends State<Product> {
       TextEditingController();
   final TextEditingController standardTextEditingController =
       TextEditingController();
+
   FocusScopeNode nameFocusNode = FocusScopeNode();
   FocusScopeNode brandFocusNode = FocusScopeNode();
   FocusScopeNode descriptionFocusNode = FocusScopeNode();
@@ -64,6 +60,11 @@ class _ProductState extends State<Product> {
   FocusScopeNode discountFocusNode = FocusScopeNode();
   FocusScopeNode tagsFocusNode = FocusScopeNode();
   FocusScopeNode standardFocusNode = FocusScopeNode();
+
+  final String mapProductModel = 'productModel';
+  final String mapProductCategoryModel = 'productCategoryModel';
+
+  bool isAlreadyPopulated = false;
 
   ProgressDialog progressDialog;
 
@@ -79,9 +80,9 @@ class _ProductState extends State<Product> {
     } else if (focusScopeNode == mrpFocusNode) {
       focusScopeNode2 = discountFocusNode;
     } else if (focusScopeNode == discountFocusNode) {
-      focusScopeNode2 = tagsFocusNode;
-    } else if (focusScopeNode == tagsFocusNode) {
       focusScopeNode2 = standardFocusNode;
+    } else if (focusScopeNode == standardFocusNode) {
+      focusScopeNode2 = tagsFocusNode;
     }
     FocusScope.of(context).requestFocus(focusScopeNode2);
   }
@@ -93,40 +94,33 @@ class _ProductState extends State<Product> {
     } else if (mrpTextEditingController.text.length == 0) {
       CustomToast.show('enter mrp', context);
       return;
-    } else if (mrpTextEditingController.text.length == 0) {
-      CustomToast.show('enter mrp', context);
-      return;
     } else if (standardTextEditingController.text.length == 0) {
       CustomToast.show('Choose the standard quality of selling', context);
       return;
-    } else if (files.length == 0) {
+    } else if (files.length == 0 && widget.isNewProduct) {
       CustomToast.show('Please upload a photo', context);
       return;
     }
-    uploadToServer(productCategoryModel.productCategoryId);
+    widget.isNewProduct
+        ? uploadToServer(widget.productCategoryId)
+        : updateProduct(widget.productCategoryId);
   }
 
-  void deleteImage(int index) {
-    widget.productModel.images.removeAt(index - 1);
-  }
-
-  void replaceImage() {}
-
-  void showDeleteDialog(int index) {
+  void showDeleteDialog(int index, String imageUrl) {
     Dialog dialog;
     dialog = Dialog(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Image.network(
-              Strings.hostUrl + widget.productModel.images[index - 1].imageUrl),
+            Strings.hostUrl + imageUrl,
+          ),
           InkWell(
             onTap: () {
-              if (widget.productModel.images.length == 1) {
-                replaceImage();
-                return;
-              }
-              deleteImage(index);
+              productBloc.deleteProductImage(index);
+//                replaceImage();
+//              deleteImage(index);
+              Navigator.pop(context);
             },
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 12),
@@ -151,7 +145,6 @@ class _ProductState extends State<Product> {
   void uploadToServer(int productCategoryId) {
     ProductModel productModel = ProductModel(
         null,
-        -1,
         nameTextEditingController.text,
         productCategoryId,
         brandTextEditingController.text,
@@ -168,51 +161,43 @@ class _ProductState extends State<Product> {
         true,
         false, [], [], []);
     productBloc.addProduct(productModel, files);
-    productBloc.productApiStream.listen((event) {
+    productBloc.productStream.listen((event) {
       if (event.status == Status.SUCCESSFUL) {
-        print(event.toString());
-
-        ///Server will give the product id
-        productModel.productId = event.data['product_id'];
-
-        ///Need to parse the data type after retrieval
-//        productModel.parseImages(event.data['images']);
-
-        insertInDb(productModel);
-//        Navigator.pop(context);
-//        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (BuildContext context) => Products()));
       }
     });
   }
 
-  void loadTags() {
+  void updateProduct(int productCategoryId) {
+    productBloc.updateProduct(
+        nameTextEditingController.text,
+        brandTextEditingController.text,
+        descriptionTextEditingController.text,
+        double.parse(standardTextEditingController.text),
+        double.parse(mrpTextEditingController.text),
+        int.parse(discountTextEditingController.text) ?? 0,
+        productCategoryId);
+  }
+
+  void loadTags(ProductCategoryModel productCategoryModel) {
     tagsList = productCategoryModel.tags.split(',');
     for (String i in tagsList) {
       tagsWidgetList.add(TagsWidget(boxDecoration: boxDecoration, tags: i));
     }
   }
 
-  void insertInDb(ProductModel productModel) {
-//    productBloc.insertProduct(productModel);
-    productBloc.productStream.listen((event) {
-      print(event.toString());
-      if (event.status == DBStatus.SUCCESSFUL) {
-        CustomToast.show('Successfully Added', context);
-      }
-    });
-  }
-
-  void populateFields() {
-    setState(() {
-      nameTextEditingController.text = widget.productModel.name;
-      brandTextEditingController.text = widget.productModel.brand;
-      descriptionTextEditingController.text = widget.productModel.description;
-      mrpTextEditingController.text = widget.productModel.mrp.toString();
-      discountTextEditingController.text =
-          widget.productModel.discountPercentage.toString();
-      standardTextEditingController.text =
-          widget.productModel.standardQuantityOfSelling.toString();
-    });
+  void populateFields(ProductModel productModel) {
+    nameTextEditingController.text = productModel.name;
+    brandTextEditingController.text = productModel.brand;
+    descriptionTextEditingController.text = productModel.description;
+    mrpTextEditingController.text = productModel.mrp.toString();
+    discountTextEditingController.text =
+        productModel.discountPercentage.toString();
+    standardTextEditingController.text =
+        productModel.standardQuantityOfSelling.toString();
   }
 
   List<String> tagsList;
@@ -221,15 +206,21 @@ class _ProductState extends State<Product> {
   @override
   void initState() {
     super.initState();
-    productBloc = ProductBloc();
+    productBloc = ProductBloc(widget.productModel);
+    productBloc.init(widget.productCategoryId);
+    productBloc.productStream.listen((event) {
+      if (event.status == Status.LOADING) {
+        showProgressDialog(context: context, loadingText: 'Loading');
+      } else if (event.status == Status.SUCCESSFUL) {
+        if (event.showToast) {
+          CustomToast.show(event.message, context);
+        }
+        dismissProgressDialog();
+      }
+    });
     if (widget.isNewProduct) {
 //      loadTags();
-    } else {
-      populateFields();
     }
-    productBloc.getProductCategory(widget.productCategoryId);
-//    VendorDatabaseProvider vendorDatabaseProvider = VendorDatabaseProvider();
-//    vendorDatabaseProvider.initiate();
   }
 
   @override
@@ -259,7 +250,7 @@ class _ProductState extends State<Product> {
       ],
     );
     if (croppedFile != null) {
-      setState(() {});
+      productBloc.addProductImage(croppedFile);
     }
   }
 
@@ -313,28 +304,37 @@ class _ProductState extends State<Product> {
         ),
         backgroundColor: AppTheme.background_grey,
         body: StreamBuilder(
-            stream: productBloc.productCategoryStream,
-            builder: (context,
-                AsyncSnapshot<DbResponse<ProductCategoryModel>> snapshot) {
-              print(snapshot.toString());
+            stream: productBloc.productStream,
+            builder:
+                (context, AsyncSnapshot<ApiResponse<ProductModel>> snapshot) {
               if (snapshot.connectionState != ConnectionState.waiting) {
-                productCategoryModel = snapshot.data.data;
-                print(snapshot.data.data);
+                if (!widget.isNewProduct && !isAlreadyPopulated) {
+                  isAlreadyPopulated = true;
+                  populateFields(snapshot.data.data[mapProductModel]);
+                }
                 return SingleChildScrollView(
                   child: Column(
                     children: [
                       widget.isNewProduct
-                          ? Container(
-                              decoration: boxDecoration,
-                              margin: EdgeInsets.only(top: 10),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 10),
-                              child: Text(
-                                Strings.chooseFromOurListOfProducts,
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppTheme.secondary_color),
+                          ? InkWell(
+                              onTap: () {
+                                nameFocusNode.unfocus();
+                                print(5);
+                                FocusScope.of(context)
+                                    .requestFocus(brandFocusNode);
+                              },
+                              child: Container(
+                                decoration: boxDecoration,
+                                margin: EdgeInsets.only(top: 10, bottom: 10),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 10),
+                                child: Text(
+                                  Strings.chooseFromOurListOfProducts,
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppTheme.secondary_color),
+                                ),
                               ),
                             )
                           : Padding(
@@ -347,11 +347,11 @@ class _ProductState extends State<Product> {
                                     width: 40,
                                     height: 20,
                                     openColor: AppTheme.green,
-                                    open: true,
+                                    open: snapshot
+                                        .data.data[mapProductModel].inStock,
                                     onChanged: (value) {
-                                      setState(() {
-//                              isSwitchedOn = value;
-                                      });
+                                      print(value);
+                                      productBloc.toggleInStock();
                                     },
                                   ),
                                   InkWell(
@@ -363,7 +363,7 @@ class _ProductState extends State<Product> {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 10, vertical: 10),
                                       child: Text(
-                                        'product id : 1234',
+                                        'product id : ${snapshot.data.data[mapProductModel].id}',
                                         style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.w700,
@@ -376,7 +376,9 @@ class _ProductState extends State<Product> {
                                       Row(
                                         children: [
                                           Text(
-                                            '400',
+                                            snapshot.data.data[mapProductModel]
+                                                .views
+                                                .toString(),
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w800,
@@ -396,7 +398,9 @@ class _ProductState extends State<Product> {
                                       Row(
                                         children: [
                                           Text(
-                                            '400',
+                                            snapshot.data.data[mapProductModel]
+                                                .unitsSold
+                                                .toString(),
                                             style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w800,
@@ -418,21 +422,29 @@ class _ProductState extends State<Product> {
                                 ],
                               ),
                             ),
-                      SizedBox(
-                        height: 10,
-                      ),
                       Wrap(
                         alignment: WrapAlignment.center,
                         runSpacing: 10,
-                        spacing: snapshot.data.data.noOfPhotos == 1 ? 0 : 10,
+                        spacing: snapshot.data.data[mapProductCategoryModel]
+                                    .noOfPhotos ==
+                                1
+                            ? 0
+                            : 10,
                         children: [
-                          snapshot.data.data.noOfPhotos > 0
+                          snapshot.data.data[mapProductCategoryModel]
+                                      .noOfPhotos >
+                                  0
                               ? (!widget.isNewProduct &&
-                                      widget.productModel.images.length > 0)
+                                      snapshot.data.data[mapProductModel].images
+                                              .length >
+                                          0)
                                   ? ImageShowerWidget(
                                       showDialog: showDeleteDialog,
-                                      imageUrl: widget
-                                          .productModel.images[0].imageUrl,
+                                      imageUrl: snapshot
+                                          .data
+                                          .data[mapProductModel]
+                                          .images[0]
+                                          .imageUrl,
                                       index: 1)
                                   : ImagePickerWidget(
                                       boxDecoration: boxDecoration,
@@ -441,13 +453,20 @@ class _ProductState extends State<Product> {
                                       index: 1,
                                     )
                               : SizedBox(),
-                          snapshot.data.data.noOfPhotos > 1
+                          snapshot.data.data[mapProductCategoryModel]
+                                      .noOfPhotos >
+                                  1
                               ? (!widget.isNewProduct &&
-                                      widget.productModel.images.length > 1)
+                                      snapshot.data.data[mapProductModel].images
+                                              .length >
+                                          1)
                                   ? ImageShowerWidget(
                                       showDialog: showDeleteDialog,
-                                      imageUrl: widget
-                                          .productModel.images[1].imageUrl,
+                                      imageUrl: snapshot
+                                          .data
+                                          .data[mapProductModel]
+                                          .images[1]
+                                          .imageUrl,
                                       index: 2)
                                   : ImagePickerWidget(
                                       boxDecoration: boxDecoration,
@@ -456,13 +475,20 @@ class _ProductState extends State<Product> {
                                       index: 2,
                                     )
                               : SizedBox(),
-                          snapshot.data.data.noOfPhotos > 2
+                          snapshot.data.data[mapProductCategoryModel]
+                                      .noOfPhotos >
+                                  2
                               ? (!widget.isNewProduct &&
-                                      widget.productModel.images.length > 2)
+                                      snapshot.data.data[mapProductModel].images
+                                              .length >
+                                          2)
                                   ? ImageShowerWidget(
                                       showDialog: showDeleteDialog,
-                                      imageUrl: widget
-                                          .productModel.images[2].imageUrl,
+                                      imageUrl: snapshot
+                                          .data
+                                          .data[mapProductModel]
+                                          .images[2]
+                                          .imageUrl,
                                       index: 3)
                                   : ImagePickerWidget(
                                       boxDecoration: boxDecoration,
@@ -471,13 +497,20 @@ class _ProductState extends State<Product> {
                                       index: 3,
                                     )
                               : SizedBox(),
-                          snapshot.data.data.noOfPhotos > 3
+                          snapshot.data.data[mapProductCategoryModel]
+                                      .noOfPhotos >
+                                  3
                               ? (!widget.isNewProduct &&
-                                      widget.productModel.images.length > 3)
+                                      snapshot.data.data[mapProductModel].images
+                                              .length >
+                                          3)
                                   ? ImageShowerWidget(
                                       showDialog: showDeleteDialog,
-                                      imageUrl: widget
-                                          .productModel.images[3].imageUrl,
+                                      imageUrl: snapshot
+                                          .data
+                                          .data[mapProductModel]
+                                          .images[3]
+                                          .imageUrl,
                                       index: 4)
                                   : ImagePickerWidget(
                                       boxDecoration: boxDecoration,
@@ -494,7 +527,7 @@ class _ProductState extends State<Product> {
                         textEditingController: nameTextEditingController,
                         labelText: Strings.name,
                         changeFocus: changeFocus,
-                        focusScopeNode: nameFocusNode,
+                        focusNode: nameFocusNode,
                         textInputType: TextInputType.name,
                         isMarginApplicable: true,
                         isMultiline: false,
@@ -505,7 +538,7 @@ class _ProductState extends State<Product> {
                         textEditingController: brandTextEditingController,
                         labelText: Strings.brand,
                         changeFocus: changeFocus,
-                        focusScopeNode: brandFocusNode,
+                        focusNode: brandFocusNode,
                         textInputType: TextInputType.name,
                         isMarginApplicable: false,
                         isMultiline: false,
@@ -516,7 +549,7 @@ class _ProductState extends State<Product> {
                         textEditingController: descriptionTextEditingController,
                         labelText: Strings.description,
                         changeFocus: changeFocus,
-                        focusScopeNode: descriptionFocusNode,
+                        focusNode: descriptionFocusNode,
                         textInputType: TextInputType.name,
                         isMarginApplicable: true,
                         isMultiline: true,
@@ -526,11 +559,12 @@ class _ProductState extends State<Product> {
                         textInputAction: TextInputAction.next,
                         textEditingController: mrpTextEditingController,
                         labelText: Strings.mrp +
-                            (snapshot.data.data.quantityByPiece
+                            (snapshot.data.data[mapProductCategoryModel]
+                                    .quantityByPiece
                                 ? '(Per Piece)'
                                 : '(Per Kg)'),
                         changeFocus: changeFocus,
-                        focusScopeNode: mrpFocusNode,
+                        focusNode: mrpFocusNode,
                         textInputType: TextInputType.number,
                         isMarginApplicable: false,
                         isMultiline: false,
@@ -541,7 +575,7 @@ class _ProductState extends State<Product> {
                         textEditingController: discountTextEditingController,
                         labelText: Strings.discount,
                         changeFocus: changeFocus,
-                        focusScopeNode: discountFocusNode,
+                        focusNode: discountFocusNode,
                         textInputType: TextInputType.number,
                         isMarginApplicable: true,
                         isMultiline: false,
@@ -552,7 +586,7 @@ class _ProductState extends State<Product> {
                         textEditingController: standardTextEditingController,
                         labelText: Strings.standardQuantityOfSelling,
                         changeFocus: changeFocus,
-                        focusScopeNode: standardFocusNode,
+                        focusNode: standardFocusNode,
                         textInputType: TextInputType.number,
                         isMarginApplicable: false,
                         isMultiline: false,
@@ -563,7 +597,7 @@ class _ProductState extends State<Product> {
                         textEditingController: tagsTextEditingController,
                         labelText: Strings.tags,
                         changeFocus: changeFocus,
-                        focusScopeNode: tagsFocusNode,
+                        focusNode: tagsFocusNode,
                         textInputType: TextInputType.text,
                         isMarginApplicable: true,
                         isMultiline: false,
@@ -583,7 +617,8 @@ class _ProductState extends State<Product> {
                       SizedBox(
                         height: 10,
                       ),
-                      snapshot.data.data.haveColorVariants &&
+                      snapshot.data.data[mapProductCategoryModel]
+                                  .haveColorVariants &&
                               !widget.isNewProduct
                           ? Column(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -630,7 +665,8 @@ class _ProductState extends State<Product> {
                               ],
                             )
                           : SizedBox(),
-                      snapshot.data.data.haveSizeVariants &&
+                      snapshot.data.data[mapProductCategoryModel]
+                                  .haveSizeVariants &&
                               !widget.isNewProduct
                           ? Column(
                               children: [
@@ -695,7 +731,7 @@ class ProductTextInputWidget extends StatelessWidget {
     this.textInputType,
     this.labelText,
     this.textInputAction,
-    this.focusScopeNode,
+    this.focusNode,
     this.changeFocus,
     this.textEditingController,
     this.isMarginApplicable,
@@ -704,7 +740,7 @@ class ProductTextInputWidget extends StatelessWidget {
   final TextInputType textInputType;
   final String labelText;
   final TextInputAction textInputAction;
-  final FocusScopeNode focusScopeNode;
+  final FocusNode focusNode;
   final Function changeFocus;
   final TextEditingController textEditingController;
   final bool isMarginApplicable;
@@ -717,6 +753,8 @@ class ProductTextInputWidget extends StatelessWidget {
       margin: EdgeInsets.symmetric(
           horizontal: 10, vertical: isMarginApplicable ? 10 : 0),
       child: TextFormField(
+        focusNode: focusNode,
+        onFieldSubmitted: (value) => changeFocus(focusNode),
         controller: textEditingController,
         textInputAction: textInputAction,
         maxLines: isMultiline ? 5 : 1,
@@ -785,7 +823,7 @@ class ImageShowerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        showDialog(index);
+        showDialog(index, imageUrl);
       },
       child: ClipRRect(
         borderRadius: BorderRadius.all(Radius.circular(5)),

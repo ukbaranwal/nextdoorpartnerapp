@@ -49,8 +49,11 @@ class _PendingOrderState extends State<PendingOrder> {
                 margin: EdgeInsets.symmetric(vertical: 10),
                 padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(5),
+                  ),
+                ),
               ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 10),

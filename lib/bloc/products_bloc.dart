@@ -15,19 +15,24 @@ class ProductsBloc implements BlocInterface {
   List<ProductModel> productModelList = List<ProductModel>();
   Stream<ApiResponse<List<ProductModel>>> get productsStream =>
       _productsFetcher.stream;
+  String searchQuery = '';
 
   ProductsBloc() {
     productModelList = List<ProductModel>();
   }
 
-  getProducts() async {
+  getProducts(String search) async {
     if (alreadyExecuting) {
       return;
+    }
+    if (searchQuery != search) {
+      productModelList = List<ProductModel>();
+      searchQuery = search;
     }
     try {
       alreadyExecuting = true;
       Response response =
-          await _repository.getProducts(productModelList.length);
+          await _repository.getProducts(productModelList.length, searchQuery);
       var jsonResponse = jsonDecode(response.body);
       print(jsonResponse['data']['products'].length.toString());
       if (jsonResponse['data']['products'].length == 0) {

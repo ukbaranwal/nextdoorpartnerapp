@@ -2,86 +2,129 @@ import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class VendorModel {
-  int _id;
-  int _vendorType;
-  String _imageUrl;
-  String _name;
-  String _shopName;
-  String _email;
-  String _phone;
-  String _address;
-  bool _isVerified;
-  String _city;
-  bool _shopOpen;
-  bool _optForDeliveryBoy;
-  bool _localStore;
-  String _upiId;
-  String _paytmNo;
-  bool _membershipActive;
-  String _openingTime;
-  String _closingTime;
-  int _deliveryBoy;
-  String _authorisationToken;
-  int _noOfRatings;
-  double _rating;
-  List<int> _ratingStars;
+  int id;
+  int vendorType;
+  String imageUrl;
+  String name;
+  String shopName;
+  String email;
+  String phone;
+  String address;
+  bool isVerified;
+  String city;
+  bool shopOpen;
+  bool optForDeliveryBoy;
+  bool localStore;
+  String upiId;
+  String paytmNo;
+  bool membershipActive;
+  String openingTime;
+  String closingTime;
+  int deliveryBoy;
+  String authorisationToken;
+  double rating;
 
   VendorModel.fromJson(Map<String, dynamic> parsedJson) {
-    _authorisationToken = parsedJson['token'];
+    authorisationToken = parsedJson['token'];
     parsedJson = parsedJson['vendor'];
-    _id = parsedJson['id'];
-    _isVerified = parsedJson['verified'];
-    _vendorType = parsedJson['vendor_type'];
-    _imageUrl = parsedJson['image_url'];
-    _name = parsedJson['name'];
-    _email = parsedJson['email'];
-    _phone = parsedJson['phone'];
-    _address = parsedJson['address'];
-    _city = parsedJson['city'];
-    _shopOpen = parsedJson['shop_open'];
-    _optForDeliveryBoy = parsedJson['opt_for_delivery_boy'];
-    _localStore = parsedJson['local_store'];
-    _upiId = parsedJson['upi_id'];
-    _paytmNo = parsedJson['paytm_no'];
-    _membershipActive = parsedJson['membership_active'];
-    _openingTime = parsedJson['opening_time'];
-    _closingTime = parsedJson['closing_time'];
-    _deliveryBoy = parsedJson['delivery_boy'];
+    id = parsedJson['id'];
+    shopName = parsedJson['shop_name'];
+    isVerified = parsedJson['verified'];
+    vendorType = parsedJson['vendor_type'];
+    imageUrl = parsedJson['image_url'];
+    name = parsedJson['name'];
+    email = parsedJson['email'];
+    phone = parsedJson['phone'];
+    address = parsedJson['address'];
+    city = parsedJson['city'];
+    shopOpen = parsedJson['shop_open'];
+    optForDeliveryBoy = parsedJson['opt_for_delivery_boy'];
+    localStore = parsedJson['local_store'];
+    upiId = parsedJson['upi_id'];
+    paytmNo = parsedJson['paytm_no'];
+    membershipActive = parsedJson['membership_active'];
+    openingTime = parsedJson['opening_time'];
+    closingTime = parsedJson['closing_time'];
+    deliveryBoy = parsedJson['delivery_boy'];
+    rating = parsedJson['rating'];
   }
+
+  VendorModel();
 
   void storeInSharedPreferences() async {
     SharedPreferences sharedPreferences =
         await SharedPreferencesManager.getInstance();
-    print(_vendorType);
-    print(_email);
-    sharedPreferences.setInt(SharedPreferencesManager.id, _id);
-    sharedPreferences.setInt(SharedPreferencesManager.vendorType, _vendorType);
-    sharedPreferences.setString(SharedPreferencesManager.imageUrl, _imageUrl);
-    sharedPreferences.setString(SharedPreferencesManager.name, _name);
-    sharedPreferences.setString(SharedPreferencesManager.shopName, _shopName);
-    sharedPreferences.setString(SharedPreferencesManager.email, _email);
-    sharedPreferences.setString(SharedPreferencesManager.phone, _phone);
-    sharedPreferences.setString(SharedPreferencesManager.address, _address);
-    sharedPreferences.setString(SharedPreferencesManager.city, _city);
-    sharedPreferences.setBool(SharedPreferencesManager.shopOpen, _shopOpen);
+    sharedPreferences.setInt(SharedPreferencesManager.id, id);
+    sharedPreferences.setInt(SharedPreferencesManager.vendorType, vendorType);
+    sharedPreferences.setString(SharedPreferencesManager.imageUrl, imageUrl);
+    sharedPreferences.setString(SharedPreferencesManager.name, name);
+    sharedPreferences.setString(SharedPreferencesManager.shopName, shopName);
+    sharedPreferences.setString(SharedPreferencesManager.email, email);
+    sharedPreferences.setString(SharedPreferencesManager.phone, phone);
+    sharedPreferences.setString(SharedPreferencesManager.address, address);
+    sharedPreferences.setString(SharedPreferencesManager.city, city);
+    sharedPreferences.setBool(SharedPreferencesManager.shopOpen, shopOpen);
     sharedPreferences.setBool(
-        SharedPreferencesManager.optForDeliveryBoy, _optForDeliveryBoy);
-    sharedPreferences.setBool(SharedPreferencesManager.localStore, _localStore);
-    sharedPreferences.setString(SharedPreferencesManager.upiId, _upiId);
-    sharedPreferences.setString(SharedPreferencesManager.paytmNo, _paytmNo);
+        SharedPreferencesManager.optForDeliveryBoy, optForDeliveryBoy);
+    sharedPreferences.setBool(SharedPreferencesManager.localStore, localStore);
+    sharedPreferences.setString(SharedPreferencesManager.upiId, upiId);
+    sharedPreferences.setString(SharedPreferencesManager.paytmNo, paytmNo);
     sharedPreferences.setBool(
-        SharedPreferencesManager.membershipActive, _membershipActive);
+        SharedPreferencesManager.membershipActive, membershipActive);
     sharedPreferences.setString(
-        SharedPreferencesManager.openingTime, _openingTime);
+        SharedPreferencesManager.openingTime, openingTime);
     sharedPreferences.setString(
-        SharedPreferencesManager.closingTime, _closingTime);
-    sharedPreferences.setInt(
-        SharedPreferencesManager.deliveryBoy, _deliveryBoy);
+        SharedPreferencesManager.closingTime, closingTime);
+    sharedPreferences.setInt(SharedPreferencesManager.deliveryBoy, deliveryBoy);
     sharedPreferences.setString(
-        SharedPreferencesManager.authorisationToken, _authorisationToken);
+        SharedPreferencesManager.authorisationToken, authorisationToken);
+    sharedPreferences.setDouble(SharedPreferencesManager.rating, rating);
     sharedPreferences.setBool(SharedPreferencesManager.isLoggedIn, true);
-    sharedPreferences.setBool(SharedPreferencesManager.isVerified, _isVerified);
+    sharedPreferences.setBool(SharedPreferencesManager.isVerified, isVerified);
   }
 
-  bool get isVerified => _isVerified;
+  void getStoredData(SharedPreferences sharedPreferences) async {
+    vendorModelGlobal.id =
+        sharedPreferences.getInt(SharedPreferencesManager.id);
+    vendorModelGlobal.vendorType =
+        sharedPreferences.getInt(SharedPreferencesManager.vendorType);
+    vendorModelGlobal.imageUrl =
+        sharedPreferences.getString(SharedPreferencesManager.imageUrl);
+    vendorModelGlobal.name =
+        sharedPreferences.getString(SharedPreferencesManager.name);
+    vendorModelGlobal.shopName =
+        sharedPreferences.getString(SharedPreferencesManager.shopName);
+    vendorModelGlobal.email =
+        sharedPreferences.getString(SharedPreferencesManager.email);
+    vendorModelGlobal.phone =
+        sharedPreferences.getString(SharedPreferencesManager.phone);
+    vendorModelGlobal.address =
+        sharedPreferences.getString(SharedPreferencesManager.address);
+    vendorModelGlobal.city =
+        sharedPreferences.getString(SharedPreferencesManager.city);
+    vendorModelGlobal.shopOpen =
+        sharedPreferences.getBool(SharedPreferencesManager.shopOpen);
+    vendorModelGlobal.optForDeliveryBoy =
+        sharedPreferences.getBool(SharedPreferencesManager.optForDeliveryBoy);
+    vendorModelGlobal.localStore =
+        sharedPreferences.getBool(SharedPreferencesManager.localStore);
+    vendorModelGlobal.upiId =
+        sharedPreferences.getString(SharedPreferencesManager.upiId);
+    vendorModelGlobal.paytmNo =
+        sharedPreferences.getString(SharedPreferencesManager.paytmNo);
+    vendorModelGlobal.membershipActive =
+        sharedPreferences.getBool(SharedPreferencesManager.membershipActive);
+    vendorModelGlobal.openingTime =
+        sharedPreferences.getString(SharedPreferencesManager.openingTime);
+    vendorModelGlobal.closingTime =
+        sharedPreferences.getString(SharedPreferencesManager.closingTime);
+    vendorModelGlobal.deliveryBoy =
+        sharedPreferences.getInt(SharedPreferencesManager.deliveryBoy);
+    vendorModelGlobal.authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    vendorModelGlobal.rating =
+        sharedPreferences.getDouble(SharedPreferencesManager.rating);
+  }
 }
+
+VendorModel vendorModelGlobal = VendorModel();

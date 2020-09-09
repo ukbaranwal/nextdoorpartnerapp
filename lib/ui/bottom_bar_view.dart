@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:nextdoorpartner/ui/orders.dart';
 import 'package:nextdoorpartner/ui/products.dart';
+import 'package:nextdoorpartner/ui/reviews.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 import '../models/tabIcon_data.dart';
@@ -92,10 +93,11 @@ class _BottomBarViewState extends State<BottomBarView>
                             Expanded(
                               child: TabIcons(
                                   callback: () {
+                                    print(5);
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                Products()));
+                                                Reviews()));
                                   },
                                   tabIconData: widget.tabIconsList[1],
                                   removeAllSelect: () {
@@ -273,6 +275,12 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    widget.tabIconData.animationController.dispose();
+    super.dispose();
+  }
+
   void setAnimation() {
     widget.tabIconData.animationController.forward();
   }
@@ -288,10 +296,10 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
           highlightColor: Colors.transparent,
           hoverColor: Colors.transparent,
           onTap: () {
-            if (!widget.tabIconData.isSelected) {
-              setAnimation();
-              widget.callback();
-            }
+//            if (!widget.tabIconData.isSelected) {
+            setAnimation();
+            widget.callback();
+//            }
           },
           child: IgnorePointer(
             child: Stack(

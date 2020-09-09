@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/ui/dashboard.dart';
 import 'package:nextdoorpartner/ui/get_started.dart';
 import 'package:nextdoorpartner/ui/logged_in_unverified.dart';
@@ -50,7 +51,7 @@ class _MyAppState extends State<MyApp> {
     FirebaseNotifications().setUpFirebase(localNotifications);
   }
 
-  Future<bool> getIsLoggedIn() async {
+  Future<bool> getStoredData() async {
     final sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn =
         sharedPreferences.getBool(SharedPreferencesManager.isLoggedIn) ?? false;
@@ -58,6 +59,8 @@ class _MyAppState extends State<MyApp> {
         sharedPreferences.getBool(SharedPreferencesManager.isVerified) ?? false;
     if (!isLoggedIn) {
       sharedPreferences.setBool(SharedPreferencesManager.isLoggedIn, false);
+    } else {
+      vendorModelGlobal.getStoredData(sharedPreferences);
     }
     return isLoggedIn;
   }
@@ -80,7 +83,7 @@ class _MyAppState extends State<MyApp> {
         fontFamily: 'nunito',
       ),
       home: FutureBuilder(
-        future: getIsLoggedIn(),
+        future: getStoredData(),
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Splashscreen();

@@ -27,6 +27,8 @@ class SharedPreferencesManager {
   static String openingTime = 'openingTime';
   static String closingTime = 'closingTime';
   static String deliveryBoy = 'deliveryBoy';
+  static String rating = 'rating';
+  static String isFirebaseTokenUploaded = 'isFirebaseTokenUploaded';
 
   SharedPreferencesManager._();
   static Future<SharedPreferences> getInstance() async {

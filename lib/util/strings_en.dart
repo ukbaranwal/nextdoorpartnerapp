@@ -1,5 +1,5 @@
 class Strings {
-  static const String hostUrl = 'http://192.168.0.2:3003/';
+  static const String hostUrl = 'http://192.168.0.8:3003/';
   static const String supportLocalBusiness =
       'Support your nearby Local Businesses:';
   static const String orderDailyEssentials =
