@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:nextdoorpartner/util/date_converter.dart';
 
 class ReviewModel {

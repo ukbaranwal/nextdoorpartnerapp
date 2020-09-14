@@ -1,3 +1,4 @@
+import 'package:jiffy/jiffy.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,6 +24,8 @@ class VendorModel {
   int deliveryBoy;
   String authorisationToken;
   double rating;
+  List<String> banners;
+  String createdAt;
 
   VendorModel.fromJson(Map<String, dynamic> parsedJson) {
     authorisationToken = parsedJson['token'];
@@ -42,11 +45,19 @@ class VendorModel {
     localStore = parsedJson['local_store'];
     upiId = parsedJson['upi_id'];
     paytmNo = parsedJson['paytm_no'];
+    banners = List<String>();
+    if (parsedJson['banners'] != null) {
+      for (var i in parsedJson['banners']) {
+        banners.add(i['url']);
+      }
+    }
     membershipActive = parsedJson['membership_active'];
     openingTime = parsedJson['opening_time'];
     closingTime = parsedJson['closing_time'];
     deliveryBoy = parsedJson['delivery_boy'];
     rating = parsedJson['rating'];
+    DateTime date = DateTime.parse(parsedJson['createdAt']).toLocal();
+    createdAt = Jiffy(date, 'yyyy-MM-dd hh:mm:ss.ms').yMMMd;
   }
 
   VendorModel();
@@ -81,6 +92,8 @@ class VendorModel {
     sharedPreferences.setDouble(SharedPreferencesManager.rating, rating);
     sharedPreferences.setBool(SharedPreferencesManager.isLoggedIn, true);
     sharedPreferences.setBool(SharedPreferencesManager.isVerified, isVerified);
+    sharedPreferences.setStringList(SharedPreferencesManager.banners, banners);
+    sharedPreferences.setString(SharedPreferencesManager.createdAt, createdAt);
   }
 
   void getStoredData(SharedPreferences sharedPreferences) async {
@@ -124,6 +137,10 @@ class VendorModel {
         .getString(SharedPreferencesManager.authorisationToken);
     vendorModelGlobal.rating =
         sharedPreferences.getDouble(SharedPreferencesManager.rating);
+    vendorModelGlobal.banners =
+        sharedPreferences.getStringList(SharedPreferencesManager.banners);
+    vendorModelGlobal.createdAt =
+        sharedPreferences.getString(SharedPreferencesManager.createdAt);
   }
 }
 

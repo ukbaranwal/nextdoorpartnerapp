@@ -13,20 +13,27 @@ import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/bottom_bar_view.dart';
+import 'package:nextdoorpartner/ui/coupons.dart';
+import 'package:nextdoorpartner/ui/help_page.dart';
 import 'package:nextdoorpartner/ui/login.dart';
 import 'package:nextdoorpartner/ui/new_order.dart';
 import 'package:nextdoorpartner/ui/notifications.dart';
+import 'package:nextdoorpartner/ui/order_page.dart';
 import 'package:nextdoorpartner/ui/pending_order.dart';
 import 'package:nextdoorpartner/ui/product_category.dart';
+import 'package:nextdoorpartner/ui/product_templates.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/ui/seller_support.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/background_sync.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/database.dart';
+import 'package:nextdoorpartner/util/date_converter.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'banners.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -40,6 +47,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     color: AppTheme.background_grey,
   );
 
+  OrderFilter orderFilter = OrderFilter.ALL;
+
   DashboardBloc dashboardBloc;
 
   BoxDecoration boxDecoration = BoxDecoration(
@@ -51,6 +60,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       color: AppTheme.secondary_color);
 
   AnimationController animationController;
+
+  void filterOrder(OrderFilter orderFilter) {
+    this.orderFilter = orderFilter;
+    dashboardBloc.filter(orderFilter);
+  }
 
   void signOut() async {
     showDialog(
@@ -354,14 +368,24 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         color: AppTheme.secondary_color),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    Strings.help,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.secondary_color),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HelpPage(),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      Strings.help,
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.secondary_color),
+                    ),
                   ),
                 ),
                 InkWell(
@@ -401,7 +425,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 ),
                 Expanded(
                   child: Center(
-                    child: Text('${Strings.sellingSince}\n13 January 2020',
+                    child: Text(
+                        '${Strings.sellingSince}\n${vendorModelGlobal.createdAt}',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 18,
@@ -502,9 +527,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                               child: Row(
                                 children: [
                                   GestureDetector(
-                                    onTap: () {
-                                      scaffoldKey.currentState.openEndDrawer();
-                                    },
+                                    onTap: () {},
                                     child: Container(
                                       width: MediaQuery.of(context).size.width *
                                               0.50 -
@@ -573,7 +596,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => Products(),
+                                    builder: (context) => Coupons(),
                                   ),
                                 );
                               },
@@ -617,7 +640,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                           children: [
                                             ActiveOrderOptionWidget(
                                               text: 'All',
-                                              isSelected: true,
+                                              isSelected: orderFilter ==
+                                                  OrderFilter.ALL,
+                                              orderFilter: OrderFilter.ALL,
+                                              callback: filterOrder,
                                             ),
                                             Padding(
                                               padding:
@@ -625,12 +651,20 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                                       horizontal: 5),
                                               child: ActiveOrderOptionWidget(
                                                 text: 'Pending',
-                                                isSelected: false,
+                                                isSelected: orderFilter ==
+                                                    OrderFilter.PENDING,
+                                                orderFilter:
+                                                    OrderFilter.PENDING,
+                                                callback: filterOrder,
                                               ),
                                             ),
                                             ActiveOrderOptionWidget(
-                                              text: 'Accepted',
-                                              isSelected: false,
+                                              text: 'Confirmed',
+                                              isSelected: orderFilter ==
+                                                  OrderFilter.CONFIRMED,
+                                              orderFilter:
+                                                  OrderFilter.CONFIRMED,
+                                              callback: filterOrder,
                                             )
                                           ],
                                         ),
@@ -654,24 +688,37 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                     itemBuilder:
                                         (BuildContext context, int index) {
                                       ///Return Single Widget
-                                      return RecentOrderWidget(
-                                        orderNo: snapshot.data.data
-                                            .orderModelList[index].orderId,
-                                        orderValue: snapshot.data.data
-                                            .orderModelList[index].amount,
-                                        units: snapshot.data.data
-                                            .orderModelList[index].units,
-                                        discount: snapshot
-                                            .data
-                                            .data
-                                            .orderModelList[index]
-                                            .discountApplied,
-                                        date: snapshot.data.data
-                                            .orderModelList[index].createdAt,
-                                        isPaid: snapshot.data.data
-                                            .orderModelList[index].paid,
-                                        name: 'Utkarsh',
-                                        address: 'B14/172 Kalyani',
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => OrderPage(
+                                                snapshot.data.data
+                                                    .orderModelList[index].id,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: RecentOrderWidget(
+                                          orderNo: snapshot.data.data
+                                              .orderModelList[index].id,
+                                          orderValue: snapshot.data.data
+                                              .orderModelList[index].amount,
+                                          units: snapshot.data.data
+                                              .orderModelList[index].units,
+                                          discount: snapshot
+                                              .data
+                                              .data
+                                              .orderModelList[index]
+                                              .discountApplied,
+                                          date: snapshot.data.data
+                                              .orderModelList[index].createdAt,
+                                          isPaid: snapshot.data.data
+                                              .orderModelList[index].paid,
+                                          name: 'Utkarsh',
+                                          address: 'B14/172 Kalyani',
+                                        ),
                                       );
                                     },
                                   ),
@@ -703,25 +750,32 @@ class ActiveOrderOptionWidget extends StatelessWidget {
   final String text;
   final bool isSelected;
   final Function callback;
+  final OrderFilter orderFilter;
 
-  ActiveOrderOptionWidget({this.text, this.isSelected, this.callback});
+  ActiveOrderOptionWidget(
+      {this.text, this.isSelected, this.callback, this.orderFilter});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: Text(
-          text,
-          style: TextStyle(
-              color: isSelected ? Colors.white : AppTheme.secondary_color,
-              fontSize: 14,
-              fontWeight: FontWeight.w700),
-        ),
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-        decoration: BoxDecoration(
-            color: isSelected
-                ? AppTheme.secondary_color
-                : AppTheme.background_grey,
-            borderRadius: BorderRadius.all(Radius.circular(10))));
+    return InkWell(
+      onTap: () {
+        callback(orderFilter);
+      },
+      child: Container(
+          child: Text(
+            text,
+            style: TextStyle(
+                color: isSelected ? Colors.white : AppTheme.secondary_color,
+                fontSize: 14,
+                fontWeight: FontWeight.w700),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+          decoration: BoxDecoration(
+              color: isSelected
+                  ? AppTheme.secondary_color
+                  : AppTheme.background_grey,
+              borderRadius: BorderRadius.all(Radius.circular(10)))),
+    );
   }
 }
 

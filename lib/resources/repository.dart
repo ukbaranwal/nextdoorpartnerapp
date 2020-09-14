@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:nextdoorpartner/models/coupon_model.dart';
 import 'package:nextdoorpartner/models/notification_model.dart';
 import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/models/product_category_model.dart';
@@ -42,8 +43,23 @@ class Repository {
           List<ProductCategoryModel> productCategoryModelList) =>
       vendorDatabaseProvider.insertProductCategories(productCategoryModelList);
 
+  Future<Response> syncNotifications(String authorisationToken) =>
+      vendorApiProvider.syncNotifications(authorisationToken);
+
+  Future<bool> insertNotifications(
+          List<NotificationModel> notificationModelList) =>
+      vendorDatabaseProvider.insertNotifications(notificationModelList);
+
+  Future<Response> deleteNotifications() =>
+      vendorApiProvider.deleteNotifications();
+
   Future<Response> getProducts(int noOfProductsAlreadyFetched, String search) =>
       vendorApiProvider.getProducts(noOfProductsAlreadyFetched, search);
+
+  Future<Response> getProductTemplates(int noOfProductsAlreadyFetched,
+          String search, int productCategoryId) =>
+      vendorApiProvider.getProductTemplates(
+          noOfProductsAlreadyFetched, search, productCategoryId);
 
   Future<StreamedResponse> addProduct(
           ProductModel productModel, List<File> files) =>
@@ -85,4 +101,38 @@ class Repository {
 
   Future<Response> getOrders(int noOfOrdersAlreadyFetched, String status) =>
       vendorApiProvider.getOrders(noOfOrdersAlreadyFetched, status);
+
+  Future<Response> getOrder(int orderId) => vendorApiProvider.getOrder(orderId);
+
+  Future<Response> confirmOrder(int orderId) =>
+      vendorApiProvider.confirmOrder(orderId);
+
+  Future<Response> cancelOrder(int orderId, String cancellationReason) =>
+      vendorApiProvider.cancelOrder(orderId, cancellationReason);
+
+  Future<Response> registerComplaint(
+          String contactInfo, String reason, String complaint) =>
+      vendorApiProvider.registerComplaint(contactInfo, reason, complaint);
+
+  Future<StreamedResponse> addBanner(File file) =>
+      vendorApiProvider.addBanner(file);
+
+  Future<Response> deleteBanner(String url) =>
+      vendorApiProvider.deleteBanner(url);
+
+  Future<Response> getHelpTabs() => vendorApiProvider.getHelpTabs();
+
+  Future<Response> getHelpContent(int index) =>
+      vendorApiProvider.getHelpContent(index);
+
+  Future<Response> addCoupon(CouponModel couponModel) =>
+      vendorApiProvider.addCoupon(couponModel);
+
+  Future<Response> updateCoupon(CouponModel couponModel) =>
+      vendorApiProvider.updateCoupon(couponModel);
+
+  Future<Response> deleteCoupon(int couponId) =>
+      vendorApiProvider.deleteCoupon(couponId);
+
+  Future<Response> getCoupon() => vendorApiProvider.getCoupons();
 }

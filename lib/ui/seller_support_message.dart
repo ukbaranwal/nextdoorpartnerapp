@@ -1,20 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nextdoorpartner/bloc/seller_support_bloc.dart';
+import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/dashboard.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/custom_toast.dart';
 
 class SellerSupportMessage extends StatefulWidget {
-  final String issue;
+  final String reason;
 
-  SellerSupportMessage(this.issue);
+  SellerSupportMessage(this.reason);
 
   @override
   _SellerSupportMessageState createState() => _SellerSupportMessageState();
 }
 
 class _SellerSupportMessageState extends State<SellerSupportMessage> {
+  SellerSupportBloc sellerSupportBloc;
   PageController pageController = PageController();
   int pageNo = 0;
+  TextEditingController phoneTextEditingController = TextEditingController();
+  TextEditingController emailTextEditingController = TextEditingController();
+  TextEditingController reasonTextEditingController = TextEditingController();
+  TextEditingController issueTextEditingController = TextEditingController();
+
+  ///To Validate Email
+  bool isValidEmail(String value) {
+    return RegExp(
+            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+        .hasMatch(value);
+  }
+
+  checkValidation() {
+    if (pageNo == 0) {
+      if (phoneTextEditingController.text.length != 10) {
+        CustomToast.show('enter a valid mobile number', context);
+        return;
+      }
+      sellerSupportBloc.registerComplaint(
+          phoneTextEditingController.text, widget.reason, "");
+    } else {
+      if (!isValidEmail(emailTextEditingController.text)) {
+        CustomToast.show('enter a valid email', context);
+        return;
+      } else if (issueTextEditingController.text.length < 20) {
+        CustomToast.show('Please write more further', context);
+        return;
+      }
+      sellerSupportBloc.registerComplaint(emailTextEditingController.text,
+          widget.reason, issueTextEditingController.text);
+    }
+    sellerSupportBloc.supportStream.listen((event) {
+      if (event.status == Status.SUCCESSFUL) {
+        CustomToast.show(event.message, context);
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (BuildContext context) => Dashboard()),
+            (route) => false);
+      } else {
+        CustomToast.show(event.message, context);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -143,7 +191,10 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                             Container(
                               width: MediaQuery.of(context).size.width * 0.7,
                               child: SellerSupportTextField(
+                                textInputType: TextInputType.phone,
                                 isMultiline: false,
+                                textEditingController:
+                                    phoneTextEditingController,
                               ),
                             ),
                           ],
@@ -165,7 +216,9 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                               fontWeight: FontWeight.w600,
                               fontSize: 18),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          checkValidation();
+                        },
                       )
                     ],
                   ),
@@ -189,6 +242,8 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                         ),
                         SellerSupportTextField(
                           isMultiline: false,
+                          textInputType: TextInputType.emailAddress,
+                          textEditingController: emailTextEditingController,
                         ),
                         SizedBox(
                           height: 25,
@@ -205,6 +260,8 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                         ),
                         SellerSupportTextField(
                           isMultiline: false,
+                          textEditingController: reasonTextEditingController,
+                          textInputType: TextInputType.text,
                         ),
                         SizedBox(
                           height: 25,
@@ -221,6 +278,8 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                         ),
                         SellerSupportTextField(
                           isMultiline: true,
+                          textEditingController: issueTextEditingController,
+                          textInputType: TextInputType.text,
                         ),
                         SizedBox(
                           height: 50,
@@ -241,7 +300,9 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                                   fontWeight: FontWeight.w600,
                                   fontSize: 18),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              checkValidation();
+                            },
                           ),
                         ),
                         Align(
@@ -263,12 +324,28 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
       ),
     );
   }
+
+  @override
+  void initState() {
+    super.initState();
+    sellerSupportBloc = SellerSupportBloc();
+    reasonTextEditingController.text = widget.reason;
+  }
+
+  @override
+  void dispose() {
+    sellerSupportBloc.dispose();
+    super.dispose();
+  }
 }
 
 class SellerSupportTextField extends StatelessWidget {
   final bool isMultiline;
+  final TextInputType textInputType;
+  final TextEditingController textEditingController;
 
-  SellerSupportTextField({this.isMultiline});
+  SellerSupportTextField(
+      {this.isMultiline, this.textInputType, this.textEditingController});
 
   @override
   Widget build(BuildContext context) {
@@ -277,16 +354,13 @@ class SellerSupportTextField extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(5))),
       child: TextFormField(
-        inputFormatters: [LengthLimitingTextInputFormatter(10)],
-//                          controller: textEditingController,
-//                          textInputAction: textInputAction,
-
+        controller: textEditingController,
         style: TextStyle(
             fontWeight: FontWeight.w700,
             color: AppTheme.secondary_color,
             fontSize: 16),
         maxLines: isMultiline ? 5 : 1,
-        keyboardType: TextInputType.number,
+        keyboardType: textInputType,
         cursorColor: AppTheme.secondary_color,
         decoration: InputDecoration(
           border: InputBorder.none,

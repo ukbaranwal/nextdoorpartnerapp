@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:nextdoorpartner/models/coupon_model.dart';
 import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +14,7 @@ class VendorApiProvider {
   Client client = Client();
 //  final String _baseUrl =
 //      'http://nextdoor-dev.ap-south-1.elasticbeanstalk.com/vendors';
-  static final String _baseUrl = 'http://192.168.0.8:3003/vendors';
+  static final String _baseUrl = 'http://192.168.0.6:3003/vendors';
   Future<Response> doSignUp(String name, String email, String phone,
       String city, String password, String deviceId) async {
     Map<String, dynamic> data = {
@@ -187,6 +188,40 @@ class VendorApiProvider {
     return response;
   }
 
+  Future<Response> syncNotifications(String authorisationToken) async {
+    print('reach');
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken
+    };
+    var response;
+    try {
+      response = await client.get('$_baseUrl/notification', headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> deleteNotifications() async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken
+    };
+    var response;
+    try {
+      response =
+          await client.delete('$_baseUrl/notification', headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
   Future<Response> getProducts(
       int noOfProductsAlreadyFetched, String search) async {
     SharedPreferences sharedPreferences =
@@ -201,6 +236,27 @@ class VendorApiProvider {
     try {
       response = await client.get(
           '$_baseUrl/products?offset=$noOfProductsAlreadyFetched&search=$search',
+          headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> getProductTemplates(int noOfProductsAlreadyFetched,
+      String search, int productCategoryId) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken
+    };
+    var response;
+    try {
+      response = await client.get(
+          '$_baseUrl/productTemplates?offset=$noOfProductsAlreadyFetched&product_category_id=$productCategoryId&search=$search',
           headers: headers);
     } on SocketException {
       throw FetchDataException('No Internet connection');
@@ -399,6 +455,274 @@ class VendorApiProvider {
       response = await client.get(
           '$_baseUrl/orders?offset=$noOfOrdersAlreadyFetched&status=$status',
           headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> getOrder(int orderId) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken
+    };
+    var response;
+    try {
+      response = await client.get('$_baseUrl/order?order_id=$orderId',
+          headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> confirmOrder(int orderId) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken
+    };
+    Map<String, dynamic> body = {
+      "order_id": orderId,
+    };
+    var response;
+    try {
+      response = await client.patch('$_baseUrl/orderConfirm',
+          headers: headers, body: jsonEncode(body));
+      print('$_baseUrl/orderConfirm');
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    } catch (e) {
+      print(e);
+    }
+    return response;
+  }
+
+  Future<Response> cancelOrder(int orderId, String cancellationReason) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken
+    };
+    Map<String, dynamic> body = {
+      "order_id": orderId,
+      "cancellation_reason": cancellationReason
+    };
+    var response;
+    try {
+      response = await client.patch('$_baseUrl/orderCancel',
+          headers: headers, body: jsonEncode(body));
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> registerComplaint(
+      String contactInfo, String reason, String complaint) async {
+    Map<String, dynamic> data = {
+      'contact_info': contactInfo,
+      'reason': reason,
+      'complaint': complaint
+    };
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken
+    };
+    var response;
+    try {
+      response = await client.post('$_baseUrl/complaint',
+          body: jsonEncode(data), headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<StreamedResponse> addBanner(File file) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    print(authorisationToken);
+    Map<String, String> headers = {
+      "Authorization": authorisationToken,
+      "Content-Type": "multipart/form-data"
+    };
+    MultipartFile tempMultipartFile = await MultipartFile.fromPath(
+        'image', file.path,
+        contentType: MediaType('image', 'jpeg'));
+    var response;
+    try {
+      MultipartRequest request =
+          MultipartRequest('PUT', Uri.parse('$_baseUrl/banner'));
+      request.headers.addAll(headers);
+      request.files.add(tempMultipartFile);
+      response = await request.send();
+      print(response.toString());
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> deleteBanner(String url) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken,
+    };
+    var response;
+    try {
+      response = await client.delete('$_baseUrl/banner?banner_url=$url',
+          headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> getHelpTabs() async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+    };
+    var response;
+    try {
+      response = await client.get('$_baseUrl/helpTabs', headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> getHelpContent(int index) async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+    };
+    var response;
+    try {
+      response = await client.get('$_baseUrl/helpContent?index=$index',
+          headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> addCoupon(CouponModel couponModel) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken,
+    };
+    Map<String, dynamic> data = {
+      'name': couponModel.name,
+      'description': couponModel.description,
+      'code': couponModel.code,
+      'discount_percentage': couponModel.discount,
+      'max_discount': couponModel.maxDiscount,
+      'min_order': couponModel.minOrder,
+      'start_date': couponModel.startDate,
+      'end_date': couponModel.endDate,
+      'applicability': couponModel.applicability.toString(),
+      'applicable_on': couponModel.applicableOn.toString()
+    };
+    print(couponModel.applicability.toString());
+    var response;
+    try {
+      response = await client.put('$_baseUrl/coupon',
+          headers: headers, body: jsonEncode(data));
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    } catch (e) {
+      print(e);
+    }
+    return response;
+  }
+
+  Future<Response> updateCoupon(CouponModel couponModel) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken,
+    };
+    Map<String, dynamic> data = {
+      'id': couponModel.id,
+      'name': couponModel.name,
+      'description': couponModel.description,
+      'code': couponModel.code,
+      'discount_percentage': couponModel.discount,
+      'max_discount': couponModel.maxDiscount,
+      'min_order': couponModel.minOrder,
+      'start_date': couponModel.startDate,
+      'end_date': couponModel.endDate,
+      'applicability': couponModel.applicableOn.toString(),
+      'applicable_on': couponModel.applicability.toString()
+    };
+    var response;
+    try {
+      response = await client.patch('$_baseUrl/coupon',
+          headers: headers, body: jsonEncode(data));
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> deleteCoupon(int couponId) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken,
+    };
+    var response;
+    try {
+      response = await client.delete('$_baseUrl/coupon?coupon_id=$couponId',
+          headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> getCoupons() async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken,
+    };
+    var response;
+    try {
+      response = await client.get('$_baseUrl/coupon', headers: headers);
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }

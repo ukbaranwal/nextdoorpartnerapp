@@ -34,7 +34,11 @@ class ProductBloc implements BlocInterface {
         print(response.toString());
         if (streamedResponse.statusCode == 201) {
           _productFetcher.sink.add(ApiResponse.successful(response['message'],
-              data: response['data'], showToast: true));
+              data: {
+                'productModel': _productModel,
+                'productCategoryModel': _productCategoryModel
+              },
+              showToast: true));
         } else if (streamedResponse.statusCode == 422) {
           _productFetcher.sink
               .add(ApiResponse.validationFailed(response['message']));

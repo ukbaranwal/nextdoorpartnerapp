@@ -51,6 +51,7 @@ dependencies:
   path_provider: 1.6.11
   rxdart: 0.24.1
   flutter_icons: 1.1.0
+  flutter_html: ^1.0.2
 
 dev_dependencies:
   flutter_test:

@@ -262,7 +262,7 @@ class OrderItemWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'order id : ${orderModel.orderId}',
+                  'order id : ${orderModel.id}',
                   style: TextStyle(
                       color: AppTheme.secondary_color,
                       fontWeight: FontWeight.w700,

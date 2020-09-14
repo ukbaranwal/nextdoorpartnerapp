@@ -1,11 +1,14 @@
 import 'package:nextdoorpartner/models/order_model.dart';
 
+enum OrderFilter { ALL, CONFIRMED, PENDING }
+
 class DashboardModel {
   int noOfOrders;
   double revenue;
   int noOfRatings;
   double rating;
   List<int> ratingStars;
+  List<OrderModel> allOrderModelList;
   List<OrderModel> orderModelList;
 
   DashboardModel.fromJson(Map<String, dynamic> parsedJson) {
@@ -15,9 +18,32 @@ class DashboardModel {
     for (var i in parsedJson['rating']['rating_stars']) {
       ratingStars.add(i);
     }
-    orderModelList = List<OrderModel>();
+    allOrderModelList = List<OrderModel>();
     for (var i in parsedJson['orders']) {
-      orderModelList.add(OrderModel.fromJson(i));
+      allOrderModelList.add(OrderModel.fromJson(i));
+    }
+    orderModelList = List<OrderModel>();
+    orderModelList = allOrderModelList;
+  }
+
+  filter(OrderFilter orderFilter) {
+    if (orderFilter == OrderFilter.ALL) {
+      orderModelList = List<OrderModel>();
+      orderModelList = allOrderModelList;
+    } else if (orderFilter == OrderFilter.CONFIRMED) {
+      orderModelList = List<OrderModel>();
+      for (OrderModel orderModel in allOrderModelList) {
+        if (orderModel.status == 'Confirmed') {
+          orderModelList.add(orderModel);
+        }
+      }
+    } else {
+      orderModelList = List<OrderModel>();
+      for (OrderModel orderModel in allOrderModelList) {
+        if (orderModel.status == 'Pending') {
+          orderModelList.add(orderModel);
+        }
+      }
     }
   }
 
@@ -25,15 +51,4 @@ class DashboardModel {
     noOfOrders = parsedJson['order_count'];
     revenue = parsedJson['revenue'].toDouble();
   }
-}
-
-class EndDrawerModel {
-  String shopName;
-  String address;
-  String email;
-  String phone;
-  String imageUrl;
-
-  EndDrawerModel(
-      this.shopName, this.address, this.email, this.phone, this.imageUrl);
 }

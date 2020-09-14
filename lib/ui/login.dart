@@ -51,6 +51,7 @@ class _LoginState extends State<Login> {
       CustomToast.show(data.message, context);
       if (data.status == Status.SUCCESSFUL) {
         data.data.storeInSharedPreferences();
+        vendorModelGlobal = data.data;
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(

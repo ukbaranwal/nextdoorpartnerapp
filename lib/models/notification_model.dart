@@ -4,12 +4,15 @@ class NotificationModel {
   final String columnId = '_id';
   final String mapTitle = 'title';
   final String mapBody = 'body';
+  final String mapAction = 'action';
   final String mapReceivedAt = 'received_at';
+  final String mapCreatedAt = 'createdAt';
   int id;
   String title;
   String body;
   dynamic data;
-  ACTION action;
+  //TODO: action set enum
+  String action;
   String receivedAt;
 
 //  NotificationModel.fromJson();
@@ -21,7 +24,8 @@ class NotificationModel {
     var map = <String, dynamic>{
       mapTitle: title,
       mapBody: body,
-      mapReceivedAt: receivedAt
+      mapReceivedAt: receivedAt,
+      mapAction: action
     };
     if (id != null) {
       map[columnId] = id;
@@ -32,8 +36,16 @@ class NotificationModel {
   NotificationModel.fromMap(Map<String, dynamic> parsedJson) {
     title = parsedJson[mapTitle];
     body = parsedJson[mapBody];
-    receivedAt = DateConverter.convert(parsedJson[mapReceivedAt]);
+    receivedAt = parsedJson[mapReceivedAt];
     id = parsedJson[columnId];
+    action = parsedJson[mapAction];
+  }
+
+  NotificationModel.fromJson(Map<String, dynamic> parsedJson) {
+    title = parsedJson[mapTitle];
+    body = parsedJson[mapBody];
+    receivedAt = DateConverter.convert(parsedJson[mapCreatedAt]);
+    action = parsedJson[mapAction];
   }
 }
 

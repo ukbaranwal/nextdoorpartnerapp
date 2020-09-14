@@ -1,22 +1,27 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:fswitch/fswitch.dart';
+import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextdoorpartner/bloc/product_bloc.dart';
 import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/models/product_category_model.dart';
+import 'package:nextdoorpartner/models/product_template_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/product_templates.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/ui/sign_up.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Product extends StatefulWidget {
   final bool isNewProduct;
@@ -264,7 +269,6 @@ class _ProductState extends State<Product> {
     if (croppedFile != null) {
       setState(() {
         if (index <= files.length) {
-          print(1);
           files.removeAt(index - 1);
           files.insert(index - 1, croppedFile);
         } else {
@@ -272,6 +276,37 @@ class _ProductState extends State<Product> {
         }
       });
     }
+  }
+
+  getTemplate() async {
+    ProductTemplateModel productTemplateModel = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProductTemplates(widget.productCategoryId),
+      ),
+    );
+    nameTextEditingController.text = productTemplateModel.name;
+    brandTextEditingController.text = productTemplateModel.brand;
+    descriptionTextEditingController.text = productTemplateModel.description;
+    mrpTextEditingController.text = productTemplateModel.mrp.toString();
+    standardTextEditingController.text =
+        productTemplateModel.standardQuantityOfSelling.toString();
+    List<File> temp = List<File>();
+    for (var image in productTemplateModel.images) {
+      temp.add(await urlToFile(Strings.hostUrl + image.imageUrl));
+      setState(() {
+        files = temp;
+      });
+    }
+  }
+
+  Future<File> urlToFile(String imageUrl) async {
+    Directory tempDir = await getTemporaryDirectory();
+    String tempPath = tempDir.path;
+    File file = File('$tempPath' + (Random().nextInt(100)).toString() + '.png');
+    Response response = await get(imageUrl);
+    await file.writeAsBytes(response.bodyBytes);
+    return file;
   }
 
   @override
@@ -318,10 +353,7 @@ class _ProductState extends State<Product> {
                       widget.isNewProduct
                           ? InkWell(
                               onTap: () {
-                                nameFocusNode.unfocus();
-                                print(5);
-                                FocusScope.of(context)
-                                    .requestFocus(brandFocusNode);
+                                getTemplate();
                               },
                               child: Container(
                                 decoration: boxDecoration,

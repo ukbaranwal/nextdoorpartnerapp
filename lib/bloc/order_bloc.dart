@@ -8,6 +8,7 @@ import 'package:nextdoorpartner/models/Order_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
+import 'package:nextdoorpartner/util/constants.dart';
 import 'package:rxdart/rxdart.dart';
 
 class OrderBloc implements BlocInterface {
@@ -45,29 +46,29 @@ class OrderBloc implements BlocInterface {
     try {
       String status;
       if (pageNo == 0) {
-        status = 'Pending';
+        status = Constants.pending;
       } else if (pageNo == 1) {
-        status = 'Confirmed';
+        status = Constants.confirmed;
       } else if (pageNo == 2) {
-        status = 'Dispatched';
+        status = Constants.dispatched;
       } else {
-        status = 'Completed';
+        status = Constants.completed;
       }
       alreadyExecuting = true;
       Response response;
       var jsonResponse;
       print(jsonResponse);
-      if (status == 'Pending') {
+      if (status == Constants.pending) {
         response = await _repository.getOrders(
             orderModelBloc.ordersModelListPending.length, status);
         jsonResponse = jsonDecode(response.body);
         orderModelBloc.parseOrderModelListPending(jsonResponse['data']);
-      } else if (status == 'Confirmed') {
+      } else if (status == Constants.confirmed) {
         response = await _repository.getOrders(
             orderModelBloc.ordersModelListConfirmed.length, status);
         jsonResponse = jsonDecode(response.body);
         orderModelBloc.parseOrderModelListConfirmed(jsonResponse['data']);
-      } else if (status == 'Dispatched') {
+      } else if (status == Constants.dispatched) {
         response = await _repository.getOrders(
             orderModelBloc.ordersModelListDispatched.length, status);
         jsonResponse = jsonDecode(response.body);

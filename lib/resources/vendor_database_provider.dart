@@ -62,6 +62,9 @@ class VendorDatabaseProvider {
   final String mapTitle = 'title';
   final String mapBody = 'body';
   final String mapReceivedAt = 'received_at';
+  final String mapAction = 'action';
+
+  static const int MAX_NOTIFICATIONS = 5;
 
   final String productCategoryTable = 'product_category';
   final String orderTable = 'orders';
@@ -152,6 +155,32 @@ class VendorDatabaseProvider {
     return true;
   }
 
+  Future<bool> insertNotifications(
+      List<NotificationModel> notificationModelList) async {
+    if (db == null) {
+      await open();
+    }
+    int noOfNotifications = Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM $notificationTable'));
+    int notificationsInExcess =
+        noOfNotifications + notificationModelList.length - MAX_NOTIFICATIONS;
+    if (notificationsInExcess > 0) {
+      List<int> rowId = List<int>();
+      List<Map> maps = await db.query(notificationTable,
+          columns: [columnId], limit: notificationsInExcess);
+      for (Map map in maps) {
+        rowId.add(map[columnId]);
+      }
+      await db.delete(notificationTable,
+          where: columnId +
+              ' IN (${rowId.toString().substring(1, rowId.toString().length - 1)})');
+    }
+    for (NotificationModel notificationModel in notificationModelList) {
+      await db.insert(notificationTable, notificationModel.toMap());
+    }
+    return true;
+  }
+
   Future<List<ProductCategoryModel>> getProductCategoriesParentId(
       int parentId) async {
     if (db == null) {
@@ -204,12 +233,12 @@ class VendorDatabaseProvider {
     if (db == null) {
       await open();
     }
-    List<Map> maps = await db.query(notificationTable);
+    List<Map> maps =
+        await db.query(notificationTable, orderBy: columnId + ' DESC');
     List<NotificationModel> notificationModelList = List<NotificationModel>();
     for (var map in maps) {
       notificationModelList.add(NotificationModel.fromMap(map));
     }
-    print(notificationModelList.toString());
     return notificationModelList;
   }
 

@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:nextdoorpartner/util/constants.dart';
 import 'package:nextdoorpartner/util/date_converter.dart';
+
+enum OrderStatus { PENDING, CONFIRMED, DISPATCHED, COMPLETED }
 
 class OrderModel {
   int id;
-  int orderId;
   bool paid;
   double amount;
   double amountPaidByWallet;
@@ -18,7 +20,7 @@ class OrderModel {
   int units;
   String transactionId;
   String instructions;
-  String status;
+  OrderStatus status;
   bool cancelled;
   String review;
   double rating;
@@ -29,10 +31,9 @@ class OrderModel {
   String deliveredAt;
   String expectedDeliveryAt;
   List<OrderProductModel> products;
+  bool allProductSelected = false;
 
   final String mapId = 'id';
-  final String mapColumnId = '_id';
-  final String mapOrderId = 'order_id';
   final String mapPaid = 'paid';
   final String mapAmount = 'amount';
   final String mapAmountPaidByWallet = 'amount_paid_by_wallet';
@@ -59,21 +60,21 @@ class OrderModel {
   final String mapProducts = 'products';
 
   OrderModel.fromJson(Map<String, dynamic> parsedJson) {
-    orderId = parsedJson[mapId];
+    id = parsedJson[mapId];
     paid = parsedJson[mapPaid];
     amount = convertIntToDouble(parsedJson[mapAmount]);
     amountPaidByWallet = convertIntToDouble(parsedJson[mapAmountPaidByWallet]);
     amountDue = convertIntToDouble(parsedJson[mapAmountDue]);
     discountApplied = convertIntToDouble(parsedJson[mapDiscountApplied]);
     couponApplied = parsedJson[mapCouponApplied];
-    couponId = parsedJson[mapColumnId];
+    couponId = parsedJson[mapCouponId];
     couponDiscount = convertIntToDouble(parsedJson[mapCouponDiscount]);
     paymentMethod = parsedJson[mapPaymentMethod];
     cashback = convertIntToDouble(parsedJson[mapCashback]);
     units = parsedJson[mapUnits];
     transactionId = parsedJson[mapTransactionId];
     instructions = parsedJson[mapInstructions];
-    status = parsedJson[mapStatus];
+    status = getStatus(parsedJson[mapStatus]);
     cancelled = parsedJson[mapCancelled];
     review = jsonEncode(parsedJson[mapReview]);
     rating = convertIntToDouble(parsedJson[mapRating]);
@@ -96,6 +97,18 @@ class OrderModel {
     }
     return double.parse(value.toString());
   }
+
+  OrderStatus getStatus(String status) {
+    if (status == Constants.pending) {
+      return OrderStatus.PENDING;
+    } else if (status == Constants.confirmed) {
+      return OrderStatus.CONFIRMED;
+    } else if (status == Constants.dispatched) {
+      return OrderStatus.DISPATCHED;
+    } else {
+      return OrderStatus.COMPLETED;
+    }
+  }
 }
 
 class OrderProductModel {
@@ -106,6 +119,7 @@ class OrderProductModel {
   double discountApplied;
   int quantity;
   String image;
+  bool isSelected = false;
   final String mapProductId = 'product_id';
   final String mapProductName = 'product_name';
   final String mapProductBrand = 'product_brand';
@@ -119,7 +133,7 @@ class OrderProductModel {
     productBrand = parsedJson[mapProductBrand];
     amount = convertIntToDouble(parsedJson[mapAmount]);
     discountApplied = convertIntToDouble(parsedJson[mapDiscountApplied]);
-    quantity = parsedJson[quantity];
+    quantity = parsedJson[mapQuantity];
     image = parsedJson[mapImage];
   }
 

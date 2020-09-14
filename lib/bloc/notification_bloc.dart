@@ -4,9 +4,10 @@ import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
-class NotificationBloc implements BlocInterface{
+class NotificationBloc implements BlocInterface {
   final _repository = Repository();
-  var _notificationFetcher = PublishSubject<DbResponse<List<NotificationModel>>>();
+  var _notificationFetcher =
+      PublishSubject<DbResponse<List<NotificationModel>>>();
   Stream<DbResponse<List<NotificationModel>>> get notificationStream =>
       _notificationFetcher.stream;
 
@@ -19,8 +20,9 @@ class NotificationBloc implements BlocInterface{
     }
   }
 
-  getNotifications() async{
-    _notificationFetcher = PublishSubject<DbResponse<List<NotificationModel>>>();
+  getNotifications() async {
+    _notificationFetcher =
+        PublishSubject<DbResponse<List<NotificationModel>>>();
     try {
       _notificationFetcher.sink.add(DbResponse.loading('Checking'));
       List<NotificationModel> data = await _repository.getNotifications();
@@ -33,9 +35,6 @@ class NotificationBloc implements BlocInterface{
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _notificationFetcher.close();
   }
-
-
 }

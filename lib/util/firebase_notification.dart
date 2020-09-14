@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class FirebaseNotifications {
   FirebaseMessaging _firebaseMessaging;
   LocalNotifications localNotifications;
+  final String defaultTopic = 'default';
+  final String vendorTopic = 'vendor';
 
   void setUpFirebase(LocalNotifications localNotifications) {
     this.localNotifications = localNotifications;
@@ -21,30 +23,26 @@ class FirebaseNotifications {
     if (Platform.isIOS) iOSPermission();
 
     _firebaseMessaging.getToken().then((token) {
-      print(token);
-      SharedPreferencesManager.getInstance().then((value) =>
-          {value.setString(SharedPreferencesManager.firebaseToken, token)});
+      SharedPreferencesManager.getInstance().then(
+        (value) => {
+          value.setString(SharedPreferencesManager.firebaseToken, token),
+        },
+      );
     });
+
+    _firebaseMessaging.subscribeToTopic(defaultTopic);
+    _firebaseMessaging.subscribeToTopic(vendorTopic);
 
     _firebaseMessaging.configure(
         onMessage: (Map<String, dynamic> message) async {
           print('on message $message');
-          NotificationBloc notificationBloc = NotificationBloc();
-          notificationBloc.insertNotificationInDb(NotificationModel(
-              title: 'Message', body: 'hello', receivedAt: '124rfx'));
           localNotifications.showNotification();
         },
         onResume: (Map<String, dynamic> message) async {
           print('on resume $message');
-          NotificationBloc notificationBloc = NotificationBloc();
-          notificationBloc.insertNotificationInDb(NotificationModel(
-              title: 'Resume', body: 'hello', receivedAt: '124rfx'));
         },
         onLaunch: (Map<String, dynamic> message) async {
           print('on launch $message');
-          NotificationBloc notificationBloc = NotificationBloc();
-          notificationBloc.insertNotificationInDb(NotificationModel(
-              title: 'Launch', body: 'hello', receivedAt: '124rfx'));
         },
         onBackgroundMessage:
             Platform.isAndroid ? myBackgroundMessageHandler : null);

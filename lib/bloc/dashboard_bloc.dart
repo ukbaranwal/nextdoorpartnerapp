@@ -29,11 +29,9 @@ class DashboardBloc implements BlocInterface {
       _dashboardFetcher.add(ApiResponse.loading('checking'));
       Response response = await _repository.getDashboard();
       Response revenueResponse = await _repository.getDashboardRevenue();
-      print(response.toString());
+
       var jsonResponse = jsonDecode(response.body);
       var jsonRevenueResponse = jsonDecode(revenueResponse.body);
-      print(jsonResponse.toString());
-      print(jsonRevenueResponse.toString());
       _dashboardModel = DashboardModel.fromJson(jsonResponse['data']);
       _dashboardModel.fromRevenueJson(jsonRevenueResponse['data']);
       _dashboardFetcher.sink
@@ -44,9 +42,14 @@ class DashboardBloc implements BlocInterface {
     }
   }
 
+  filter(OrderFilter orderFilter) {
+    _dashboardModel.filter(orderFilter);
+    _dashboardFetcher.sink
+        .add(ApiResponse.successful('Done', data: _dashboardModel));
+  }
+
   getDashboardRevenue() async {
     try {
-      _dashboardFetcher.add(ApiResponse.loading('checking'));
       Response response = await _repository.getDashboardRevenue();
       var jsonResponse = jsonDecode(response.body);
       _dashboardModel.fromRevenueJson(jsonResponse['data']);
@@ -80,6 +83,7 @@ class DashboardBloc implements BlocInterface {
 
   firebaseTokenUpload() async {
     try {
+      return;
       SharedPreferences sharedPreferences =
           await SharedPreferencesManager.getInstance();
       bool isFirebaseTokenUploaded = sharedPreferences

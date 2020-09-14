@@ -4,6 +4,7 @@ import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:nextdoorpartner/bloc/background_sync_bloc.dart';
+import 'package:nextdoorpartner/models/notification_model.dart';
 import 'package:nextdoorpartner/models/product_category_model.dart';
 import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
@@ -24,10 +25,9 @@ class BackgroundSync {
         message.send(sharedPreferences);
       } else if (message is List<ProductCategoryModel>) {
         backgroundSyncBloc.insertProductCategoriesInDb(message);
-      } else if (message is List<ProductModel>) {
-//        backgroundSyncBloc.insertProductsInDb(message);
+      } else if (message is List<NotificationModel>) {
+        backgroundSyncBloc.insertNotificationsInDb(message);
       }
-//      receivePort.close();
     }, onDone: () {
       print('Done');
     });
@@ -49,13 +49,15 @@ class BackgroundSync {
           productCategoryModelList.add(ProductCategoryModel.fromJson(i));
         }
         sendPort.send(productCategoryModelList);
-//        response = await backgroundSyncBloc.syncProducts(
-//            message.getString(SharedPreferencesManager.authorisationToken));
-//        List<ProductModel> productModelList = List<ProductModel>();
-//        for (var i in response.data) {
-//          productModelList.add(ProductModel.fromJson(i));
-//        }
-//        sendPort.send(productModelList);
+        response = await backgroundSyncBloc.syncNotifications(
+            message.getString(SharedPreferencesManager.authorisationToken));
+        List<NotificationModel> notificationModelList =
+            List<NotificationModel>();
+        for (var i in response.data) {
+          notificationModelList.add(NotificationModel.fromJson(i));
+        }
+        sendPort.send(notificationModelList);
+//        receivePort.close();
       }
     });
   }
