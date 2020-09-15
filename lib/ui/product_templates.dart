@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -249,8 +250,9 @@ class ProductTemplateWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ClipRRect(
-                  child: Image.network(
-                    Strings.hostUrl + productTemplateModel.images[0].imageUrl,
+                  child: CachedNetworkImage(
+                    imageUrl: Strings.hostUrl +
+                        productTemplateModel.images[0].imageUrl,
 //                  imageUrl,
                     height: 80,
                     width: 80,

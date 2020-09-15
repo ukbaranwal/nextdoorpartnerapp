@@ -670,7 +670,7 @@ class VendorApiProvider {
       "Authorization": authorisationToken,
     };
     Map<String, dynamic> data = {
-      'id': couponModel.id,
+      'coupon_id': couponModel.id,
       'name': couponModel.name,
       'description': couponModel.description,
       'code': couponModel.code,
@@ -679,15 +679,18 @@ class VendorApiProvider {
       'min_order': couponModel.minOrder,
       'start_date': couponModel.startDate,
       'end_date': couponModel.endDate,
-      'applicability': couponModel.applicableOn.toString(),
-      'applicable_on': couponModel.applicability.toString()
+      'applicability': couponModel.applicability.toString(),
+      'applicable_on': couponModel.applicableOn.toString(),
     };
+    print(data);
     var response;
     try {
       response = await client.patch('$_baseUrl/coupon',
           headers: headers, body: jsonEncode(data));
     } on SocketException {
       throw FetchDataException('No Internet connection');
+    } catch (e) {
+      print(e);
     }
     return response;
   }
@@ -723,6 +726,29 @@ class VendorApiProvider {
     var response;
     try {
       response = await client.get('$_baseUrl/coupon', headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> toggleIsLive(int couponId, bool isLive) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken,
+    };
+    Map<String, dynamic> data = {
+      "coupon_id": couponId,
+      "is_live": isLive,
+    };
+    var response;
+    try {
+      response = await client.patch('$_baseUrl/couponStatus',
+          headers: headers, body: jsonEncode(data));
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }

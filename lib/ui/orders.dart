@@ -5,6 +5,8 @@ import 'package:nextdoorpartner/models/order_model.dart';
 import 'package:nextdoorpartner/models/order_model_bloc.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/order_page.dart';
+import 'package:nextdoorpartner/ui/pending_order.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 
@@ -249,201 +251,147 @@ class OrderItemWidget extends StatelessWidget {
 
   final OrderModel orderModel;
 
+  String getProducts() {
+    String temp = '';
+    for (OrderProductModel orderProductModel in orderModel.products) {
+      temp = temp + orderProductModel.productName + ', ';
+    }
+    return temp.substring(0, temp.length - 2);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'order id : ${orderModel.id}',
-                  style: TextStyle(
-                      color: AppTheme.secondary_color,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18),
-                ),
-                RatingBarIndicator(
-                  rating: 5,
-                  itemSize: 20,
-                  direction: Axis.horizontal,
-                  itemCount: 5,
-                  itemBuilder: (context, _) => Icon(
-                    Icons.star,
-                    color: Colors.amber,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(5))),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 10),
-                      child: Text('Total units : ${orderModel.units}',
-                          style: TextStyle(
-                              color: AppTheme.secondary_color,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14)),
-                    ),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      margin: EdgeInsets.only(left: 3),
-                      child: Text(
-                        orderModel.paid ? Strings.paid : 'cod',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700),
-                      ),
-                      decoration: BoxDecoration(
-                          color:
-                              orderModel.paid ? AppTheme.green : Colors.yellow,
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(5),
-                              bottomLeft: Radius.circular(5))),
-                    )
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                  ),
-                  child: Text(
-                      'Ordered at ${orderModel.createdAt}\nExpected delivery before ${orderModel.expectedDeliveryAt}\n'
-                      'Delivered at ${orderModel.deliveredAt}\nTotal amount: ${orderModel.amount}\n'
-                      'Discount applied: ${orderModel.discountApplied}\nAmount due:${orderModel.amountDue}',
-                      style: TextStyle(
-                          color: AppTheme.secondary_color,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700)),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: AppTheme.background_grey,
-                      borderRadius: BorderRadius.all(Radius.circular(5))),
-                  child: Text(orderModel.instructions,
-                      style: TextStyle(
-                          color: AppTheme.secondary_color,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700)),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 5, bottom: 10),
-                  alignment: Alignment.center,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Tap here for more details',
-                          style: TextStyle(
-                              color: AppTheme.secondary_color,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700)),
-                      Icon(
-                        Icons.keyboard_arrow_down,
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) =>
+                orderModel.status == OrderStatus.PENDING
+                    ? PendingOrder(orderModel.id)
+                    : OrderPage(orderModel.id)));
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Order id : ${orderModel.id}',
+                    style: TextStyle(
                         color: AppTheme.secondary_color,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18),
+                  ),
+                  orderModel.rating != null
+                      ? RatingBarIndicator(
+                          rating: orderModel.rating,
+                          itemSize: 20,
+                          direction: Axis.horizontal,
+                          itemCount: 5,
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                          ),
+                        )
+                      : SizedBox(),
+                ],
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 5, horizontal: 10),
+                        child: Text('Total units : ${orderModel.units}',
+                            style: TextStyle(
+                                color: AppTheme.secondary_color,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14)),
+                      ),
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        margin: EdgeInsets.only(left: 3),
+                        child: Text(
+                          orderModel.paid ? Strings.paid : 'cod',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700),
+                        ),
+                        decoration: BoxDecoration(
+                            color: orderModel.paid
+                                ? AppTheme.green
+                                : Colors.yellow,
+                            borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(5),
+                                bottomLeft: Radius.circular(5))),
                       )
                     ],
                   ),
-                ),
-                Container(
-                  child: Column(
-                    children: <OrdersProductWidget>[
-                      OrdersProductWidget(),
-                      OrdersProductWidget(),
-                      OrdersProductWidget(),
-                      OrdersProductWidget(),
-                      OrdersProductWidget(),
-                      OrdersProductWidget(),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                    ),
+                    child: Text(
+                        'Ordered at ${orderModel.createdAt}\nExpected delivery before ${orderModel.expectedDeliveryAt}\n'
+                        'Delivered at ${orderModel.deliveredAt}\nTotal amount: ${orderModel.amount}\n'
+                        'Discount applied: ${orderModel.discountApplied}\nAmount due: ${orderModel.amountDue}',
+                        style: TextStyle(
+                            color: AppTheme.secondary_color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700)),
                   ),
-                ),
-                SizedBox(
-                  height: 10,
-                )
-              ],
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: AppTheme.background_grey,
+                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                    child: Text(
+                        orderModel.review == null
+                            ? orderModel.instructions
+                            : orderModel.review,
+                        style: TextStyle(
+                            color: AppTheme.secondary_color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700)),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      getProducts(),
+                      style: TextStyle(
+                          color: AppTheme.secondary_color,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600),
+                      textAlign: TextAlign.justify,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  )
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class OrdersProductWidget extends StatelessWidget {
-  final OrderProductModel orderProductModel;
-
-  OrdersProductWidget({this.orderProductModel});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            width: MediaQuery.of(context).size.width * 0.4,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Maggi x 2',
-                  style: TextStyle(
-                      color: Colors.black45,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700),
-                ),
-                Text('Rs. 20',
-                    style: TextStyle(
-                        color: Colors.black45,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700))
-              ],
-            ),
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width * 0.4,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Maggi x 2',
-                  style: TextStyle(
-                      color: Colors.black45,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700),
-                ),
-                Text('Rs. 20',
-                    style: TextStyle(
-                        color: Colors.black45,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700))
-              ],
-            ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }

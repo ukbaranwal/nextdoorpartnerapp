@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -35,8 +36,8 @@ class _BannersState extends State<Banners> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.network(
-            Strings.hostUrl + imageUrl,
+          CachedNetworkImage(
+            imageUrl: Strings.hostUrl + imageUrl,
           ),
           InkWell(
             onTap: () {
@@ -186,8 +187,8 @@ class BannerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      child: Image.network(
-        Strings.hostUrl + url,
+      child: CachedNetworkImage(
+        imageUrl: Strings.hostUrl + url,
         height: (MediaQuery.of(context).size.width - 20) / (16 / 9),
       ),
     );

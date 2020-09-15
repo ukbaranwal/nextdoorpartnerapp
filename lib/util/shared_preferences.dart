@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+///Utility Class SharedPreferences Manager to Store and retrieve data locally
 class SharedPreferencesManager {
   static SharedPreferences _sharedPreferences;
   static String email = 'email';
@@ -33,6 +34,8 @@ class SharedPreferencesManager {
   static String createdAt = 'createdAt';
 
   SharedPreferencesManager._();
+
+  ///Get Instance for sharedpreferences
   static Future<SharedPreferences> getInstance() async {
     if (_sharedPreferences == null) {
       _sharedPreferences = await SharedPreferences.getInstance();

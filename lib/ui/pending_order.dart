@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:nextdoorpartner/bloc/pending_order_bloc.dart';
@@ -367,8 +368,8 @@ class PendingOrderProduct extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.all(Radius.circular(5)),
-            child: Image.network(
-              Strings.hostUrl + orderProductModel.image,
+            child: CachedNetworkImage(
+              imageUrl: Strings.hostUrl + orderProductModel.image,
               width: MediaQuery.of(context).size.width * 0.2,
             ),
           ),

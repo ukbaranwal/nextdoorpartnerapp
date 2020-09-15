@@ -52,6 +52,8 @@ dependencies:
   rxdart: 0.24.1
   flutter_icons: 1.1.0
   flutter_html: ^1.0.2
+  cached_network_image: ^2.3.2+1
+  shimmer: ^1.1.1
 
 dev_dependencies:
   flutter_test:

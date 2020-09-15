@@ -1,3 +1,4 @@
+///String for English
 class Strings {
   static const String hostUrl = 'http://192.168.0.6:3003/';
   static const String supportLocalBusiness =

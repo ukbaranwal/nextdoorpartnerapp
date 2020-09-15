@@ -33,6 +33,8 @@ class CouponBloc implements BlocInterface {
 
   updateCoupon(CouponModel couponModel) async {
     try {
+      couponModel.id = _couponModel.id;
+      couponModel.isLive = _couponModel.isLive;
       Response response = await _repository.updateCoupon(couponModel);
       var jsonResponse = jsonDecode(response.body);
       if (response.statusCode == 200) {
@@ -45,7 +47,20 @@ class CouponBloc implements BlocInterface {
     }
   }
 
-  toggleIsLive(bool isLive) async {}
+  toggleIsLive() async {
+    try {
+      Response response =
+          await _repository.toggleIsLive(_couponModel.id, !_couponModel.isLive);
+      var jsonResponse = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        _couponModel.isLive = !_couponModel.isLive;
+        _couponFetcher.sink.add(ApiResponse.successful(jsonResponse['message'],
+            data: _couponModel, showToast: true));
+      }
+    } catch (e) {
+      _couponFetcher.sink.add(ApiResponse.error(e.toString()));
+    }
+  }
 
   init() async {
     await Future.delayed(Duration(milliseconds: 100));

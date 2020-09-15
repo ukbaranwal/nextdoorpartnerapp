@@ -9,6 +9,7 @@ import 'package:nextdoorpartner/models/review_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/order_page.dart';
 import 'package:nextdoorpartner/ui/product.dart';
 import 'package:nextdoorpartner/ui/product_category.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
@@ -149,6 +150,7 @@ class _ReviewsState extends State<Reviews> {
                               snapshot.data.data[reviewsList].length < 5) {
                             isEnd = true;
                           }
+
                           ///Return Single Widget
                           return index == snapshot.data.data[reviewsList].length
                               ? isEnd
@@ -328,11 +330,17 @@ class ReviewWidget extends StatelessWidget {
               ),
             ),
           ),
-          Text('VIEW ORDER DETAILS',
-              style: TextStyle(
-                  color: Colors.black45,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800))
+          InkWell(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => OrderPage(orderNo)));
+            },
+            child: Text('VIEW ORDER DETAILS',
+                style: TextStyle(
+                    color: Colors.black45,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800)),
+          )
         ],
       ),
     );

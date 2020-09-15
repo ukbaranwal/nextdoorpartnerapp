@@ -21,13 +21,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   ///manage for IOS
+  ///Enable it to record error in firebase crashlytics
   Crashlytics.instance.enableInDevMode = false;
 
-  // Pass all uncaught errors to Crashlytics.
+  /// Pass all uncaught errors to Crashlytics.
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
+
+  ///Initialize LocalNotifications
   LocalNotifications.initialize();
   runZoned(() {
     runApp(MyApp());
+
+    ///onError Will be called on every error to report error to firebase
   }, onError: Crashlytics.instance.recordError);
 }
 
@@ -39,6 +44,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   LocalNotifications localNotifications = LocalNotifications();
   SharedPreferences sharedPreferences;
+
+  ///Boolean to check if vendor has been verified by Next Door
   bool isVerified;
 
   @override
@@ -48,9 +55,13 @@ class _MyAppState extends State<MyApp> {
     localNotifications.configureDidReceiveLocalNotificationSubject(context);
     localNotifications.configureSelectNotificationSubject(context);
     localNotifications.requestIOSPermissions();
+
+    ///Setup Firebase
     FirebaseNotifications().setUpFirebase(localNotifications);
   }
 
+  ///Function to Store data in global vendor model
+  ///and also to check if user is logged in or is verified
   Future<bool> getStoredData() async {
     final sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn =
@@ -60,6 +71,7 @@ class _MyAppState extends State<MyApp> {
     if (!isLoggedIn) {
       sharedPreferences.setBool(SharedPreferencesManager.isLoggedIn, false);
     } else {
+      ///Get All data stored in SharedPreferences
       vendorModelGlobal.getStoredData(sharedPreferences);
     }
     return isLoggedIn;
@@ -67,12 +79,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
+    ///Lose the instance of local notifications
     localNotifications.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    ///Change color of Bottom or top Toolbar and bottombar
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.white,
       statusBarIconBrightness: Brightness.dark,
@@ -86,10 +100,15 @@ class _MyAppState extends State<MyApp> {
         future: getStoredData(),
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
+            ///Show splashscreen while loading
             return Splashscreen();
           } else {
             return snapshot.data
+
+                ///If vendor is verified take him to dashboard or take it Unverified Page
                 ? (isVerified ? Dashboard() : UnverifiedLoggedIn())
+
+                ///If not logged in Take them to Walkthrough
                 : WalkThrough();
           }
         },

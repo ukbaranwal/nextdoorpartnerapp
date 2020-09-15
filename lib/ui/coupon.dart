@@ -107,42 +107,6 @@ class _CouponState extends State<Coupon> {
     widget.isNewCoupon ? uploadToServer() : updateProduct();
   }
 
-  void showDeleteDialog(int index, String imageUrl) {
-    Dialog dialog;
-    dialog = Dialog(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.network(
-            Strings.hostUrl + imageUrl,
-          ),
-          InkWell(
-            onTap: () {
-//              productBloc.deleteProductImage(index);
-//                replaceImage();
-//              deleteImage(index);
-              Navigator.pop(context);
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              width: MediaQuery.of(context).size.width,
-              alignment: Alignment.center,
-              color: Colors.red,
-              child: Text(
-                'Delete Image',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 18),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-    showDialog(context: context, child: dialog);
-  }
-
   void selectAvailability(Applicability availability) async {
     if (availability == Applicability.PRODUCT_WISE) {
       selectProductIds = await Navigator.push(
@@ -150,7 +114,6 @@ class _CouponState extends State<Coupon> {
           MaterialPageRoute(
               builder: (BuildContext context) =>
                   CouponProduct(selectProductIds)));
-      print(selectProductIds.toString());
       if (selectProductIds.length > 0) {
         setState(() {
           this.applicability = availability;
@@ -171,10 +134,10 @@ class _CouponState extends State<Coupon> {
         discount,
         maxDiscount,
         minOrder,
-        DateConverter.convert(startDate.toString()).substring(0, 6),
-        DateConverter.convert(endDate.toString()).substring(0, 6),
+        startDate.toString(),
+        endDate.toString(),
         applicability,
-        selectProductIds);
+        applicability == Applicability.PRODUCT_WISE ? selectProductIds : null);
     couponBloc.addCoupon(couponModel);
     couponBloc.couponStream.listen((event) {
       if (event.status == Status.SUCCESSFUL) {
@@ -194,10 +157,10 @@ class _CouponState extends State<Coupon> {
         discount,
         maxDiscount,
         minOrder,
-        DateConverter.convert(startDate.toString()).substring(0, 6),
-        DateConverter.convert(endDate.toString()).substring(0, 6),
+        startDate.toString(),
+        endDate.toString(),
         applicability,
-        selectProductIds);
+        applicability == Applicability.PRODUCT_WISE ? selectProductIds : null);
     couponBloc.updateCoupon(couponModel);
   }
 
@@ -206,6 +169,15 @@ class _CouponState extends State<Coupon> {
     super.initState();
     couponBloc = CouponBloc(widget.couponModel);
     couponBloc.init();
+    couponBloc.couponStream.listen((event) {
+      if (event.showToast) {
+        CustomToast.show(event.message, context);
+      }
+      if (widget.isNewCoupon) {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (BuildContext context) => Coupons()));
+      }
+    });
   }
 
   void populateFields(CouponModel couponModel) {
@@ -216,6 +188,10 @@ class _CouponState extends State<Coupon> {
     maxDiscountTextEditingController.text = couponModel.maxDiscount.toString();
     minOrderTextEditingController.text = couponModel.minOrder.toString();
     applicability = couponModel.applicability;
+    print(applicability);
+    startDate = DateTime.parse(couponModel.startDate);
+    endDate = DateTime.parse(couponModel.endDate);
+    selectProductIds = couponModel.applicableOn;
   }
 
   @override
@@ -288,7 +264,7 @@ class _CouponState extends State<Coupon> {
                                     width: 5,
                                   ),
                                   Text(
-                                    '${DateConverter.convert(startDate.toString()).substring(0, 6)}-${DateConverter.convert(endDate.toString()).substring(0, 6)}',
+                                    '${DateConverter.convertMonthDate(startDate.toString())}-${DateConverter.convertMonthDate(endDate.toString())}',
                                     style: TextStyle(
                                         color: AppTheme.secondary_color,
                                         fontWeight: FontWeight.w700,
@@ -299,15 +275,18 @@ class _CouponState extends State<Coupon> {
                             ),
                           ),
                           !widget.isNewCoupon
-                              ? FSwitch(
-                                  width: 40,
-                                  height: 20,
-                                  openColor: AppTheme.green,
-                                  open: snapshot.data.data.isLive,
-                                  onChanged: (value) {
-                                    print(value);
-                                    couponBloc.toggleIsLive(value);
-                                  },
+                              ? Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: FSwitch(
+                                    width: 60,
+                                    height: 35,
+                                    openColor: AppTheme.green,
+                                    open: snapshot.data.data.isLive,
+                                    onChanged: (value) {
+                                      couponBloc.toggleIsLive();
+                                    },
+                                  ),
                                 )
                               : SizedBox()
                         ],

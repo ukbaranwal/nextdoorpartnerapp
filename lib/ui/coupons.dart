@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:nextdoorpartner/bloc/coupons_bloc.dart';
 import 'package:nextdoorpartner/models/coupon_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/coupon.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/date_converter.dart';
 
 class Coupons extends StatefulWidget {
   @override
@@ -34,6 +36,7 @@ class _CouponsState extends State<Coupons> {
         appBar: CustomAppBar(),
         backgroundColor: AppTheme.background_grey,
         body: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -85,9 +88,12 @@ class _CouponsState extends State<Coupons> {
                       return Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 20, top: 15),
+                            padding: const EdgeInsets.only(
+                                left: 20, top: 15, bottom: 10),
                             child: Text(
-                              'Running Campaigns',
+                              snapshot.data.data.length == 0
+                                  ? 'No Campaigns'
+                                  : 'Running Campaigns',
                               style: TextStyle(
                                   color: AppTheme.secondary_color,
                                   fontSize: 18,
@@ -129,99 +135,109 @@ class CouponWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(10))),
-            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
-            margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${couponModel.discount}% OFF',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w800),
-                        ),
-                        Text(
-                          'MAX: Rs.${couponModel.maxDiscount}',
-                          style: TextStyle(
-                              color: Colors.black45,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800),
-                        ),
-                        Text(
-                          'MIN ORDER: Rs.${couponModel.minOrder}',
-                          style: TextStyle(
-                              color: Colors.black45,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          couponModel.code,
-                          style: TextStyle(
-                              color: AppTheme.green,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w900),
-                        ),
-                        Text(
-                          'EXPIRES ON 03/12',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-                Text(
-                  couponModel.name,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800),
-                ),
-              ],
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (BuildContext context) => Coupon(
+                  couponModel: couponModel,
+                  isNewCoupon: false,
+                )));
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+              margin: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${couponModel.discount}% OFF',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800),
+                          ),
+                          Text(
+                            'MAX: Rs.${couponModel.maxDiscount}',
+                            style: TextStyle(
+                                color: Colors.black45,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800),
+                          ),
+                          Text(
+                            'MIN ORDER: Rs.${couponModel.minOrder}',
+                            style: TextStyle(
+                                color: Colors.black45,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            couponModel.code,
+                            style: TextStyle(
+                                color: AppTheme.green,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w900),
+                          ),
+                          Text(
+                            'STARTS ON ${DateConverter.convertMonthDate(couponModel.startDate).toUpperCase()}\nEXPIRES ON ${DateConverter.convertMonthDate(couponModel.endDate).toUpperCase()}',
+                            textAlign: TextAlign.end,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  Text(
+                    '${couponModel.name}\n${couponModel.description}',
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        Align(
-          alignment: Alignment.bottomLeft,
-          child: Container(
-            height: 30,
-            width: 30,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle, color: AppTheme.background_grey),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Container(
+              height: 30,
+              width: 30,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle, color: AppTheme.background_grey),
+            ),
           ),
-        ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Container(
-            height: 30,
-            width: 30,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle, color: AppTheme.background_grey),
-          ),
-        )
-      ],
+          Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              height: 30,
+              width: 30,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle, color: AppTheme.background_grey),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

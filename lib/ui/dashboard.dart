@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,6 +33,7 @@ import 'package:nextdoorpartner/util/date_converter.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'banners.dart';
 
@@ -222,8 +224,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        Strings.hostUrl + vendorModelGlobal.imageUrl,
+                      child: CachedNetworkImage(
+                        imageUrl: Strings.hostUrl + vendorModelGlobal.imageUrl,
                         height: 100,
                         width: 100,
                       ),
@@ -733,8 +735,16 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       ),
                     );
                   } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
+                    return Shimmer.fromColors(
+                      direction: ShimmerDirection.ltr,
+                      baseColor: AppTheme.background_grey,
+                      highlightColor: Colors.grey[100],
+                      enabled: true,
+                      child: Container(
+                        width: double.infinity,
+                        height: 100,
+                        color: Colors.white,
+                      ),
                     );
                   }
                 }),

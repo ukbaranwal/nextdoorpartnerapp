@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:fswitch/fswitch.dart';
@@ -859,8 +860,8 @@ class ImageShowerWidget extends StatelessWidget {
       },
       child: ClipRRect(
         borderRadius: BorderRadius.all(Radius.circular(5)),
-        child: Image.network(
-          Strings.hostUrl + imageUrl,
+        child: CachedNetworkImage(
+          imageUrl: Strings.hostUrl + imageUrl,
           height: MediaQuery.of(context).size.width * 0.21,
           width: MediaQuery.of(context).size.width * 0.21,
         ),

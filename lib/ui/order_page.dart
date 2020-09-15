@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:nextdoorpartner/bloc/order_page_bloc.dart';
@@ -34,32 +35,56 @@ class _OrderPageState extends State<OrderPage> {
     });
   }
 
+  String getStatus(OrderStatus orderStatus) {
+    if (orderStatus == OrderStatus.CONFIRMED) {
+      return 'CONFIRMED';
+    } else if (orderStatus == OrderStatus.DISPATCHED) {
+      return 'DISPATCHED';
+    } else {
+      return 'COMPLETED';
+    }
+  }
+
+  void showCancelDialog(int index, String imageUrl) {
+    Dialog dialog;
+    dialog = Dialog(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CachedNetworkImage(
+            imageUrl: Strings.hostUrl + imageUrl,
+          ),
+          InkWell(
+            onTap: () {
+//              bannerBloc.deleteBanner(index);
+              Navigator.pop(context);
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              width: MediaQuery.of(context).size.width,
+              alignment: Alignment.center,
+              color: Colors.red,
+              child: Text(
+                'Delete Image',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+    showDialog(context: context, child: dialog);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: AppTheme.background_grey,
         appBar: CustomAppBar(),
-        bottomNavigationBar: InkWell(
-          onTap: () {},
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 15),
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(
-                  blurRadius: 5,
-                  offset: Offset(0, -1),
-                  color: Colors.black.withOpacity(0.4))
-            ], color: AppTheme.green),
-            child: Text(
-              'Confirm Order',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 22),
-            ),
-          ),
-        ),
         body: SingleChildScrollView(
           child: Container(
             child: StreamBuilder<ApiResponse<OrderModel>>(
@@ -95,25 +120,22 @@ class _OrderPageState extends State<OrderPage> {
                               ),
                             ),
                             Align(
-                              alignment: Alignment.centerRight,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                child: RaisedButton(
-                                  color: Colors.red,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10))),
-                                  onPressed: () {},
+                                alignment: Alignment.centerRight,
+                                child: Container(
+                                  decoration: BoxDecoration(
+//                                          color: AppTheme.green,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5))),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
                                   child: Text(
-                                    'Cancel',
+                                    getStatus(snapshot.data.data.status),
                                     style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16),
+                                        color: AppTheme.green,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 18),
                                   ),
-                                ),
-                              ),
-                            )
+                                ))
                           ],
                         ),
                         Container(
@@ -135,16 +157,18 @@ class _OrderPageState extends State<OrderPage> {
                                           fontWeight: FontWeight.w700,
                                           fontSize: 18),
                                     ),
-                                    RatingBarIndicator(
-                                      rating: snapshot.data.data.rating,
-                                      itemSize: 20,
-                                      direction: Axis.horizontal,
-                                      itemCount: 5,
-                                      itemBuilder: (context, _) => Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                      ),
-                                    ),
+                                    snapshot.data.data.rating != null
+                                        ? RatingBarIndicator(
+                                            rating: snapshot.data.data.rating,
+                                            itemSize: 20,
+                                            direction: Axis.horizontal,
+                                            itemCount: 5,
+                                            itemBuilder: (context, _) => Icon(
+                                              Icons.star,
+                                              color: Colors.amber,
+                                            ),
+                                          )
+                                        : SizedBox(),
                                   ],
                                 ),
                               ),
@@ -225,7 +249,9 @@ class _OrderPageState extends State<OrderPage> {
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(10))),
                                       child: Text(
-                                          snapshot.data.data.instructions,
+                                          snapshot.data.data.review == null
+                                              ? snapshot.data.data.instructions
+                                              : snapshot.data.data.review,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                               color: AppTheme.secondary_color,

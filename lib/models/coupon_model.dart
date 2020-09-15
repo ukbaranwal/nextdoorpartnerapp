@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:jiffy/jiffy.dart';
+import 'package:nextdoorpartner/util/date_converter.dart';
+
 enum Applicability { ALL, PRODUCT_WISE, FIRST_TIMER }
 
 class CouponModel {
@@ -22,13 +27,16 @@ class CouponModel {
     maxDiscount = parsedJson['max_discount'].toDouble();
     minOrder = parsedJson['min_order'].toDouble();
     startDate = parsedJson['start_date'];
+
     endDate = parsedJson['end_date'];
     isLive = parsedJson['is_live'];
     code = parsedJson['code'];
+    code = code.toUpperCase();
     discount = parsedJson['discount_percentage'];
-    if (parsedJson['availability'] == Applicability.ALL.toString()) {
+    print(parsedJson['applicability']);
+    if (parsedJson['applicability'] == Applicability.ALL.toString()) {
       applicability = Applicability.ALL;
-    } else if (parsedJson['availability'] ==
+    } else if (parsedJson['applicability'] ==
         Applicability.PRODUCT_WISE.toString()) {
       applicability = Applicability.PRODUCT_WISE;
     } else {
@@ -36,7 +44,7 @@ class CouponModel {
     }
     if (applicability == Applicability.PRODUCT_WISE) {
       applicableOn = List<int>();
-      for (var i in parsedJson['applicable_on']) {
+      for (var i in jsonDecode(parsedJson['applicable_on'])) {
         applicableOn.add(i);
       }
     }

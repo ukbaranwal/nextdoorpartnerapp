@@ -33,14 +33,14 @@ class DashboardModel {
     } else if (orderFilter == OrderFilter.CONFIRMED) {
       orderModelList = List<OrderModel>();
       for (OrderModel orderModel in allOrderModelList) {
-        if (orderModel.status == 'Confirmed') {
+        if (orderModel.status == OrderStatus.CONFIRMED) {
           orderModelList.add(orderModel);
         }
       }
     } else {
       orderModelList = List<OrderModel>();
       for (OrderModel orderModel in allOrderModelList) {
-        if (orderModel.status == 'Pending') {
+        if (orderModel.status == OrderStatus.PENDING) {
           orderModelList.add(orderModel);
         }
       }
