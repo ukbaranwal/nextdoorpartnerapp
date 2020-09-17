@@ -10,6 +10,7 @@ import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'app_bar.dart';
 
@@ -22,6 +23,8 @@ class _BannersState extends State<Banners> {
   BannerBloc bannerBloc;
   PickedFile imageFile;
   ImagePicker imagePicker = ImagePicker();
+  BoxDecoration boxDecoration = BoxDecoration(
+      color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5)));
 
   @override
   void initState() {
@@ -145,8 +148,39 @@ class _BannersState extends State<Banners> {
                     ],
                   );
                 } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
+                  return Container(
+                    color: Colors.white,
+                    child: Shimmer.fromColors(
+                      direction: ShimmerDirection.ltr,
+                      baseColor: Colors.grey[200],
+                      highlightColor: Colors.grey[100],
+                      enabled: true,
+                      child: SingleChildScrollView(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 15),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                          child: ListView.separated(
+                            separatorBuilder: (context, index) => SizedBox(
+                              height: 15,
+                            ),
+                            shrinkWrap: true,
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            itemCount: 3,
+                            scrollDirection: Axis.vertical,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                height:
+                                    (MediaQuery.of(context).size.width - 20) /
+                                        (16 / 9),
+                                width: MediaQuery.of(context).size.width - 30,
+                                decoration: boxDecoration,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
                   );
                 }
               }),

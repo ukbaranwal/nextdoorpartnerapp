@@ -56,6 +56,9 @@ class BackgroundSyncBloc {
   Future<DbResponse> insertNotificationsInDb(
       List<NotificationModel> notificationModelList) async {
     try {
+      if (notificationModelList.length == 0) {
+        return DbResponse.successful('Loaded');
+      }
       await _repository.insertNotifications(notificationModelList);
       await _repository.deleteNotifications();
       return DbResponse.successful('Loaded');

@@ -26,10 +26,16 @@ class _NotificationsState extends State<Notifications> {
             print(snapshot.toString());
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
-                  child: Padding(
-                padding: const EdgeInsets.only(top: 150),
-                child: CircularProgressIndicator(),
-              ));
+                child: Container(
+                  height: 100,
+                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 5),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 5,
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppTheme.secondary_color),
+                  ),
+                ),
+              );
             } else {
               return Column(
                 children: [

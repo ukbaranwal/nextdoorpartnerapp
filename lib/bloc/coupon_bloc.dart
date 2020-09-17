@@ -7,6 +7,7 @@ import 'package:nextdoorpartner/models/coupon_model.dart';
 import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/models/product_category_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
+import 'package:nextdoorpartner/resources/app_exception.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 

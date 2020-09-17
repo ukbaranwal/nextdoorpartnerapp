@@ -114,6 +114,9 @@ class _CouponState extends State<Coupon> {
           MaterialPageRoute(
               builder: (BuildContext context) =>
                   CouponProduct(selectProductIds)));
+      if (selectProductIds == null) {
+        selectProductIds = List<int>();
+      }
       if (selectProductIds.length > 0) {
         setState(() {
           this.applicability = availability;

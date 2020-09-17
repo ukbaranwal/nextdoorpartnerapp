@@ -5,6 +5,7 @@ import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:nextdoorpartner/models/coupon_model.dart';
 import 'package:nextdoorpartner/models/product_model.dart';
+import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -222,8 +223,8 @@ class VendorApiProvider {
     return response;
   }
 
-  Future<Response> getProducts(
-      int noOfProductsAlreadyFetched, String search) async {
+  Future<Response> getProducts(int noOfProductsAlreadyFetched, String search,
+      {ORDER_BY orderBy}) async {
     SharedPreferences sharedPreferences =
         await SharedPreferencesManager.getInstance();
     String authorisationToken = sharedPreferences
@@ -232,10 +233,18 @@ class VendorApiProvider {
       "Content-Type": "application/json",
       "Authorization": authorisationToken
     };
+    String tempOrderBy = '';
+    if (orderBy == ORDER_BY.SOLD) {
+      tempOrderBy = 'units_sold';
+    } else if (orderBy == ORDER_BY.VIEWS) {
+      tempOrderBy = 'views';
+    } else if (orderBy == ORDER_BY.RATING) {
+      tempOrderBy = 'rating';
+    }
     var response;
     try {
       response = await client.get(
-          '$_baseUrl/products?offset=$noOfProductsAlreadyFetched&search=$search',
+          '$_baseUrl/products?offset=$noOfProductsAlreadyFetched&search=$search&order_by=$tempOrderBy',
           headers: headers);
     } on SocketException {
       throw FetchDataException('No Internet connection');

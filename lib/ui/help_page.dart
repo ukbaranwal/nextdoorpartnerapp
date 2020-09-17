@@ -7,6 +7,7 @@ import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/help_page_content.dart';
 import 'package:nextdoorpartner/ui/seller_support_message.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HelpPage extends StatefulWidget {
   @override
@@ -15,6 +16,8 @@ class HelpPage extends StatefulWidget {
 
 class _HelpPageState extends State<HelpPage> {
   HelpPageBloc helpPageBloc;
+  BoxDecoration boxDecoration = BoxDecoration(
+      color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5)));
 
   @override
   void initState() {
@@ -71,8 +74,43 @@ class _HelpPageState extends State<HelpPage> {
                         },
                       ));
                 } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
+                  return Container(
+                    height: MediaQuery.of(context).size.height,
+                    color: Colors.white,
+                    child: Shimmer.fromColors(
+                      direction: ShimmerDirection.ltr,
+                      baseColor: Colors.grey[200],
+                      highlightColor: Colors.grey[100],
+                      enabled: true,
+                      child: SingleChildScrollView(
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 30, horizontal: 5),
+                          child: ListView.separated(
+                            separatorBuilder: (context, index) => SizedBox(
+                              height: 15,
+                            ),
+                            shrinkWrap: true,
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            itemCount: 8,
+                            scrollDirection: Axis.vertical,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Row(
+                                children: [
+                                  Container(
+                                    height: 35,
+                                    width: MediaQuery.of(context).size.width -
+                                        20 * (index) -
+                                        30,
+                                    decoration: boxDecoration,
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
                   );
                 }
               }),

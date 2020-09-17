@@ -15,7 +15,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class BackgroundSync {
   static BackgroundSyncBloc backgroundSyncBloc = BackgroundSyncBloc();
   static SharedPreferences sharedPreferences;
-  Future<SendPort> initializeIsolate() async {
+
+  Future<SendPort> initializeIsolate(Function callback) async {
     Completer completer = Completer<SendPort>();
     ReceivePort receivePort = ReceivePort();
     sharedPreferences = await SharedPreferencesManager.getInstance();
@@ -26,6 +27,7 @@ class BackgroundSync {
       } else if (message is List<ProductCategoryModel>) {
         backgroundSyncBloc.insertProductCategoriesInDb(message);
       } else if (message is List<NotificationModel>) {
+        callback(message.length);
         backgroundSyncBloc.insertNotificationsInDb(message);
       }
     }, onDone: () {

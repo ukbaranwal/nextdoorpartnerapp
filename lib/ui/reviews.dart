@@ -14,6 +14,7 @@ import 'package:nextdoorpartner/ui/product.dart';
 import 'package:nextdoorpartner/ui/product_category.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
+import 'package:shimmer/shimmer.dart';
 
 class Reviews extends StatefulWidget {
   @override
@@ -88,7 +89,8 @@ class _ReviewsState extends State<Reviews> {
               builder: (BuildContext context,
                   AsyncSnapshot<ApiResponse<List<ReviewModel>>> snapshot) {
                 print(snapshot);
-                if (snapshot.connectionState != ConnectionState.waiting) {
+                if (snapshot.connectionState != ConnectionState.waiting &&
+                    false) {
                   return Column(
                     children: [
                       SizedBox(
@@ -190,8 +192,96 @@ class _ReviewsState extends State<Reviews> {
                     ],
                   );
                 } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
+                  return Container(
+                    height: MediaQuery.of(context).size.height,
+                    margin: EdgeInsets.only(top: 10),
+                    color: Colors.white,
+                    child: Shimmer.fromColors(
+                      direction: ShimmerDirection.ltr,
+                      baseColor: Colors.grey[200],
+                      highlightColor: Colors.grey[100],
+                      enabled: true,
+                      child: SingleChildScrollView(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 30),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListView.separated(
+                                separatorBuilder: (context, index) => SizedBox(
+                                  height: 35,
+                                ),
+                                shrinkWrap: true,
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                itemCount: 5,
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 8),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.6,
+                                              height: 20,
+                                              decoration: boxDecoration,
+                                            ),
+                                            SizedBox(
+                                              height: 8,
+                                            ),
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.8,
+                                              height: 20,
+                                              decoration: boxDecoration,
+                                            ),
+                                            SizedBox(
+                                              height: 8,
+                                            ),
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.4,
+                                              height: 25,
+                                              decoration: boxDecoration,
+                                            ),
+                                            SizedBox(
+                                              height: 8,
+                                            ),
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.3,
+                                              height: 25,
+                                              decoration: boxDecoration,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   );
                 }
               }),

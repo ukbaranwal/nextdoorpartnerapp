@@ -8,6 +8,7 @@ import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/coupon.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/date_converter.dart';
+import 'package:shimmer/shimmer.dart';
 
 class Coupons extends StatefulWidget {
   @override
@@ -16,6 +17,8 @@ class Coupons extends StatefulWidget {
 
 class _CouponsState extends State<Coupons> {
   CouponsBloc couponsBloc;
+  BoxDecoration boxDecoration = BoxDecoration(
+      color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5)));
   @override
   void initState() {
     super.initState();
@@ -40,86 +43,166 @@ class _CouponsState extends State<Coupons> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Card(
-                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                elevation: 10,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: Container(
-                  padding: EdgeInsets.all(18),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Coupon(
-                                  isNewCoupon: true,
-                                ),
-                              ));
-                        },
-                        child: Text(
-                          'Add New Coupon',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 22),
-                        ),
-                      ),
-                      Icon(
-                        Icons.add,
-                        color: Colors.white,
-                      )
-                    ],
-                  ),
-                  decoration: BoxDecoration(
-                      color: AppTheme.green,
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                ),
-              ),
               StreamBuilder<ApiResponse<List<CouponModel>>>(
-                  stream: couponsBloc.couponsStream,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<ApiResponse<List<CouponModel>>> snapshot) {
-                    if (snapshot.connectionState != ConnectionState.waiting) {
-                      print(snapshot);
-                      return Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 20, top: 15, bottom: 10),
-                            child: Text(
-                              snapshot.data.data.length == 0
-                                  ? 'No Campaigns'
-                                  : 'Running Campaigns',
-                              style: TextStyle(
-                                  color: AppTheme.secondary_color,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800),
+                stream: couponsBloc.couponsStream,
+                builder: (BuildContext context,
+                    AsyncSnapshot<ApiResponse<List<CouponModel>>> snapshot) {
+                  if (snapshot.connectionState != ConnectionState.waiting) {
+                    print(snapshot);
+                    return Column(
+                      children: [
+                        Card(
+                          margin: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Container(
+                            padding: EdgeInsets.all(18),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Coupon(
+                                            isNewCoupon: true,
+                                          ),
+                                        ));
+                                  },
+                                  child: Text(
+                                    'Add New Coupon',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 22),
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                )
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                                color: AppTheme.green,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 20, top: 15, bottom: 10),
+                          child: Text(
+                            snapshot.data.data.length == 0
+                                ? 'No Campaigns'
+                                : 'Running Campaigns',
+                            style: TextStyle(
+                                color: AppTheme.secondary_color,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                        ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          shrinkWrap: true,
+                          padding:
+                              EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+                          itemCount: snapshot.data.data.length,
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (BuildContext context, int index) {
+                            ///Return Single Widget
+                            return CouponWidget(snapshot.data.data[index]);
+                          },
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Container(
+                      height: MediaQuery.of(context).size.height,
+                      padding: EdgeInsets.only(top: 20),
+                      color: Colors.white,
+                      child: Shimmer.fromColors(
+                        direction: ShimmerDirection.ltr,
+                        baseColor: Colors.grey[200],
+                        highlightColor: Colors.grey[100],
+                        enabled: true,
+                        child: SingleChildScrollView(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 5),
+                            child: ListView.separated(
+                              separatorBuilder: (context, index) => SizedBox(
+                                height: 30,
+                              ),
+                              shrinkWrap: true,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              itemCount: 5,
+                              scrollDirection: Axis.vertical,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      height: 80,
+                                      width: 80,
+                                      decoration: boxDecoration,
+                                    ),
+                                    SizedBox(
+                                      width: 15,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          height: 20,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              130,
+                                          decoration: boxDecoration,
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          height: 20,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              160,
+                                          decoration: boxDecoration,
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          height: 20,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width -
+                                              190,
+                                          decoration: boxDecoration,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                           ),
-                          ListView.builder(
-                            physics: BouncingScrollPhysics(),
-                            shrinkWrap: true,
-                            padding: EdgeInsets.symmetric(
-                                vertical: 5, horizontal: 2),
-                            itemCount: snapshot.data.data.length,
-                            scrollDirection: Axis.vertical,
-                            itemBuilder: (BuildContext context, int index) {
-                              ///Return Single Widget
-                              return CouponWidget(snapshot.data.data[index]);
-                            },
-                          ),
-                        ],
-                      );
-                    } else {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  }),
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
             ],
           ),
         ),

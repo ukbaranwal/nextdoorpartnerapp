@@ -13,6 +13,7 @@ class ProductModel {
   int views;
   int unitsSold;
   int noOfRatings;
+  double rating;
   bool templateUsed;
   bool isPrimary;
   bool inSync;
@@ -31,6 +32,7 @@ class ProductModel {
   final String mapViews = 'views';
   final String mapUnitsSold = 'units_sold';
   final String mapNoOfRatings = 'no_of_ratings';
+  final String mapRating = 'rating';
   final String mapTemplateUsed = 'template_used';
   final String mapIsPrimary = 'is_primary';
   final String mapSizeVariants = 'size_variants';
@@ -53,6 +55,7 @@ class ProductModel {
       this.tags,
       this.views,
       this.unitsSold,
+      this.rating,
       this.noOfRatings,
       this.templateUsed,
       this.isPrimary,
@@ -80,6 +83,7 @@ class ProductModel {
     views = parsedJson[mapViews];
     unitsSold = parsedJson[mapUnitsSold];
     noOfRatings = parsedJson[mapNoOfRatings];
+    rating = parsedJson[mapRating].toDouble();
     templateUsed = parsedJson[mapTemplateUsed];
     isPrimary = parsedJson[mapIsPrimary];
     List<SizeVariant> tempSizeVariants = List<SizeVariant>();

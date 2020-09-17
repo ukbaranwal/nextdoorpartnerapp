@@ -8,6 +8,7 @@ import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/seller_support_message.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HelpContentPage extends StatefulWidget {
   final int index;
@@ -36,21 +37,30 @@ class _HelpContentPageState extends State<HelpContentPage> {
         backgroundColor: AppTheme.background_grey,
         body: SingleChildScrollView(
           child: StreamBuilder<ApiResponse<String>>(
-              stream: helpPageContentBloc.helpPageStream,
-              builder: (context, AsyncSnapshot<ApiResponse<String>> snapshot) {
-                if (snapshot.connectionState != ConnectionState.waiting) {
-                  return Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Html(
-                      data: snapshot.data.data,
+            stream: helpPageContentBloc.helpPageStream,
+            builder: (context, AsyncSnapshot<ApiResponse<String>> snapshot) {
+              if (snapshot.connectionState != ConnectionState.waiting) {
+                return Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Html(
+                    data: snapshot.data.data,
+                  ),
+                );
+              } else {
+                return Center(
+                  child: Container(
+                    height: 100,
+                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 5),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 5,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          AppTheme.secondary_color),
                     ),
-                  );
-                } else {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              }),
+                  ),
+                );
+              }
+            },
+          ),
         ),
       ),
     );

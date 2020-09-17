@@ -163,6 +163,7 @@ class _ProductState extends State<Product> {
         0,
         0,
         0,
+        0,
         false,
         true,
         false, [], [], []);
@@ -286,6 +287,9 @@ class _ProductState extends State<Product> {
         builder: (context) => ProductTemplates(widget.productCategoryId),
       ),
     );
+    if (productTemplateModel == null) {
+      return;
+    }
     nameTextEditingController.text = productTemplateModel.name;
     brandTextEditingController.text = productTemplateModel.brand;
     descriptionTextEditingController.text = productTemplateModel.description;

@@ -6,6 +6,7 @@ import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
+import 'package:nextdoorpartner/ui/products.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ProductsBloc implements BlocInterface {
@@ -21,7 +22,7 @@ class ProductsBloc implements BlocInterface {
     productModelList = List<ProductModel>();
   }
 
-  getProducts(String search) async {
+  getProducts(String search, {ORDER_BY orderBy}) async {
     if (alreadyExecuting) {
       return;
     }
@@ -31,10 +32,10 @@ class ProductsBloc implements BlocInterface {
     }
     try {
       alreadyExecuting = true;
-      Response response =
-          await _repository.getProducts(productModelList.length, searchQuery);
+      Response response = await _repository
+          .getProducts(productModelList.length, searchQuery, orderBy: orderBy);
       var jsonResponse = jsonDecode(response.body);
-      print(jsonResponse['data']['products'].length.toString());
+      print(jsonResponse['data']['products'].toString());
       if (jsonResponse['data']['products'].length == 0) {
         _productsFetcher.sink
             .add(ApiResponse.successful('end', data: productModelList));

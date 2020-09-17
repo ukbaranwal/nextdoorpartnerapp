@@ -5,6 +5,7 @@ import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nextdoorpartner/bloc/signup_bloc.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/login.dart';
+import 'package:nextdoorpartner/ui/terms_and_conditions.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
@@ -45,6 +46,16 @@ class _SignUpState extends State<SignUp> {
   }
 
   void signUp() async {
+    bool hasAcceptedTerms = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => TermsAndConditions()));
+    if (!hasAcceptedTerms) {
+      CustomToast.show(
+          'You need to Accept our Terms and Conditions to move forward',
+          context);
+      return;
+    }
     showProgressDialog(context: context, loadingText: 'Loading');
     AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
     print(androidDeviceInfo.id);

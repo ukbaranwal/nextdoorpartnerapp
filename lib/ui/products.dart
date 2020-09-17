@@ -12,6 +12,9 @@ import 'package:nextdoorpartner/ui/product.dart';
 import 'package:nextdoorpartner/ui/product_category.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
+import 'package:shimmer/shimmer.dart';
+
+enum ORDER_BY { VIEWS, SOLD, RATING }
 
 class Products extends StatefulWidget {
   @override
@@ -24,6 +27,206 @@ class _ProductsState extends State<Products> {
   bool isEnd = false;
   String searchQuery = '';
   TextEditingController searchTextEditingController = TextEditingController();
+  ORDER_BY sortedBy;
+  BoxDecoration boxDecoration = BoxDecoration(
+      color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5)));
+
+  void showFilterOption() async {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (BuildContext context,
+                void Function(void Function()) setModalState) {
+              return Column(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20))),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Sort by',
+                                style: TextStyle(
+                                    color: AppTheme.secondary_color,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 20),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  Icons.clear,
+                                  size: 24,
+                                  color: AppTheme.secondary_color,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            Transform.scale(
+                              scale: 1.2,
+                              child: Radio(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                activeColor: AppTheme.green,
+                                groupValue: sortedBy,
+                                value: ORDER_BY.SOLD,
+                                onChanged: (value) {
+                                  setModalState(() {
+                                    sortedBy = value;
+                                    productsBloc.getProducts(searchQuery,
+                                        orderBy: sortedBy);
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                setModalState(() {
+                                  sortedBy = ORDER_BY.SOLD;
+                                  productsBloc.getProducts(searchQuery,
+                                      orderBy: sortedBy);
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                'Units Sold',
+                                style: TextStyle(
+                                    color: AppTheme.secondary_color,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 20),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          children: [
+                            Transform.scale(
+                              scale: 1.2,
+                              child: Radio(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                activeColor: AppTheme.green,
+                                groupValue: sortedBy,
+                                value: ORDER_BY.VIEWS,
+                                onChanged: (value) {
+                                  setModalState(() {
+                                    sortedBy = value;
+                                    productsBloc.getProducts(searchQuery,
+                                        orderBy: sortedBy);
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                setModalState(() {
+                                  sortedBy = ORDER_BY.VIEWS;
+                                  productsBloc.getProducts(searchQuery,
+                                      orderBy: sortedBy);
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                'Number of Views',
+                                style: TextStyle(
+                                    color: AppTheme.secondary_color,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 20),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Row(
+                          children: [
+                            Transform.scale(
+                              scale: 1.2,
+                              child: Radio(
+                                visualDensity:
+                                    VisualDensity.adaptivePlatformDensity,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                activeColor: AppTheme.green,
+                                groupValue: sortedBy,
+                                value: ORDER_BY.RATING,
+                                onChanged: (value) {
+                                  setModalState(() {
+                                    sortedBy = value;
+                                    productsBloc.getProducts(searchQuery,
+                                        orderBy: sortedBy);
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                setModalState(() {
+                                  sortedBy = ORDER_BY.RATING;
+                                  productsBloc.getProducts(searchQuery,
+                                      orderBy: sortedBy);
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                'Rating',
+                                style: TextStyle(
+                                    color: AppTheme.secondary_color,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 20),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +330,8 @@ class _ProductsState extends State<Products> {
                           onFieldSubmitted: (value) => {},
                           onChanged: (value) {
                             searchQuery = value;
-                            productsBloc.getProducts(searchQuery);
+                            productsBloc.getProducts(searchQuery,
+                                orderBy: sortedBy);
                             isEnd = false;
                           },
                           style: TextStyle(
@@ -162,7 +366,7 @@ class _ProductsState extends State<Products> {
                               return;
                             }
                             searchTextEditingController.clear();
-                            productsBloc.getProducts('');
+                            productsBloc.getProducts('', orderBy: sortedBy);
                             isEnd = false;
                           },
                         ),
@@ -173,17 +377,53 @@ class _ProductsState extends State<Products> {
                       color: Colors.white,
                       borderRadius: BorderRadius.all(Radius.circular(50))),
                 ),
+                SizedBox(
+                  height: 5,
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: InkWell(
+                    onTap: () {
+                      showFilterOption();
+                    },
+                    child: Container(
+                      width: 100,
+                      padding: EdgeInsets.symmetric(vertical: 5),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: 12,
+                      ),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Sort by',
+                            style: TextStyle(
+                                color: AppTheme.secondary_color,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800),
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Icon(
+                            Icons.sort,
+                            size: 16,
+                            color: AppTheme.secondary_color,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 StreamBuilder(
                   stream: productsBloc.productsStream,
                   builder: (BuildContext context,
                       AsyncSnapshot<ApiResponse<List<ProductModel>>> snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(
-                          child: Padding(
-                        padding: const EdgeInsets.only(top: 150),
-                        child: CircularProgressIndicator(),
-                      ));
-                    } else {
+                    if (snapshot.connectionState != ConnectionState.waiting) {
                       if (snapshot.data.message == 'end' ||
                           snapshot.data.data.length < 6) {
                         isEnd = true;
@@ -215,6 +455,108 @@ class _ProductsState extends State<Products> {
                                   index: index + 1);
                         },
                       );
+                    } else {
+                      return Container(
+                        margin: EdgeInsets.only(top: 10),
+                        color: Colors.white,
+                        child: Shimmer.fromColors(
+                          direction: ShimmerDirection.ltr,
+                          baseColor: Colors.grey[200],
+                          highlightColor: Colors.grey[100],
+                          enabled: true,
+                          child: SingleChildScrollView(
+                            child: Container(
+                              margin: EdgeInsets.only(top: 30),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ListView.separated(
+                                    separatorBuilder: (context, index) =>
+                                        SizedBox(
+                                      height: 35,
+                                    ),
+                                    shrinkWrap: true,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 10),
+                                    itemCount: 5,
+                                    scrollDirection: Axis.vertical,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.2,
+                                            height: 84,
+                                            decoration: boxDecoration,
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 8),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.6,
+                                                  height: 15,
+                                                  decoration: boxDecoration,
+                                                ),
+                                                SizedBox(
+                                                  height: 8,
+                                                ),
+                                                Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.5,
+                                                  height: 15,
+                                                  decoration: boxDecoration,
+                                                ),
+                                                SizedBox(
+                                                  height: 8,
+                                                ),
+                                                Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.4,
+                                                  height: 15,
+                                                  decoration: boxDecoration,
+                                                ),
+                                                SizedBox(
+                                                  height: 8,
+                                                ),
+                                                Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.3,
+                                                  height: 15,
+                                                  decoration: boxDecoration,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
                     }
                   },
                 )
@@ -230,14 +572,14 @@ class _ProductsState extends State<Products> {
   void initState() {
     super.initState();
     productsBloc = ProductsBloc();
-    productsBloc.getProducts(searchQuery);
+    productsBloc.getProducts(searchQuery, orderBy: sortedBy);
     scrollController = ScrollController();
     scrollController.addListener(() {
       if (scrollController.offset >=
               scrollController.position.maxScrollExtent &&
           !scrollController.position.outOfRange) {
         if (!isEnd) {
-          productsBloc.getProducts(searchQuery);
+          productsBloc.getProducts(searchQuery, orderBy: sortedBy);
         }
       }
     });
@@ -289,7 +631,7 @@ class ProductWidget extends StatelessWidget {
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                 ),
                 SizedBox(
-                  width: 5,
+                  width: 10,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -406,35 +748,41 @@ class ProductWidget extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    RatingBarIndicator(
-                      rating: 5,
-                      itemSize: 14,
-                      direction: Axis.horizontal,
-                      itemCount: 5,
-                      itemBuilder: (context, _) => Icon(
-                        Icons.star,
-                        color: Colors.amber,
-                      ),
-                    ),
-                    Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5))),
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                        child: Text(
-                          '${productModel.discountPercentage}% off',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12),
-                        ),
-                        decoration: BoxDecoration(
-                            color: AppTheme.green,
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
-                      ),
-                    )
+                    productModel.noOfRatings == 0
+                        ? SizedBox()
+                        : RatingBarIndicator(
+                            rating: productModel.rating,
+                            itemSize: 14,
+                            direction: Axis.horizontal,
+                            itemCount: 5,
+                            itemBuilder: (context, _) => Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                            ),
+                          ),
+                    productModel.discountPercentage != 0
+                        ? Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5))),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 2),
+                              child: Text(
+                                '${productModel.discountPercentage}% off',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 12),
+                              ),
+                              decoration: BoxDecoration(
+                                  color: AppTheme.green,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5))),
+                            ),
+                          )
+                        : SizedBox()
                   ],
                 ),
                 SizedBox(

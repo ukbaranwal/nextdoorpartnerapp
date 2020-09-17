@@ -15,6 +15,7 @@ import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/bottom_bar_view.dart';
 import 'package:nextdoorpartner/ui/coupons.dart';
+import 'package:nextdoorpartner/ui/error_screens.dart';
 import 'package:nextdoorpartner/ui/help_page.dart';
 import 'package:nextdoorpartner/ui/login.dart';
 import 'package:nextdoorpartner/ui/new_order.dart';
@@ -25,6 +26,7 @@ import 'package:nextdoorpartner/ui/product_category.dart';
 import 'package:nextdoorpartner/ui/product_templates.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/ui/seller_support.dart';
+import 'package:nextdoorpartner/ui/terms_and_conditions.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/background_sync.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
@@ -62,6 +64,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
       color: AppTheme.secondary_color);
 
   AnimationController animationController;
+
+  int noOfNotifications = 0;
 
   void filterOrder(OrderFilter orderFilter) {
     this.orderFilter = orderFilter;
@@ -173,7 +177,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   void runIsolate() async {
     BackgroundSync backgroundSync = BackgroundSync();
-    await backgroundSync.initializeIsolate();
+    await backgroundSync.initializeIsolate(setNoOfNotification);
+  }
+
+  void setNoOfNotification(int count) {
+    setState(() {
+      noOfNotifications = count;
+    });
   }
 
   Widget bottomBar() {
@@ -440,40 +450,57 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             ),
           ),
         ),
-        floatingActionButton: Container(
-          margin: EdgeInsets.only(bottom: 80),
-          height: 70,
-          width: 70,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(35)),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
-                  offset: const Offset(2, 4.0),
-                  blurRadius: 1.0),
-            ],
-          ),
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Notifications(),
-                ),
-              );
-            },
-            elevation: 10,
-            backgroundColor: AppTheme.secondary_color,
-            child: Transform.rotate(
-              child: Icon(
-                Icons.notifications_active,
-                size: 32,
+        floatingActionButton: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            Container(
+              margin: EdgeInsets.only(bottom: 80),
+              height: 70,
+              width: 70,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(35)),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      offset: const Offset(2, 4.0),
+                      blurRadius: 1.0),
+                ],
               ),
-              angle: 345,
+              child: FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Notifications(),
+                    ),
+                  );
+                },
+                elevation: 10,
+                backgroundColor: AppTheme.secondary_color,
+                child: Icon(
+                  Icons.notifications_active,
+                  size: 32,
+                ),
+              ),
             ),
-          ),
+            noOfNotifications == 0
+                ? SizedBox()
+                : Container(
+                    margin: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                        color: Colors.white, shape: BoxShape.circle),
+                    child: Text(
+                      noOfNotifications.toString(),
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.secondary_color),
+                    ),
+                  )
+          ],
         ),
-        backgroundColor: AppTheme.background_grey,
+        backgroundColor: Colors.white,
         appBar: CustomAppBar(),
         body: Stack(
           children: [
@@ -541,7 +568,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            Strings.orders,
+                                            Strings.orders + ' Completed',
                                             style: textStyleStats,
                                           ),
                                           Text(
@@ -598,7 +625,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => Coupons(),
+                                    builder: (context) => HelpPage(),
                                   ),
                                 );
                               },
@@ -737,13 +764,142 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   } else {
                     return Shimmer.fromColors(
                       direction: ShimmerDirection.ltr,
-                      baseColor: AppTheme.background_grey,
+                      baseColor: Colors.grey[200],
                       highlightColor: Colors.grey[100],
                       enabled: true,
-                      child: Container(
-                        width: double.infinity,
-                        height: 100,
-                        color: Colors.white,
+                      child: SingleChildScrollView(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 30),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Container(
+                                    width: MediaQuery.of(context).size.width *
+                                            0.5 -
+                                        25,
+                                    height: 60,
+                                    decoration: boxDecoration,
+                                  ),
+                                  Container(
+                                    width: MediaQuery.of(context).size.width *
+                                            0.5 -
+                                        25,
+                                    height: 60,
+                                    decoration: boxDecoration,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 50,
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 20,
+                                      decoration: boxDecoration,
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.85,
+                                      height: 20,
+                                      decoration: boxDecoration,
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.7,
+                                      height: 20,
+                                      decoration: boxDecoration,
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.55,
+                                      height: 20,
+                                      decoration: boxDecoration,
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.4,
+                                      height: 20,
+                                      decoration: boxDecoration,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 50,
+                              ),
+                              ListView.separated(
+                                separatorBuilder: (context, index) => SizedBox(
+                                  height: 15,
+                                ),
+                                shrinkWrap: true,
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                itemCount: 4,
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Row(
+                                    children: [
+                                      Container(
+                                        height: 50,
+                                        width: 50,
+                                        decoration: boxDecoration,
+                                      ),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            height: 15,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                150,
+                                            decoration: boxDecoration,
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Container(
+                                            height: 25,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                95,
+                                            decoration: boxDecoration,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     );
                   }

@@ -7,6 +7,7 @@ import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/models/product_category_model.dart';
 import 'package:nextdoorpartner/resources/vendor_api_provider.dart';
 import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
+import 'package:nextdoorpartner/ui/products.dart';
 
 class Repository {
   final vendorApiProvider = VendorApiProvider();
@@ -53,8 +54,10 @@ class Repository {
   Future<Response> deleteNotifications() =>
       vendorApiProvider.deleteNotifications();
 
-  Future<Response> getProducts(int noOfProductsAlreadyFetched, String search) =>
-      vendorApiProvider.getProducts(noOfProductsAlreadyFetched, search);
+  Future<Response> getProducts(int noOfProductsAlreadyFetched, String search,
+          {ORDER_BY orderBy}) =>
+      vendorApiProvider.getProducts(noOfProductsAlreadyFetched, search,
+          orderBy: orderBy);
 
   Future<Response> getProductTemplates(int noOfProductsAlreadyFetched,
           String search, int productCategoryId) =>
