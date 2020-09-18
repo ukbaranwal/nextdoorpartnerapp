@@ -5,6 +5,7 @@ import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:nextdoorpartner/models/coupon_model.dart';
 import 'package:nextdoorpartner/models/product_model.dart';
+import 'package:nextdoorpartner/ui/dashboard.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,7 +16,7 @@ class VendorApiProvider {
   Client client = Client();
 //  final String _baseUrl =
 //      'http://nextdoor-dev.ap-south-1.elasticbeanstalk.com/vendors';
-  static final String _baseUrl = 'http://192.168.0.6:3003/vendors';
+  static final String _baseUrl = 'http://192.168.0.5:3003/vendors';
   Future<Response> doSignUp(String name, String email, String phone,
       String city, String password, String deviceId) async {
     Map<String, dynamic> data = {
@@ -96,6 +97,29 @@ class VendorApiProvider {
     return response;
   }
 
+  Future<Response> changePassword(String password, String newPassword) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken
+    };
+    Map<String, dynamic> data = {
+      'password': password,
+      'new_password': newPassword
+    };
+    var response;
+    try {
+      response = await client.patch('$_baseUrl/changePassword',
+          body: jsonEncode(data), headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
   Future<Response> firebaseTokenUpload() async {
     SharedPreferences sharedPreferences =
         await SharedPreferencesManager.getInstance();
@@ -136,7 +160,7 @@ class VendorApiProvider {
     return response;
   }
 
-  Future<Response> getDashboardRevenue() async {
+  Future<Response> getDashboardRevenue(RevenueDuration revenueDuration) async {
     SharedPreferences sharedPreferences =
         await SharedPreferencesManager.getInstance();
     String authorisationToken = sharedPreferences
@@ -147,8 +171,9 @@ class VendorApiProvider {
     };
     var response;
     try {
-      response =
-          await client.get('$_baseUrl/dashboardRevenue', headers: headers);
+      response = await client.get(
+          '$_baseUrl/dashboardRevenue?duration=$revenueDuration',
+          headers: headers);
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }

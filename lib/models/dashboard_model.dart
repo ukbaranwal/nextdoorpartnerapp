@@ -1,4 +1,5 @@
 import 'package:nextdoorpartner/models/order_model.dart';
+import 'package:nextdoorpartner/ui/dashboard.dart';
 
 enum OrderFilter { ALL, CONFIRMED, PENDING }
 
@@ -10,6 +11,7 @@ class DashboardModel {
   List<int> ratingStars;
   List<OrderModel> allOrderModelList;
   List<OrderModel> orderModelList;
+  RevenueDuration revenueDuration;
 
   DashboardModel.fromJson(Map<String, dynamic> parsedJson) {
     rating = parsedJson['rating']['rating'];

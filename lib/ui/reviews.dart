@@ -89,8 +89,7 @@ class _ReviewsState extends State<Reviews> {
               builder: (BuildContext context,
                   AsyncSnapshot<ApiResponse<List<ReviewModel>>> snapshot) {
                 print(snapshot);
-                if (snapshot.connectionState != ConnectionState.waiting &&
-                    false) {
+                if (snapshot.connectionState != ConnectionState.waiting) {
                   return Column(
                     children: [
                       SizedBox(

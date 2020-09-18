@@ -22,7 +22,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
     if (widget.errorType == ErrorType.NO_INTERNET) {
       errorScreenModel = ErrorScreenModel(
           'No Internet Connection',
-          'assets/images/no_internet.png',
+          'assets/images/no_network.png',
           'Please check your connection again or check your wifi',
           'Try Again');
     } else if (widget.errorType == ErrorType.PAGE_NOT_FOUND) {
@@ -44,6 +44,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+          appBar: CustomAppBar(),
           backgroundColor: Colors.white,
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -85,17 +86,20 @@ class _ErrorScreenState extends State<ErrorScreen> {
                     Navigator.pop(context);
                   }
                 },
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 25),
                 child: Text(
                   errorScreenModel.buttonText,
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
-                      fontSize: 20),
+                      fontSize: 18),
                 ),
                 color: AppTheme.green,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10))),
+              ),
+              SizedBox(
+                height: 100,
               )
             ],
           )),

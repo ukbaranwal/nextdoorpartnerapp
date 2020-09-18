@@ -8,15 +8,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:nextdoorpartner/bloc/dashboard_bloc.dart';
 import 'package:nextdoorpartner/models/dashboard_model.dart';
+import 'package:nextdoorpartner/models/order_model.dart';
 import 'package:nextdoorpartner/models/tabIcon_data.dart';
 import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/bottom_bar_view.dart';
+import 'package:nextdoorpartner/ui/change_password.dart';
 import 'package:nextdoorpartner/ui/coupons.dart';
 import 'package:nextdoorpartner/ui/error_screens.dart';
 import 'package:nextdoorpartner/ui/help_page.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/ui/login.dart';
 import 'package:nextdoorpartner/ui/new_order.dart';
 import 'package:nextdoorpartner/ui/notifications.dart';
@@ -27,6 +30,7 @@ import 'package:nextdoorpartner/ui/product_templates.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/ui/seller_support.dart';
 import 'package:nextdoorpartner/ui/terms_and_conditions.dart';
+import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/background_sync.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
@@ -39,6 +43,15 @@ import 'package:shimmer/shimmer.dart';
 
 import 'banners.dart';
 
+enum RevenueDuration {
+  TODAY,
+  YESTERDAY,
+  LAST7DAYS,
+  MONTH,
+  LAST_MONTH,
+  LIFETIME
+}
+
 class Dashboard extends StatefulWidget {
   @override
   _DashboardState createState() => _DashboardState();
@@ -50,6 +63,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   Widget tabBody = Container(
     color: AppTheme.background_grey,
   );
+
+  RevenueDuration dropDownValue = RevenueDuration.LIFETIME;
 
   OrderFilter orderFilter = OrderFilter.ALL;
 
@@ -66,6 +81,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   AnimationController animationController;
 
   int noOfNotifications = 0;
+
+  bool isDialogLoading = false;
 
   void filterOrder(OrderFilter orderFilter) {
     this.orderFilter = orderFilter;
@@ -113,6 +130,17 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
             ],
           );
         });
+  }
+
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
   }
 
   void changeShopStatus() async {
@@ -168,8 +196,29 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     animationController = AnimationController(
         duration: const Duration(milliseconds: 600), vsync: this);
     dashboardBloc.dashboardStream.listen((event) {
+      if (event.status == Status.SOCKET_ERROR) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => ErrorScreen(
+                      errorType: ErrorType.NO_INTERNET,
+                    )));
+      } else if (event.status == Status.ERROR) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => ErrorScreen(
+                      errorType: ErrorType.SERVER_ERROR,
+                    )));
+      }
       if (event.showToast) {
         CustomToast.show(event.message, context);
+      }
+      if (event.showLoader) {
+        showLoadingDialog();
+        isDialogLoading = true;
+      } else if (!event.showLoader && isDialogLoading) {
+        Navigator.pop(context);
       }
     });
     initDb('next_door.db');
@@ -502,234 +551,237 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         ),
         backgroundColor: Colors.white,
         appBar: CustomAppBar(),
-        body: Stack(
-          children: [
-            StreamBuilder<ApiResponse<DashboardModel>>(
-                stream: dashboardBloc.dashboardStream,
-                builder: (context,
-                    AsyncSnapshot<ApiResponse<DashboardModel>> snapshot) {
-                  if (snapshot.connectionState != ConnectionState.waiting) {
-                    return SingleChildScrollView(
-                      child: Container(
-                        color: AppTheme.background_grey,
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                DropdownButtonHideUnderline(
-                                  child: DropdownButton(
-                                    items: [
-                                      DropdownMenuItem(
-                                        child: DropDownTextWidget(
-                                            Strings.lifeTime),
-                                      ),
-                                      DropdownMenuItem(
-                                        child:
-                                            DropDownTextWidget(Strings.today),
-                                      ),
-                                      DropdownMenuItem(
-                                        child: DropDownTextWidget(
-                                            Strings.yesterday),
-                                      ),
-                                      DropdownMenuItem(
-                                        child: DropDownTextWidget(
-                                            Strings.lastWeek),
-                                      ),
-                                      DropdownMenuItem(
-                                        child: DropDownTextWidget(
-                                            Strings.lastMonth),
-                                      )
-                                    ],
-                                    icon: Icon(Icons.keyboard_arrow_down),
-                                    onChanged: (value) {},
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                )
-                              ],
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Row(
+        body: StreamBuilder<ApiResponse<DashboardModel>>(
+            stream: dashboardBloc.dashboardStream,
+            builder:
+                (context, AsyncSnapshot<ApiResponse<DashboardModel>> snapshot) {
+              if (snapshot.hasData) {
+                if (snapshot.data.status == Status.HAS_DATA) {
+                  return Stack(
+                    children: [
+                      SingleChildScrollView(
+                        child: Container(
+                          height: MediaQuery.of(context).size.height,
+                          color: AppTheme.background_grey,
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {},
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                              0.50 -
-                                          15,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 10),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            Strings.orders + ' Completed',
-                                            style: textStyleStats,
-                                          ),
-                                          Text(
-                                              snapshot.data.data.noOfOrders
-                                                  .toString(),
-                                              style: textStyleStats)
-                                        ],
-                                      ),
-                                      decoration: boxDecoration,
+                                  DropdownButtonHideUnderline(
+                                    child: DropdownButton<RevenueDuration>(
+                                      value: snapshot.data.data.revenueDuration,
+                                      items: [
+                                        DropdownMenuItem(
+                                          child: DropDownTextWidget(
+                                              Strings.lifeTime),
+                                          value: RevenueDuration.LIFETIME,
+                                        ),
+                                        DropdownMenuItem(
+                                          child:
+                                              DropDownTextWidget(Strings.today),
+                                          value: RevenueDuration.TODAY,
+                                        ),
+                                        DropdownMenuItem(
+                                          child: DropDownTextWidget(
+                                              Strings.yesterday),
+                                          value: RevenueDuration.YESTERDAY,
+                                        ),
+                                        DropdownMenuItem(
+                                          child: DropDownTextWidget(
+                                              Strings.lastWeek),
+                                          value: RevenueDuration.LAST7DAYS,
+                                        ),
+                                        DropdownMenuItem(
+                                          child:
+                                              DropDownTextWidget('This Month'),
+                                          value: RevenueDuration.MONTH,
+                                        ),
+                                        DropdownMenuItem(
+                                          value: RevenueDuration.LAST_MONTH,
+                                          child: DropDownTextWidget(
+                                              Strings.lastMonth),
+                                        )
+                                      ],
+                                      icon: Icon(Icons.keyboard_arrow_down),
+                                      onChanged: (value) {
+                                        dashboardBloc
+                                            .getDashboardRevenue(value);
+                                      },
                                     ),
                                   ),
                                   SizedBox(
-                                    width: 10,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProductCategory(),
-                                        ),
-                                      );
-                                    },
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                              0.50 -
-                                          15,
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 10),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            Strings.revenue,
-                                            style: textStyleStats,
-                                          ),
-                                          Text(
-                                              'Rs. ${snapshot.data.data.revenue}',
-                                              style: textStyleStats)
-                                        ],
-                                      ),
-                                      decoration: boxDecoration,
-                                    ),
+                                    width: 5,
                                   )
                                 ],
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
                               ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => HelpPage(),
-                                  ),
-                                );
-                              },
-                              child: RatingCardDashboard(
-                                boxDecoration: boxDecoration,
-                                totalRatings: snapshot.data.data.noOfRatings,
-                                avgRating: snapshot.data.data.rating,
-                                ratingStars: snapshot.data.data.ratingStars,
-                              ),
-                            ),
-                            Container(
-                              decoration: boxDecoration,
-                              padding: EdgeInsets.only(top: 10),
-                              margin: EdgeInsets.symmetric(horizontal: 10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    NewOrder(),
-                                              ),
-                                            );
-                                          },
-                                          child: Text(
-                                            Strings.activeOrders,
-                                            style: textStyleStats,
-                                          ),
-                                        ),
-                                        Row(
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                    0.50 -
+                                                15,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            ActiveOrderOptionWidget(
-                                              text: 'All',
-                                              isSelected: orderFilter ==
-                                                  OrderFilter.ALL,
-                                              orderFilter: OrderFilter.ALL,
-                                              callback: filterOrder,
+                                            Text(
+                                              Strings.orders + ' Completed',
+                                              style: textStyleStats,
                                             ),
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5),
-                                              child: ActiveOrderOptionWidget(
-                                                text: 'Pending',
-                                                isSelected: orderFilter ==
-                                                    OrderFilter.PENDING,
-                                                orderFilter:
-                                                    OrderFilter.PENDING,
-                                                callback: filterOrder,
-                                              ),
-                                            ),
-                                            ActiveOrderOptionWidget(
-                                              text: 'Confirmed',
-                                              isSelected: orderFilter ==
-                                                  OrderFilter.CONFIRMED,
-                                              orderFilter:
-                                                  OrderFilter.CONFIRMED,
-                                              callback: filterOrder,
-                                            )
+                                            Text(
+                                                snapshot.data.data.noOfOrders
+                                                    .toString(),
+                                                style: textStyleStats)
                                           ],
                                         ),
-                                      ],
+                                        decoration: boxDecoration,
+                                      ),
                                     ),
-                                  ),
-                                  Divider(
-                                    color: AppTheme.background_grey,
-                                    thickness: 2,
-                                    indent: 30,
-                                    endIndent: 30,
-                                  ),
-                                  ListView.builder(
-                                    physics: BouncingScrollPhysics(),
-                                    shrinkWrap: true,
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 5, horizontal: 2),
-                                    itemCount: snapshot
-                                        .data.data.orderModelList.length,
-                                    scrollDirection: Axis.vertical,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      ///Return Single Widget
-                                      return InkWell(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => OrderPage(
-                                                snapshot.data.data
-                                                    .orderModelList[index].id,
-                                              ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProductCategory(),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                    0.50 -
+                                                15,
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 10, horizontal: 10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              Strings.revenue,
+                                              style: textStyleStats,
                                             ),
-                                          );
-                                        },
-                                        child: RecentOrderWidget(
+                                            Text(
+                                                'Rs. ${snapshot.data.data.revenue}',
+                                                style: textStyleStats)
+                                          ],
+                                        ),
+                                        decoration: boxDecoration,
+                                      ),
+                                    )
+                                  ],
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          ChangePassword()));
+                                },
+                                child: RatingCardDashboard(
+                                  boxDecoration: boxDecoration,
+                                  totalRatings: snapshot.data.data.noOfRatings,
+                                  avgRating: snapshot.data.data.rating,
+                                  ratingStars: snapshot.data.data.ratingStars,
+                                ),
+                              ),
+                              Container(
+                                decoration: boxDecoration,
+                                padding: EdgeInsets.only(top: 10),
+                                margin: EdgeInsets.symmetric(horizontal: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      NewOrder(),
+                                                ),
+                                              );
+                                            },
+                                            child: Text(
+                                              Strings.activeOrders,
+                                              style: textStyleStats,
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              ActiveOrderOptionWidget(
+                                                text: 'All',
+                                                isSelected: orderFilter ==
+                                                    OrderFilter.ALL,
+                                                orderFilter: OrderFilter.ALL,
+                                                callback: filterOrder,
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 5),
+                                                child: ActiveOrderOptionWidget(
+                                                  text: 'Pending',
+                                                  isSelected: orderFilter ==
+                                                      OrderFilter.PENDING,
+                                                  orderFilter:
+                                                      OrderFilter.PENDING,
+                                                  callback: filterOrder,
+                                                ),
+                                              ),
+                                              ActiveOrderOptionWidget(
+                                                text: 'Confirmed',
+                                                isSelected: orderFilter ==
+                                                    OrderFilter.CONFIRMED,
+                                                orderFilter:
+                                                    OrderFilter.CONFIRMED,
+                                                callback: filterOrder,
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Divider(
+                                      color: AppTheme.background_grey,
+                                      thickness: 2,
+                                      indent: 30,
+                                      endIndent: 30,
+                                    ),
+                                    ListView.builder(
+                                      physics: BouncingScrollPhysics(),
+                                      shrinkWrap: true,
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 5, horizontal: 2),
+                                      itemCount: snapshot
+                                          .data.data.orderModelList.length,
+                                      scrollDirection: Axis.vertical,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        ///Return Single Widget
+                                        return RecentOrderWidget(
                                           orderNo: snapshot.data.data
                                               .orderModelList[index].id,
                                           orderValue: snapshot.data.data
@@ -747,166 +799,171 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                               .orderModelList[index].paid,
                                           name: 'Utkarsh',
                                           address: 'B14/172 Kalyani',
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 95,
-                            )
-                          ],
-                        ),
-                      ),
-                    );
-                  } else {
-                    return Shimmer.fromColors(
-                      direction: ShimmerDirection.ltr,
-                      baseColor: Colors.grey[200],
-                      highlightColor: Colors.grey[100],
-                      enabled: true,
-                      child: SingleChildScrollView(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 30),
-                          padding:
-                              EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Container(
-                                    width: MediaQuery.of(context).size.width *
-                                            0.5 -
-                                        25,
-                                    height: 60,
-                                    decoration: boxDecoration,
-                                  ),
-                                  Container(
-                                    width: MediaQuery.of(context).size.width *
-                                            0.5 -
-                                        25,
-                                    height: 60,
-                                    decoration: boxDecoration,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 50,
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      height: 20,
-                                      decoration: boxDecoration,
-                                    ),
-                                    SizedBox(
-                                      height: 12,
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.85,
-                                      height: 20,
-                                      decoration: boxDecoration,
-                                    ),
-                                    SizedBox(
-                                      height: 12,
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.7,
-                                      height: 20,
-                                      decoration: boxDecoration,
-                                    ),
-                                    SizedBox(
-                                      height: 12,
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.55,
-                                      height: 20,
-                                      decoration: boxDecoration,
-                                    ),
-                                    SizedBox(
-                                      height: 12,
-                                    ),
-                                    Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.4,
-                                      height: 20,
-                                      decoration: boxDecoration,
+                                          orderStatus: snapshot.data.data
+                                              .orderModelList[index].status,
+                                        );
+                                      },
                                     ),
                                   ],
                                 ),
                               ),
                               SizedBox(
-                                height: 50,
-                              ),
-                              ListView.separated(
-                                separatorBuilder: (context, index) => SizedBox(
-                                  height: 15,
-                                ),
-                                shrinkWrap: true,
-                                padding: EdgeInsets.symmetric(horizontal: 10),
-                                itemCount: 4,
-                                scrollDirection: Axis.vertical,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Row(
-                                    children: [
-                                      Container(
-                                        height: 50,
-                                        width: 50,
-                                        decoration: boxDecoration,
-                                      ),
-                                      SizedBox(
-                                        width: 15,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            height: 15,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                150,
-                                            decoration: boxDecoration,
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Container(
-                                            height: 25,
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                95,
-                                            decoration: boxDecoration,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
+                                height: 95,
+                              )
                             ],
                           ),
                         ),
                       ),
-                    );
-                  }
-                }),
-            bottomBar(),
-          ],
-        ),
+                      bottomBar(),
+                    ],
+                  );
+                } else if (snapshot.data.status == Status.SOCKET_ERROR) {
+                  return ErrorScreen(
+                    errorType: ErrorType.NO_INTERNET,
+                  );
+                } else {
+                  return ErrorScreen(
+                    errorType: ErrorType.SERVER_ERROR,
+                  );
+                }
+              } else {
+                return Shimmer.fromColors(
+                  direction: ShimmerDirection.ltr,
+                  baseColor: Colors.grey[200],
+                  highlightColor: Colors.grey[100],
+                  enabled: true,
+                  child: SingleChildScrollView(
+                    child: Container(
+                      margin: EdgeInsets.only(top: 30),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.5 -
+                                    25,
+                                height: 60,
+                                decoration: boxDecoration,
+                              ),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.5 -
+                                    25,
+                                height: 60,
+                                decoration: boxDecoration,
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 50,
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 20,
+                                  decoration: boxDecoration,
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.85,
+                                  height: 20,
+                                  decoration: boxDecoration,
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                  height: 20,
+                                  decoration: boxDecoration,
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.55,
+                                  height: 20,
+                                  decoration: boxDecoration,
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  height: 20,
+                                  decoration: boxDecoration,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 50,
+                          ),
+                          ListView.separated(
+                            separatorBuilder: (context, index) => SizedBox(
+                              height: 15,
+                            ),
+                            shrinkWrap: true,
+                            padding: EdgeInsets.symmetric(horizontal: 10),
+                            itemCount: 4,
+                            scrollDirection: Axis.vertical,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Row(
+                                children: [
+                                  Container(
+                                    height: 50,
+                                    width: 50,
+                                    decoration: boxDecoration,
+                                  ),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        height: 15,
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                150,
+                                        decoration: boxDecoration,
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        height: 25,
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                95,
+                                        decoration: boxDecoration,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+            }),
       ),
     );
   }
@@ -1066,6 +1123,7 @@ class RecentOrderWidget extends StatelessWidget {
   final bool isPaid;
   final String name;
   final String address;
+  final OrderStatus orderStatus;
 
   RecentOrderWidget(
       {this.orderNo,
@@ -1075,110 +1133,127 @@ class RecentOrderWidget extends StatelessWidget {
       this.date,
       this.isPaid,
       this.name,
-      this.address});
+      this.address,
+      this.orderStatus});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(left: 10, right: 10, bottom: 8),
-      decoration: BoxDecoration(
-          color: AppTheme.background_grey,
-          borderRadius: BorderRadius.all(Radius.circular(5))),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0, top: 5, bottom: 5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '#$orderNo',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.secondary_color),
-                ),
-                Text(
-                  '${Strings.orderValue}:\nRs. $orderValue',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.secondary_color),
-                ),
-              ],
-            ),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => orderStatus == OrderStatus.PENDING
+                ? PendingOrder(orderNo)
+                : OrderPage(
+                    orderNo,
+                  ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 5, bottom: 5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${Strings.totalUnits}: $units',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.secondary_color),
-                ),
-                Text(
-                  '${Strings.totalDiscount}:\nRs. $discount',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.secondary_color),
-                ),
-              ],
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.only(left: 10, right: 10, bottom: 8),
+        decoration: BoxDecoration(
+            color: AppTheme.background_grey,
+            borderRadius: BorderRadius.all(Radius.circular(5))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0, top: 5, bottom: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '#$orderNo',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                  Text(
+                    '${Strings.orderValue}:\nRs. $orderValue',
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 5.0, top: 5, bottom: 5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      date,
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.secondary_color),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                      margin: EdgeInsets.only(left: 3),
-                      child: Text(
-                        isPaid ? Strings.paid : Strings.cod,
+            Padding(
+              padding: const EdgeInsets.only(top: 5, bottom: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${Strings.totalUnits}: $units',
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                  Text(
+                    '${Strings.totalDiscount}:\nRs. $discount',
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 5.0, top: 5, bottom: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        date,
                         style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w700),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.secondary_color),
                       ),
-                      decoration: BoxDecoration(
-                          color: isPaid ? AppTheme.green : Colors.orange,
-                          borderRadius: BorderRadius.all(Radius.circular(5))),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.3,
-                  child: Tooltip(
-                    message: '$name\n$address',
-                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    child: Text(
-                      '$name\n$address',
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.secondary_color),
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+                        margin: EdgeInsets.only(left: 3),
+                        child: Text(
+                          isPaid ? Strings.paid : Strings.cod,
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w700),
+                        ),
+                        decoration: BoxDecoration(
+                            color: isPaid ? AppTheme.green : Colors.orange,
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    child: Tooltip(
+                      message: '$name\n$address',
+                      padding:
+                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      child: Text(
+                        '$name\n$address',
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.secondary_color),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          )
-        ],
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

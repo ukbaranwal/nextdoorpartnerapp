@@ -7,6 +7,7 @@ import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/models/product_category_model.dart';
 import 'package:nextdoorpartner/resources/vendor_api_provider.dart';
 import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
+import 'package:nextdoorpartner/ui/dashboard.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 
 class Repository {
@@ -26,13 +27,16 @@ class Repository {
   Future<Response> resetPassword(String email, String pin, String password) =>
       vendorApiProvider.resetPassword(email, pin, password);
 
+  Future<Response> changePassword(String password, String newPassword) =>
+      vendorApiProvider.changePassword(password, newPassword);
+
   Future<Response> getDashboard() => vendorApiProvider.getDashboard();
 
   Future<Response> firebaseTokenUpload() =>
       vendorApiProvider.firebaseTokenUpload();
 
-  Future<Response> getDashboardRevenue() =>
-      vendorApiProvider.getDashboardRevenue();
+  Future<Response> getDashboardRevenue(RevenueDuration revenueDuration) =>
+      vendorApiProvider.getDashboardRevenue(revenueDuration);
 
   Future<Response> changeShopStatus(bool shopOpen) =>
       vendorApiProvider.changeShopStatus(shopOpen);

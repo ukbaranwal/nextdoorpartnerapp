@@ -273,162 +273,173 @@ class _ProductsState extends State<Products> {
           child: SingleChildScrollView(
             physics: BouncingScrollPhysics(),
             controller: scrollController,
-            child: Column(
-              children: [
-                Card(
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  elevation: 10,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10))),
-                  child: Container(
-                    padding: EdgeInsets.all(18),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProductCategory(),
-                                ));
-                          },
-                          child: Text(
-                            Strings.addNewProduct,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 22),
-                          ),
-                        ),
-                        Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        )
-                      ],
-                    ),
-                    decoration: BoxDecoration(
-                        color: AppTheme.green,
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  padding: EdgeInsets.symmetric(horizontal: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+            child: StreamBuilder(
+              stream: productsBloc.productsStream,
+              builder: (BuildContext context,
+                  AsyncSnapshot<ApiResponse<List<ProductModel>>> snapshot) {
+                if (snapshot.connectionState != ConnectionState.waiting) {
+                  if (snapshot.data.message == 'end' ||
+                      snapshot.data.data.length < 6) {
+                    isEnd = true;
+                  }
+                  return Column(
                     children: [
-                      Icon(
-                        Icons.search,
-                        color: AppTheme.grey,
+                      Card(
+                        margin:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: Container(
+                          padding: EdgeInsets.all(18),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductCategory(),
+                                      ));
+                                },
+                                child: Text(
+                                  Strings.addNewProduct,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 22),
+                                ),
+                              ),
+                              Icon(
+                                Icons.add,
+                                color: Colors.white,
+                              )
+                            ],
+                          ),
+                          decoration: BoxDecoration(
+                              color: AppTheme.green,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                        ),
                       ),
                       Container(
-                        width: MediaQuery.of(context).size.width * 0.7,
-                        child: TextFormField(
-                          controller: searchTextEditingController,
-                          cursorColor: AppTheme.secondary_color,
-                          onFieldSubmitted: (value) => {},
-                          onChanged: (value) {
-                            searchQuery = value;
-                            productsBloc.getProducts(searchQuery,
-                                orderBy: sortedBy);
-                            isEnd = false;
-                          },
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.secondary_color,
-                              fontSize: 18),
-                          keyboardType: TextInputType.text,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              hintStyle: TextStyle(
-                                  fontWeight: FontWeight.w700,
+                        margin:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.search,
+                              color: AppTheme.grey,
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.7,
+                              child: TextFormField(
+                                controller: searchTextEditingController,
+                                cursorColor: AppTheme.secondary_color,
+                                onFieldSubmitted: (value) => {},
+                                onChanged: (value) {
+                                  searchQuery = value;
+                                  productsBloc.getProducts(searchQuery,
+                                      orderBy: sortedBy);
+                                  isEnd = false;
+                                },
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: AppTheme.secondary_color,
+                                    fontSize: 18),
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    hintStyle: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        color: AppTheme.grey,
+                                        fontSize: 18),
+                                    errorBorder: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    contentPadding: EdgeInsets.only(
+                                        left: 10,
+                                        bottom: 11,
+                                        top: 11,
+                                        right: 10),
+                                    hintText: Strings.search),
+                                onEditingComplete: () {},
+                              ),
+                            ),
+                            Expanded(
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.highlight_off,
                                   color: AppTheme.grey,
-                                  fontSize: 18),
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.only(
-                                  left: 10, bottom: 11, top: 11, right: 10),
-                              hintText: Strings.search),
-                          onEditingComplete: () {},
+                                ),
+                                onPressed: () {
+                                  if (searchTextEditingController.text.trim() ==
+                                      '') {
+                                    return;
+                                  }
+                                  searchTextEditingController.clear();
+                                  productsBloc.getProducts('',
+                                      orderBy: sortedBy);
+                                  isEnd = false;
+                                },
+                              ),
+                            )
+                          ],
                         ),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(50))),
                       ),
-                      Expanded(
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.highlight_off,
-                            color: AppTheme.grey,
-                          ),
-                          onPressed: () {
-                            if (searchTextEditingController.text.trim() == '') {
-                              return;
-                            }
-                            searchTextEditingController.clear();
-                            productsBloc.getProducts('', orderBy: sortedBy);
-                            isEnd = false;
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: InkWell(
+                          onTap: () {
+                            showFilterOption();
                           },
+                          child: Container(
+                            width: 100,
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            margin: EdgeInsets.symmetric(
+                              horizontal: 12,
+                            ),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5))),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Sort by',
+                                  style: TextStyle(
+                                      color: AppTheme.secondary_color,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w800),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Icon(
+                                  Icons.sort,
+                                  size: 16,
+                                  color: AppTheme.secondary_color,
+                                )
+                              ],
+                            ),
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(50))),
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: InkWell(
-                    onTap: () {
-                      showFilterOption();
-                    },
-                    child: Container(
-                      width: 100,
-                      padding: EdgeInsets.symmetric(vertical: 5),
-                      margin: EdgeInsets.symmetric(
-                        horizontal: 12,
                       ),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(Radius.circular(5))),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Sort by',
-                            style: TextStyle(
-                                color: AppTheme.secondary_color,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Icon(
-                            Icons.sort,
-                            size: 16,
-                            color: AppTheme.secondary_color,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                StreamBuilder(
-                  stream: productsBloc.productsStream,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<ApiResponse<List<ProductModel>>> snapshot) {
-                    if (snapshot.connectionState != ConnectionState.waiting) {
-                      if (snapshot.data.message == 'end' ||
-                          snapshot.data.data.length < 6) {
-                        isEnd = true;
-                      }
-                      return ListView.builder(
+                      ListView.builder(
                         physics: BouncingScrollPhysics(),
                         shrinkWrap: true,
                         padding:
@@ -454,113 +465,109 @@ class _ProductsState extends State<Products> {
                                   productModel: snapshot.data.data[index],
                                   index: index + 1);
                         },
-                      );
-                    } else {
-                      return Container(
-                        margin: EdgeInsets.only(top: 10),
-                        color: Colors.white,
-                        child: Shimmer.fromColors(
-                          direction: ShimmerDirection.ltr,
-                          baseColor: Colors.grey[200],
-                          highlightColor: Colors.grey[100],
-                          enabled: true,
-                          child: SingleChildScrollView(
-                            child: Container(
-                              margin: EdgeInsets.only(top: 30),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 5),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ListView.separated(
-                                    separatorBuilder: (context, index) =>
-                                        SizedBox(
-                                      height: 35,
-                                    ),
-                                    shrinkWrap: true,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 10),
-                                    itemCount: 5,
-                                    scrollDirection: Axis.vertical,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
+                      ),
+                    ],
+                  );
+                } else {
+                  return Container(
+                    color: Colors.white,
+                    height: MediaQuery.of(context).size.height,
+                    child: Shimmer.fromColors(
+                      direction: ShimmerDirection.ltr,
+                      baseColor: Colors.grey[200],
+                      highlightColor: Colors.grey[100],
+                      enabled: true,
+                      child: SingleChildScrollView(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 30),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListView.separated(
+                                separatorBuilder: (context, index) => SizedBox(
+                                  height: 35,
+                                ),
+                                shrinkWrap: true,
+                                padding: EdgeInsets.symmetric(horizontal: 10),
+                                itemCount: 5,
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
                                                 0.2,
-                                            height: 84,
-                                            decoration: boxDecoration,
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 8),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.6,
-                                                  height: 15,
-                                                  decoration: boxDecoration,
-                                                ),
-                                                SizedBox(
-                                                  height: 8,
-                                                ),
-                                                Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.5,
-                                                  height: 15,
-                                                  decoration: boxDecoration,
-                                                ),
-                                                SizedBox(
-                                                  height: 8,
-                                                ),
-                                                Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.4,
-                                                  height: 15,
-                                                  decoration: boxDecoration,
-                                                ),
-                                                SizedBox(
-                                                  height: 8,
-                                                ),
-                                                Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.3,
-                                                  height: 15,
-                                                  decoration: boxDecoration,
-                                                ),
-                                              ],
+                                        height: 84,
+                                        decoration: boxDecoration,
+                                      ),
+                                      Container(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 8),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.6,
+                                              height: 15,
+                                              decoration: boxDecoration,
                                             ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                ],
+                                            SizedBox(
+                                              height: 8,
+                                            ),
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.5,
+                                              height: 15,
+                                              decoration: boxDecoration,
+                                            ),
+                                            SizedBox(
+                                              height: 8,
+                                            ),
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.4,
+                                              height: 15,
+                                              decoration: boxDecoration,
+                                            ),
+                                            SizedBox(
+                                              height: 8,
+                                            ),
+                                            Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.3,
+                                              height: 15,
+                                              decoration: boxDecoration,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
                               ),
-                            ),
+                            ],
                           ),
                         ),
-                      );
-                    }
-                  },
-                )
-              ],
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
           ),
         ),

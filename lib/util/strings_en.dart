@@ -1,6 +1,6 @@
 ///String for English
 class Strings {
-  static const String hostUrl = 'http://192.168.0.6:3003/';
+  static const String hostUrl = 'http://192.168.0.5:3003/';
   static const String supportLocalBusiness =
       'Support your nearby Local Businesses:';
   static const String orderDailyEssentials =
