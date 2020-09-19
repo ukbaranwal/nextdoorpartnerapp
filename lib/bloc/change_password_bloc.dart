@@ -2,42 +2,59 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 import 'package:nextdoorpartner/bloc/bloc_interface.dart';
+import 'package:nextdoorpartner/models/coupon_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ChangePasswordBloc {
+class ChangePasswordBloc implements BlocInterface {
   final _repository = Repository();
   SharedPreferences sharedPreferences;
+  var _changePasswordFetcher = PublishSubject<ApiResponse<bool>>();
+  Stream<ApiResponse<bool>> get changePasswordStream =>
+      _changePasswordFetcher.stream;
 
-  Future<ApiResponse> changePassword(String password, String newPassword) async {
+  changePassword(String password, String newPassword) async {
     try {
-      sharedPreferences = await SharedPreferencesManager.getInstance();
-      String email =
-          sharedPreferences.getString(SharedPreferencesManager.email);
-      Response response = await _repository.changePassword(password, newPassword);
+      _changePasswordFetcher.sink.add(ApiResponse.hasData('Loading',
+          actions: ApiActions.LOADING, loader: LOADER.SHOW));
+      Response response =
+          await _repository.changePassword(password, newPassword);
 
-      ///no user exist with email
-      if (response.statusCode == 204) {
-        return ApiResponse.unSuccessful('No user exist with email $email');
-
-        ///For accepted password 202
+      var jsonResponse = jsonDecode(response.body);
+      print(jsonResponse);
+      if (response.statusCode == 202) {
+        _changePasswordFetcher.sink.add(ApiResponse.hasData(
+            jsonResponse['message'],
+            actions: ApiActions.SUCCESSFUL,
+            loader: LOADER.HIDE));
+      } else if (response.statusCode == 401) {
+        _changePasswordFetcher.sink.add(ApiResponse.hasData(
+            jsonResponse['message'],
+            actions: ApiActions.WRONG_INFO,
+            loader: LOADER.HIDE));
+      } else if (response.statusCode == 422) {
+        _changePasswordFetcher.sink.add(ApiResponse.hasData(
+            jsonResponse['message'],
+            actions: ApiActions.ERROR,
+            loader: LOADER.HIDE));
       } else {
-        var jsonResponse = jsonDecode(response.body);
-        if (response.statusCode == 202) {
-          return ApiResponse.successful(jsonResponse['message']);
-        } else if (response.statusCode == 401) {
-          return ApiResponse.unSuccessful(jsonResponse['message']);
-        } else if (response.statusCode == 422) {
-          return ApiResponse.validationFailed(jsonResponse['message']);
-        } else {
-          return ApiResponse.error(jsonResponse['message']);
-        }
+        _changePasswordFetcher.sink.add(ApiResponse.error(
+            jsonResponse['message'],
+            actions: ApiActions.ERROR,
+            loader: LOADER.HIDE));
       }
     } catch (e) {
       print(e.toString());
-      return ApiResponse.error(e.toString());
+      _changePasswordFetcher.sink.add(ApiResponse.error(e.toString(),
+          actions: ApiActions.ERROR, loader: LOADER.HIDE));
     }
+  }
+
+  @override
+  void dispose() {
+    _changePasswordFetcher.close();
   }
 }

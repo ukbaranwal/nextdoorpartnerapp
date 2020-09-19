@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nextdoorpartner/bloc/signup_bloc.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/ui/login.dart';
 import 'package:nextdoorpartner/ui/terms_and_conditions.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
@@ -56,7 +57,6 @@ class _SignUpState extends State<SignUp> {
           context);
       return;
     }
-    showProgressDialog(context: context, loadingText: 'Loading');
     AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
     print(androidDeviceInfo.id);
     signUpBloc.doSignUp(
@@ -66,10 +66,14 @@ class _SignUpState extends State<SignUp> {
         cityTextEditingController.text,
         passwordTextEditingController.text,
         androidDeviceInfo.id);
-    signUpBloc.signUpStream.listen((data) {
-      dismissProgressDialog();
-      CustomToast.show(data.message, context);
-      if (data.status == Status.SUCCESSFUL) {
+    signUpBloc.signUpStream.listen((event) {
+      if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      } else if (event.loader == LOADER.HIDE) {
+        CustomToast.show(event.message, context);
+        Navigator.pop(context);
+      }
+      if (event.actions == ApiActions.SUCCESSFUL) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -78,6 +82,17 @@ class _SignUpState extends State<SignUp> {
         );
       }
     });
+  }
+
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
   }
 
   void checkForValidation() {

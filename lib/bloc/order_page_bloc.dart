@@ -23,43 +23,59 @@ class OrderPageBloc implements BlocInterface {
       print(jsonResponse);
       if (response.statusCode == 200) {
         _orderModel = OrderModel.fromJson(jsonResponse['data']['order']);
-        _orderFetcher.sink.add(ApiResponse.successful(jsonResponse['message'],
-            data: _orderModel, showToast: false));
+        _orderFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _orderModel,
+            actions: ApiActions.INITIATED,
+            loader: LOADER.IDLE));
       }
     } catch (e) {
-      _orderFetcher.sink.add(ApiResponse.error(e.toString()));
+      _orderFetcher.sink
+          .add(ApiResponse.error(e.toString(), loader: LOADER.IDLE));
     }
   }
 
   confirmOrder(int orderId) async {
     try {
+      _orderFetcher.sink.add(ApiResponse.hasData('Loading',
+          data: _orderModel, actions: ApiActions.LOADING, loader: LOADER.SHOW));
       Response response = await _repository.confirmOrder(orderId);
       var jsonResponse = jsonDecode(response.body);
       print(jsonResponse);
       if (response.statusCode == 200) {
-        _orderFetcher.sink.add(ApiResponse.successful(jsonResponse['message'],
-            data: _orderModel, showToast: true));
+        _orderFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _orderModel,
+            actions: ApiActions.SUCCESSFUL,
+            loader: LOADER.HIDE));
       } else {
-        _orderFetcher.sink.add(ApiResponse.successful(jsonResponse['message'],
-            data: _orderModel, showToast: true));
+        _orderFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _orderModel, actions: ApiActions.ERROR, loader: LOADER.HIDE));
       }
     } catch (e) {
-//      _orderFetcher.sink.add(ApiResponse.error(e.toString()));
+      _orderFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          data: _orderModel, actions: ApiActions.ERROR, loader: LOADER.HIDE));
     }
   }
 
   cancelOrder(int orderId, String cancellationReason) async {
     try {
+      _orderFetcher.sink.add(ApiResponse.hasData('Loading',
+          data: _orderModel, actions: ApiActions.LOADING, loader: LOADER.SHOW));
       Response response =
           await _repository.cancelOrder(orderId, cancellationReason);
       var jsonResponse = jsonDecode(response.body);
       print(jsonResponse);
       if (response.statusCode == 200) {
-        _orderFetcher.sink.add(ApiResponse.successful(jsonResponse['message'],
-            data: _orderModel, showToast: true));
+        _orderFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _orderModel,
+            actions: ApiActions.SUCCESSFUL,
+            loader: LOADER.HIDE));
+      } else {
+        _orderFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _orderModel, actions: ApiActions.ERROR, loader: LOADER.HIDE));
       }
     } catch (e) {
-      _orderFetcher.sink.add(ApiResponse.error(e.toString()));
+      _orderFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          data: _orderModel, actions: ApiActions.ERROR, loader: LOADER.HIDE));
     }
   }
 

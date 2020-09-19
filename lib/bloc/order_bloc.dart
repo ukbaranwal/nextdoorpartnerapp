@@ -80,12 +80,13 @@ class OrderBloc implements BlocInterface {
         orderModelBloc.parseOrderModelListCompleted(jsonResponse['data']);
       }
 
-      _orderFetcher.sink
-          .add(ApiResponse.successful('done', data: orderModelBloc));
+      _orderFetcher.sink.add(ApiResponse.hasData('done', data: orderModelBloc));
       alreadyExecuting = false;
     } catch (e) {
       print(e);
-      _orderFetcher.sink.add(ApiResponse.error(e.toString()));
+      _orderFetcher.sink
+          .add(ApiResponse.hasData(e.toString(), data: orderModelBloc));
+      alreadyExecuting = false;
     }
   }
 

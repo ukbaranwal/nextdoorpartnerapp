@@ -63,6 +63,11 @@ class Repository {
       vendorApiProvider.getProducts(noOfProductsAlreadyFetched, search,
           orderBy: orderBy);
 
+  Future<Response> getCouponProducts(
+          int noOfProductsAlreadyFetched, List<int> productIds) =>
+      vendorApiProvider.getCouponProducts(
+          noOfProductsAlreadyFetched, productIds);
+
   Future<Response> getProductTemplates(int noOfProductsAlreadyFetched,
           String search, int productCategoryId) =>
       vendorApiProvider.getProductTemplates(

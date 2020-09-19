@@ -15,14 +15,15 @@ class BackgroundSyncBloc {
       Response response = await _repository.syncProductCategories(vendorType);
       var jsonResponse = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        return ApiResponse.successful(jsonResponse['message'],
+        return ApiResponse.hasData(jsonResponse['message'],
             data: jsonResponse['data']['product_categories']);
+      } else {
+        return ApiResponse.error(jsonResponse['message']);
       }
     } catch (e) {
       print(e.toString());
       return ApiResponse.error(e.toString());
     }
-    return ApiResponse.error('Something went Wrong');
   }
 
   Future<DbResponse> insertProductCategoriesInDb(
@@ -43,14 +44,15 @@ class BackgroundSyncBloc {
       var jsonResponse = jsonDecode(response.body);
       if (response.statusCode == 200) {
         print(jsonResponse);
-        return ApiResponse.successful(jsonResponse['message'],
+        return ApiResponse.hasData(jsonResponse['message'],
             data: jsonResponse['data']['notifications']);
+      } else {
+        return ApiResponse.error(jsonResponse['message']);
       }
     } catch (e) {
       print(e.toString());
       return ApiResponse.error(e.toString());
     }
-    return ApiResponse.error('Something went Wrong');
   }
 
   Future<DbResponse> insertNotificationsInDb(

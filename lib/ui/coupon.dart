@@ -8,6 +8,7 @@ import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/calendar_popup_view.dart';
 import 'package:nextdoorpartner/ui/coupon_product.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/ui/product.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
@@ -142,14 +143,6 @@ class _CouponState extends State<Coupon> {
         applicability,
         applicability == Applicability.PRODUCT_WISE ? selectProductIds : null);
     couponBloc.addCoupon(couponModel);
-    couponBloc.couponStream.listen((event) {
-      if (event.status == Status.SUCCESSFUL) {
-        Navigator.pop(context);
-        Navigator.pop(context);
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (BuildContext context) => Coupons()));
-      }
-    });
   }
 
   void updateProduct() {
@@ -167,18 +160,36 @@ class _CouponState extends State<Coupon> {
     couponBloc.updateCoupon(couponModel);
   }
 
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     couponBloc = CouponBloc(widget.couponModel);
     couponBloc.init();
     couponBloc.couponStream.listen((event) {
-      if (event.showToast) {
+      if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      } else if (event.loader == LOADER.HIDE) {
+        Navigator.pop(context);
         CustomToast.show(event.message, context);
       }
-      if (widget.isNewCoupon) {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (BuildContext context) => Coupons()));
+      if (event.actions == ApiActions.SUCCESSFUL) {
+        if (widget.isNewCoupon) {
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (BuildContext context) => Coupons()));
+        }
       }
     });
   }

@@ -4,6 +4,7 @@ import 'package:nextdoorpartner/bloc/seller_support_bloc.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/dashboard.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
 
@@ -32,6 +33,17 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
         .hasMatch(value);
   }
 
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
+  }
+
   checkValidation() {
     if (pageNo == 0) {
       if (phoneTextEditingController.text.length != 10) {
@@ -52,13 +64,16 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
           widget.reason, issueTextEditingController.text);
     }
     sellerSupportBloc.supportStream.listen((event) {
-      if (event.status == Status.SUCCESSFUL) {
+      if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      } else if (event.loader == LOADER.HIDE) {
+        Navigator.pop(context);
         CustomToast.show(event.message, context);
+      }
+      if (event.actions == ApiActions.SUCCESSFUL) {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (BuildContext context) => Dashboard()),
             (route) => false);
-      } else {
-        CustomToast.show(event.message, context);
       }
     });
   }

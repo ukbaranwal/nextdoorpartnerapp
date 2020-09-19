@@ -20,8 +20,8 @@ class HelpPageContentBloc implements BlocInterface {
 
       ///already registered
       if (response.statusCode == 200) {
-        _helpPageContentFetcher.sink.add(
-            ApiResponse.successful('Fetched', data: jsonResponse['content']));
+        _helpPageContentFetcher.sink
+            .add(ApiResponse.hasData('Fetched', data: jsonResponse['content']));
       }
     } catch (e) {
       print(e.toString());

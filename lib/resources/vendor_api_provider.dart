@@ -277,6 +277,27 @@ class VendorApiProvider {
     return response;
   }
 
+  Future<Response> getCouponProducts(
+      int noOfProductsAlreadyFetched, List<int> productIds) async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    String authorisationToken = sharedPreferences
+        .getString(SharedPreferencesManager.authorisationToken);
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": authorisationToken
+    };
+    var response;
+    try {
+      response = await client.get(
+          '$_baseUrl/couponProducts?offset=$noOfProductsAlreadyFetched&product_ids=${productIds.toString()}',
+          headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
   Future<Response> getProductTemplates(int noOfProductsAlreadyFetched,
       String search, int productCategoryId) async {
     SharedPreferences sharedPreferences =

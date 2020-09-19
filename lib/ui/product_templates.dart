@@ -330,7 +330,6 @@ class ProductTemplateWidget extends StatelessWidget {
                   child: CachedNetworkImage(
                     imageUrl: Strings.hostUrl +
                         productTemplateModel.images[0].imageUrl,
-//                  imageUrl,
                     height: 80,
                     width: 80,
                   ),

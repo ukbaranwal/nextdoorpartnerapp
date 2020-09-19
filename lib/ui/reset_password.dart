@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nextdoorpartner/bloc/reset_password_bloc.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/ui/login.dart';
 import 'package:nextdoorpartner/ui/sign_up.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
@@ -30,7 +31,8 @@ class _ResetPasswordState extends State<ResetPassword> {
       CustomToast.show('password should be of at least 8 characters', context);
       return;
     }
-    resetPassword();
+    resetPasswordBloc.resetPassword(
+        pinTextEditingController.text, passwordTextEditingController.text);
   }
 
   changeFocus(FocusScopeNode focusScopeNode) {
@@ -48,28 +50,37 @@ class _ResetPasswordState extends State<ResetPassword> {
     FocusScope.of(context).requestFocus(focusScopeNode2);
   }
 
-  void resetPassword() async {
-    showProgressDialog(context: context, loadingText: 'Loading');
-    ApiResponse<dynamic> response = await resetPasswordBloc.resetPassword(
-        pinTextEditingController.text, passwordTextEditingController.text);
-    dismissProgressDialog();
-    if (response.status == Status.SUCCESSFUL) {
-      CustomToast.show(response.message, context);
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Login(),
-          ),
-          (route) => false);
-    } else {
-      CustomToast.show(response.message, context);
-    }
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
   }
 
   @override
   void initState() {
     super.initState();
     resetPasswordBloc = ResetPasswordBloc();
+    resetPasswordBloc.resetPasswordStream.listen((event) {
+      if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      } else if (event.loader == LOADER.HIDE) {
+        Navigator.pop(context);
+        CustomToast.show(event.message, context);
+      }
+      if (event.actions == ApiActions.SUCCESSFUL) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Login(),
+            ),
+            (route) => false);
+      }
+    });
   }
 
   @override

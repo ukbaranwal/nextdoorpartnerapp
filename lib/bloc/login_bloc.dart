@@ -14,39 +14,40 @@ class LoginBloc implements BlocInterface {
 
   doLogin(String email, String password, String deviceId) async {
     _loginFetcher = PublishSubject<ApiResponse<String>>();
+    _loginFetcher.sink.add(ApiResponse.hasData('Loading',
+        actions: ApiActions.LOADING, loader: LOADER.SHOW));
     try {
       Response response = await _repository.doLogin(email, password, deviceId);
-      _loginFetcher.sink.add(ApiResponse.loading('Checking'));
       if (response.statusCode == 204) {
-        _loginFetcher.sink
-            .add(ApiResponse.unSuccessful('No user exist with email $email'));
+        _loginFetcher.sink.add(ApiResponse.hasData(
+            'No user exist with email $email',
+            actions: ApiActions.ERROR,
+            loader: LOADER.HIDE));
       } else {
         var jsonResponse = jsonDecode(response.body);
 
         ///For Wrong Password 401
         if (response.statusCode == 401) {
-          _loginFetcher.sink
-              .add(ApiResponse.unSuccessful(jsonResponse['message']));
+          _loginFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+              actions: ApiActions.WRONG_INFO, loader: LOADER.HIDE));
 
           ///For accepted password 202
         } else if (response.statusCode == 202) {
-          _loginFetcher.sink.add(ApiResponse.successful(jsonResponse['message'],
+          _loginFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+              actions: ApiActions.SUCCESSFUL,
+              loader: LOADER.HIDE,
               data: VendorModel.fromJson(jsonResponse['data'])));
 
           ///No associated id 204
-        }
-
-        ///Validation Failed 422
-        else if (response.statusCode == 422) {
-          _loginFetcher.sink
-              .add(ApiResponse.validationFailed(jsonResponse['message']));
         } else {
-          _loginFetcher.sink.add(ApiResponse.error(jsonResponse['message']));
+          _loginFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+              actions: ApiActions.ERROR, loader: LOADER.HIDE));
         }
       }
     } catch (e) {
       print(e.toString());
-      _loginFetcher.sink.add(ApiResponse.error(e.toString()));
+      _loginFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          actions: ApiActions.ERROR, loader: LOADER.HIDE));
     }
   }
 

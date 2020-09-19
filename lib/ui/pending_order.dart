@@ -5,6 +5,7 @@ import 'package:nextdoorpartner/bloc/pending_order_bloc.dart';
 import 'package:nextdoorpartner/models/order_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
@@ -25,14 +26,28 @@ class _PendingOrderState extends State<PendingOrder> {
   BoxDecoration boxDecoration = BoxDecoration(
       color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5)));
 
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     pendingOrderBloc = PendingOrderBloc();
     pendingOrderBloc.getOrder(widget.orderId);
     pendingOrderBloc.orderStream.listen((event) {
-      if (event.showToast) {
+      if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      } else if (event.loader == LOADER.HIDE) {
         CustomToast.show(event.message, context);
+        Navigator.pop(context);
       }
     });
   }

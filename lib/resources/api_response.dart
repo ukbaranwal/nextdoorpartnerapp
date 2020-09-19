@@ -2,21 +2,13 @@ class ApiResponse<T> {
   Status status;
   dynamic data;
   String message;
-  bool showToast;
-  bool showLoader;
-  ApiResponse.hasData(this.message,
-      {this.data, this.showToast = false, this.showLoader = false})
+  ApiActions actions;
+  LOADER loader;
+  ApiResponse.hasData(this.message, {this.data, this.actions, this.loader})
       : status = Status.HAS_DATA;
-  ApiResponse.loading(this.message, {this.data}) : status = Status.LOADING;
-  ApiResponse.successful(this.message, {this.data, this.showToast = false})
-      : status = Status.SUCCESSFUL;
-  ApiResponse.unSuccessful(this.message) : status = Status.UNSUCCESSFUL;
-  ApiResponse.validationFailed(this.message)
-      : status = Status.VALIDATION_FAILED;
-  ApiResponse.error(this.message,
-      {this.showToast = true, this.showLoader = false})
+  ApiResponse.error(this.message, {this.actions, this.loader})
       : status = Status.ERROR;
-  ApiResponse.socketError({this.showToast = false, this.showLoader = false})
+  ApiResponse.socketError({this.actions, this.loader})
       : status = Status.SOCKET_ERROR;
 
   @override
@@ -25,12 +17,16 @@ class ApiResponse<T> {
   }
 }
 
-enum Status {
+enum Status { HAS_DATA, ERROR, SOCKET_ERROR }
+
+enum ApiActions {
   LOADING,
-  HAS_DATA,
+  INITIATED,
   SUCCESSFUL,
   UNSUCCESSFUL,
+  WRONG_INFO,
+  NOT_FOUND,
   ERROR,
-  VALIDATION_FAILED,
-  SOCKET_ERROR
 }
+
+enum LOADER { SHOW, HIDE, IDLE }

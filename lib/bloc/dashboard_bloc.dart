@@ -22,10 +22,6 @@ class DashboardBloc implements BlocInterface {
 
   DashboardModel _dashboardModel;
 
-  DashboardBloc() {
-    firebaseTokenUpload();
-  }
-
   getDashboard() async {
     try {
       Response response = await _repository.getDashboard();
@@ -37,24 +33,31 @@ class DashboardBloc implements BlocInterface {
         _dashboardModel = DashboardModel.fromJson(jsonResponse['data']);
         _dashboardModel.fromRevenueJson(jsonRevenueResponse['data']);
         _dashboardModel.revenueDuration = RevenueDuration.LIFETIME;
-        _dashboardFetcher.sink
-            .add(ApiResponse.hasData('Done', data: _dashboardModel));
+        _dashboardFetcher.sink.add(ApiResponse.hasData('Done',
+            data: _dashboardModel,
+            actions: ApiActions.SUCCESSFUL,
+            loader: LOADER.IDLE));
       } else {
-        _dashboardFetcher.sink.add(ApiResponse.error(jsonResponse['message']));
+        _dashboardFetcher.sink.add(ApiResponse.error(jsonResponse['message'],
+            actions: ApiActions.ERROR, loader: LOADER.IDLE));
       }
     } catch (e) {
       if (e is FetchDataException) {
-        _dashboardFetcher.sink.add(ApiResponse.socketError());
+        _dashboardFetcher.sink
+            .add(ApiResponse.socketError(loader: LOADER.IDLE));
       } else {
-        _dashboardFetcher.sink.add(ApiResponse.error(e.toString()));
+        _dashboardFetcher.sink
+            .add(ApiResponse.error(e.toString(), loader: LOADER.IDLE));
       }
     }
   }
 
   filter(OrderFilter orderFilter) {
     _dashboardModel.filter(orderFilter);
-    _dashboardFetcher.sink
-        .add(ApiResponse.hasData('Done', data: _dashboardModel));
+    _dashboardFetcher.sink.add(ApiResponse.hasData('Done',
+        data: _dashboardModel,
+        actions: ApiActions.SUCCESSFUL,
+        loader: LOADER.IDLE));
   }
 
   getDashboardRevenue(RevenueDuration revenueDuration) async {
@@ -64,18 +67,23 @@ class DashboardBloc implements BlocInterface {
       var jsonResponse = jsonDecode(response.body);
       _dashboardModel.fromRevenueJson(jsonResponse['data']);
       _dashboardModel.revenueDuration = revenueDuration;
-      _dashboardFetcher.sink
-          .add(ApiResponse.hasData('Done', data: _dashboardModel));
+      _dashboardFetcher.sink.add(ApiResponse.hasData('Done',
+          data: _dashboardModel,
+          actions: ApiActions.SUCCESSFUL,
+          loader: LOADER.IDLE));
     } catch (e) {
       print(e.toString());
-      _dashboardFetcher.sink.add(ApiResponse.error(e.toString()));
+      _dashboardFetcher.sink
+          .add(ApiResponse.error(e.toString(), loader: LOADER.IDLE));
     }
   }
 
   Future<bool> changeShopStatus() async {
     try {
-      _dashboardFetcher.sink.add(
-          ApiResponse.hasData('Done', data: _dashboardModel, showLoader: true));
+      _dashboardFetcher.sink.add(ApiResponse.hasData('Done',
+          data: _dashboardModel,
+          actions: ApiActions.LOADING,
+          loader: LOADER.SHOW));
       Response response =
           await _repository.changeShopStatus(!vendorModelGlobal.shopOpen);
       var jsonResponse = jsonDecode(response.body);
@@ -86,39 +94,21 @@ class DashboardBloc implements BlocInterface {
             SharedPreferencesManager.shopOpen, !vendorModelGlobal.shopOpen);
         print(jsonResponse.toString());
         _dashboardFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
-            data: _dashboardModel, showToast: true, showLoader: false));
+            data: _dashboardModel,
+            actions: ApiActions.SUCCESSFUL,
+            loader: LOADER.HIDE));
       } else {
         _dashboardFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
-            data: _dashboardModel, showToast: true, showLoader: false));
+            data: _dashboardModel,
+            actions: ApiActions.ERROR,
+            loader: LOADER.HIDE));
       }
       return true;
     } catch (e) {
-      print(e.toString());
-      return false;
-    }
-  }
-
-  firebaseTokenUpload() async {
-    try {
-      return;
-      SharedPreferences sharedPreferences =
-          await SharedPreferencesManager.getInstance();
-      bool isFirebaseTokenUploaded = sharedPreferences
-              .getBool(SharedPreferencesManager.isFirebaseTokenUploaded) ??
-          false;
-      if (isFirebaseTokenUploaded) {
-        return;
-      }
-      Response response = await _repository.firebaseTokenUpload();
-      if (response.statusCode == 200) {
-        sharedPreferences.setBool(
-            SharedPreferencesManager.isFirebaseTokenUploaded, true);
-      } else {
-        sharedPreferences.setBool(
-            SharedPreferencesManager.isFirebaseTokenUploaded, false);
-      }
-    } catch (e) {
-      print(e.toString());
+      _dashboardFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          data: _dashboardModel,
+          actions: ApiActions.ERROR,
+          loader: LOADER.HIDE));
       return false;
     }
   }

@@ -38,7 +38,7 @@ class ProductsBloc implements BlocInterface {
       print(jsonResponse['data']['products'].toString());
       if (jsonResponse['data']['products'].length == 0) {
         _productsFetcher.sink
-            .add(ApiResponse.successful('end', data: productModelList));
+            .add(ApiResponse.hasData('end', data: productModelList));
         alreadyExecuting = false;
         return;
       }
@@ -46,7 +46,7 @@ class ProductsBloc implements BlocInterface {
         productModelList.add(ProductModel.fromJson(i));
       }
       _productsFetcher.sink
-          .add(ApiResponse.successful('Done', data: productModelList));
+          .add(ApiResponse.hasData('Done', data: productModelList));
       alreadyExecuting = false;
     } catch (e) {
       print(e.toString());

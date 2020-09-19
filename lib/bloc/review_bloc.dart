@@ -38,7 +38,7 @@ class ReviewsBloc implements BlocInterface {
       var jsonResponse = jsonDecode(response.body);
       print(jsonResponse.toString());
       if (jsonResponse['data']['reviews']['rows'].length == 0) {
-        _reviewsFetcher.sink.add(ApiResponse.successful('end', data: {
+        _reviewsFetcher.sink.add(ApiResponse.hasData('end', data: {
           'noOfReviews': jsonResponse['data']['reviews']['count'],
           'reviewsList': reviewsModelList
         }));
@@ -49,7 +49,7 @@ class ReviewsBloc implements BlocInterface {
         print(i);
         reviewsModelList.add(ReviewModel.fromJson(i));
       }
-      _reviewsFetcher.sink.add(ApiResponse.successful('done', data: {
+      _reviewsFetcher.sink.add(ApiResponse.hasData('done', data: {
         'noOfReviews': jsonResponse['data']['reviews']['count'],
         'reviewsList': reviewsModelList
       }));

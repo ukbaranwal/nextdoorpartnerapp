@@ -8,7 +8,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:nextdoorpartner/bloc/banner_bloc.dart';
 import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -26,11 +28,31 @@ class _BannersState extends State<Banners> {
   BoxDecoration boxDecoration = BoxDecoration(
       color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5)));
 
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     bannerBloc = BannerBloc();
     bannerBloc.init();
+
+    bannerBloc.bannerStream.listen((event) {
+      if (event.loader == LOADER.HIDE) {
+        CustomToast.show(event.message, context);
+        Navigator.pop(context);
+      } else if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      }
+    });
   }
 
   void showDeleteDialog(int index, String imageUrl) {

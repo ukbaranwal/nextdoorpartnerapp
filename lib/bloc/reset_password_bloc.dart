@@ -5,14 +5,20 @@ import 'package:nextdoorpartner/bloc/bloc_interface.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ResetPasswordBloc {
+class ResetPasswordBloc implements BlocInterface {
   final _repository = Repository();
   SharedPreferences sharedPreferences;
+  var _resetPasswordFetcher = PublishSubject<ApiResponse<bool>>();
+  Stream<ApiResponse<bool>> get resetPasswordStream =>
+      _resetPasswordFetcher.stream;
 
-  Future<ApiResponse> resetPassword(String pin, String password) async {
+  resetPassword(String pin, String password) async {
     try {
+      _resetPasswordFetcher.sink.add(ApiResponse.hasData('Loading',
+          actions: ApiActions.LOADING, loader: LOADER.SHOW));
       sharedPreferences = await SharedPreferencesManager.getInstance();
       String email =
           sharedPreferences.getString(SharedPreferencesManager.email);
@@ -20,24 +26,39 @@ class ResetPasswordBloc {
 
       ///no user exist with email
       if (response.statusCode == 204) {
-        return ApiResponse.unSuccessful('No user exist with email $email');
+        _resetPasswordFetcher.sink.add(ApiResponse.hasData(
+            'No user exist with email $email',
+            actions: ApiActions.WRONG_INFO,
+            loader: LOADER.HIDE));
 
         ///For accepted password 202
       } else {
         var jsonResponse = jsonDecode(response.body);
         if (response.statusCode == 202) {
-          return ApiResponse.successful(jsonResponse['message']);
+          _resetPasswordFetcher.sink.add(ApiResponse.hasData(
+              jsonResponse['message'],
+              actions: ApiActions.SUCCESSFUL,
+              loader: LOADER.HIDE));
         } else if (response.statusCode == 406) {
-          return ApiResponse.unSuccessful(jsonResponse['message']);
-        } else if (response.statusCode == 422) {
-          return ApiResponse.validationFailed(jsonResponse['message']);
+          _resetPasswordFetcher.sink.add(ApiResponse.hasData(
+              jsonResponse['message'],
+              actions: ApiActions.WRONG_INFO,
+              loader: LOADER.HIDE));
         } else {
-          return ApiResponse.error(jsonResponse['message']);
+          _resetPasswordFetcher.sink.add(ApiResponse.hasData(
+              jsonResponse['message'],
+              actions: ApiActions.ERROR,
+              loader: LOADER.HIDE));
         }
       }
     } catch (e) {
-      print(e.toString());
-      return ApiResponse.error(e.toString());
+      _resetPasswordFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          actions: ApiActions.ERROR, loader: LOADER.HIDE));
     }
+  }
+
+  @override
+  void dispose() {
+    _resetPasswordFetcher.close();
   }
 }

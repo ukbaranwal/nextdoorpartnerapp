@@ -30,7 +30,7 @@ class CouponsBloc implements BlocInterface {
         couponModelList.add(CouponModel.fromJson(i));
       }
       _couponsFetcher.sink
-          .add(ApiResponse.successful('Done', data: couponModelList));
+          .add(ApiResponse.hasData('Done', data: couponModelList));
     } catch (e) {
       print(e.toString());
       _couponsFetcher.sink.add(ApiResponse.error(e.toString()));

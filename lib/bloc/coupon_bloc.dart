@@ -23,50 +23,90 @@ class CouponBloc implements BlocInterface {
 
   addCoupon(CouponModel couponModel) async {
     try {
+      _couponFetcher.sink.add(ApiResponse.hasData('loading',
+          data: _couponModel,
+          actions: ApiActions.LOADING,
+          loader: LOADER.SHOW));
       Response response = await _repository.addCoupon(couponModel);
       var jsonResponse = jsonDecode(response.body);
-      _couponFetcher.add(ApiResponse.successful(jsonResponse['message'],
-          data: _couponModel, showToast: true));
+      if (response.statusCode == 200) {
+        _couponFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _couponModel,
+            actions: ApiActions.SUCCESSFUL,
+            loader: LOADER.HIDE));
+      } else {
+        _couponFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _couponModel,
+            actions: ApiActions.ERROR,
+            loader: LOADER.HIDE));
+      }
     } catch (e) {
-      _couponFetcher.sink.add(ApiResponse.error(e.toString()));
+      _couponFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          data: _couponModel, actions: ApiActions.ERROR, loader: LOADER.HIDE));
     }
   }
 
   updateCoupon(CouponModel couponModel) async {
     try {
+      _couponFetcher.sink.add(ApiResponse.hasData('loading',
+          data: _couponModel,
+          actions: ApiActions.LOADING,
+          loader: LOADER.SHOW));
       couponModel.id = _couponModel.id;
       couponModel.isLive = _couponModel.isLive;
       Response response = await _repository.updateCoupon(couponModel);
       var jsonResponse = jsonDecode(response.body);
       if (response.statusCode == 200) {
         _couponModel = couponModel;
-        _couponFetcher.sink.add(ApiResponse.successful(jsonResponse['message'],
-            data: _couponModel, showToast: true));
+        _couponFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _couponModel,
+            actions: ApiActions.SUCCESSFUL,
+            loader: LOADER.HIDE));
+      } else {
+        _couponFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _couponModel,
+            actions: ApiActions.ERROR,
+            loader: LOADER.HIDE));
       }
     } catch (e) {
-      _couponFetcher.sink.add(ApiResponse.error(e.toString()));
+      _couponFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          data: _couponModel, actions: ApiActions.ERROR, loader: LOADER.HIDE));
     }
   }
 
   toggleIsLive() async {
     try {
+      _couponFetcher.sink.add(ApiResponse.hasData('loading',
+          data: _couponModel,
+          actions: ApiActions.LOADING,
+          loader: LOADER.SHOW));
       Response response =
           await _repository.toggleIsLive(_couponModel.id, !_couponModel.isLive);
       var jsonResponse = jsonDecode(response.body);
       if (response.statusCode == 200) {
         _couponModel.isLive = !_couponModel.isLive;
-        _couponFetcher.sink.add(ApiResponse.successful(jsonResponse['message'],
-            data: _couponModel, showToast: true));
+        _couponFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _couponModel,
+            actions: ApiActions.SUCCESSFUL,
+            loader: LOADER.HIDE));
+      } else {
+        _couponFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: _couponModel,
+            actions: ApiActions.ERROR,
+            loader: LOADER.HIDE));
       }
     } catch (e) {
-      _couponFetcher.sink.add(ApiResponse.error(e.toString()));
+      _couponFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          data: _couponModel, actions: ApiActions.ERROR, loader: LOADER.HIDE));
     }
   }
 
   init() async {
     await Future.delayed(Duration(milliseconds: 100));
-    _couponFetcher.sink.add(ApiResponse.successful('Initiated',
-        data: _couponModel, showToast: false));
+    _couponFetcher.sink.add(ApiResponse.hasData('Initiated',
+        data: _couponModel,
+        actions: ApiActions.INITIATED,
+        loader: LOADER.IDLE));
   }
 
   @override

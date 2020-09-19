@@ -16,6 +16,7 @@ import 'package:nextdoorpartner/models/product_template_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/ui/product_templates.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/ui/sign_up.dart';
@@ -168,14 +169,6 @@ class _ProductState extends State<Product> {
         true,
         false, [], [], []);
     productBloc.addProduct(productModel, files);
-    productBloc.productStream.listen((event) {
-      if (event.status == Status.SUCCESSFUL) {
-        Navigator.pop(context);
-        Navigator.pop(context);
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (BuildContext context) => Products()));
-      }
-    });
   }
 
   void updateProduct(int productCategoryId) {
@@ -210,24 +203,36 @@ class _ProductState extends State<Product> {
   List<String> tagsList;
   List<TagsWidget> tagsWidgetList = List<TagsWidget>();
 
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     productBloc = ProductBloc(widget.productModel);
     productBloc.init(widget.productCategoryId);
     productBloc.productStream.listen((event) {
-      if (event.status == Status.LOADING) {
-        showProgressDialog(context: context, loadingText: 'Loading');
-      } else if (event.status == Status.SUCCESSFUL) {
-        if (event.showToast) {
-          CustomToast.show(event.message, context);
-        }
-        dismissProgressDialog();
+      if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      } else if (event.loader == LOADER.HIDE) {
+        Navigator.pop(context);
+        CustomToast.show(event.message, context);
+      }
+      if (event.actions == ApiActions.SUCCESSFUL) {
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (BuildContext context) => Products()));
       }
     });
-    if (widget.isNewProduct) {
-//      loadTags();
-    }
   }
 
   @override

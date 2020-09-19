@@ -15,34 +15,32 @@ class SignUpBloc implements BlocInterface {
       String password, String deviceId) async {
     _signUpFetcher = PublishSubject<ApiResponse<String>>();
     try {
+      _signUpFetcher.sink.add(ApiResponse.hasData('Loading',
+          actions: ApiActions.LOADING, loader: LOADER.SHOW));
       Response response = await _repository.doSignUp(
           name, email, phone, city, password, deviceId);
       var jsonResponse = jsonDecode(response.body);
-      _signUpFetcher.sink.add(ApiResponse.loading('Checking'));
       print(jsonResponse);
 
       ///already registered
       if (response.statusCode == 200) {
-        _signUpFetcher.sink
-            .add(ApiResponse.unSuccessful(jsonResponse['message']));
+        _signUpFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            actions: ApiActions.UNSUCCESSFUL, loader: LOADER.HIDE));
 
         ///successful sign up
       } else if (response.statusCode == 201) {
-        _signUpFetcher.sink
-            .add(ApiResponse.successful(jsonResponse['message']));
+        _signUpFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            actions: ApiActions.SUCCESSFUL, loader: LOADER.HIDE));
 
         ///validation failed
-      } else if (response.statusCode == 422) {
-        _signUpFetcher.sink
-            .add(ApiResponse.validationFailed(jsonResponse['message']));
-
-        ///server error
       } else {
-        _signUpFetcher.sink.add(ApiResponse.error(jsonResponse['message']));
+        _signUpFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            actions: ApiActions.ERROR, loader: LOADER.HIDE));
       }
     } catch (e) {
       print(e.toString());
-      _signUpFetcher.sink.add(ApiResponse.error(e.toString()));
+      _signUpFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          actions: ApiActions.ERROR, loader: LOADER.HIDE));
     }
   }
 

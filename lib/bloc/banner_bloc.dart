@@ -17,12 +17,16 @@ class BannerBloc implements BlocInterface {
 
   init() async {
     await Future.delayed(Duration(microseconds: 100));
-    _bannerFetcher.sink.add(
-        ApiResponse.successful('Initiated', data: vendorModelGlobal.banners));
+    _bannerFetcher.sink
+        .add(ApiResponse.hasData('Initiated', data: vendorModelGlobal.banners));
   }
 
   addBanner(File file) async {
     try {
+      _bannerFetcher.sink.add(ApiResponse.hasData('Loading',
+          data: vendorModelGlobal.banners,
+          actions: ApiActions.LOADING,
+          loader: LOADER.SHOW));
       StreamedResponse streamedResponse = await _repository.addBanner(file);
       streamedResponse.stream.listen((value) async {
         dynamic response =
@@ -34,17 +38,31 @@ class BannerBloc implements BlocInterface {
               await SharedPreferencesManager.getInstance();
           sharedPreferences.setStringList(
               SharedPreferencesManager.banners, vendorModelGlobal.banners);
-          _bannerFetcher.sink.add(ApiResponse.successful(response['message'],
-              data: vendorModelGlobal.banners, showToast: true));
+          _bannerFetcher.sink.add(ApiResponse.hasData(response['message'],
+              data: vendorModelGlobal.banners,
+              actions: ApiActions.SUCCESSFUL,
+              loader: LOADER.HIDE));
+        } else {
+          _bannerFetcher.sink.add(ApiResponse.hasData(response['message'],
+              data: vendorModelGlobal.banners,
+              actions: ApiActions.ERROR,
+              loader: LOADER.HIDE));
         }
       });
     } catch (e) {
-      _bannerFetcher.sink.add(ApiResponse.error(e.toString()));
+      _bannerFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          data: vendorModelGlobal.banners,
+          actions: ApiActions.ERROR,
+          loader: LOADER.HIDE));
     }
   }
 
   deleteBanner(int index) async {
     try {
+      _bannerFetcher.sink.add(ApiResponse.hasData('Deleting',
+          data: vendorModelGlobal.banners,
+          actions: ApiActions.LOADING,
+          loader: LOADER.SHOW));
       Response response =
           await _repository.deleteBanner(vendorModelGlobal.banners[index]);
       var jsonResponse = jsonDecode(response.body);
@@ -54,11 +72,21 @@ class BannerBloc implements BlocInterface {
             await SharedPreferencesManager.getInstance();
         sharedPreferences.setStringList(
             SharedPreferencesManager.banners, vendorModelGlobal.banners);
-        _bannerFetcher.sink.add(ApiResponse.successful(jsonResponse['message'],
-            data: vendorModelGlobal.banners, showToast: true));
+        _bannerFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: vendorModelGlobal.banners,
+            actions: ApiActions.SUCCESSFUL,
+            loader: LOADER.HIDE));
+      } else {
+        _bannerFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
+            data: vendorModelGlobal.banners,
+            actions: ApiActions.ERROR,
+            loader: LOADER.HIDE));
       }
     } catch (e) {
-      _bannerFetcher.sink.add(ApiResponse.error(e.toString()));
+      _bannerFetcher.sink.add(ApiResponse.hasData(e.toString(),
+          data: vendorModelGlobal.banners,
+          actions: ApiActions.ERROR,
+          loader: LOADER.HIDE));
     }
   }
 

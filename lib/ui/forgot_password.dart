@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nextdoorpartner/bloc/forgot_password_bloc.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/ui/login.dart';
 import 'package:nextdoorpartner/ui/reset_password.dart';
 import 'package:nextdoorpartner/ui/sign_up.dart';
@@ -29,25 +30,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       CustomToast.show('enter a valid email', context);
       return;
     }
-    requestResetPin();
-  }
-
-  void requestResetPin() async {
-    showProgressDialog(context: context, loadingText: 'Loading');
-    ApiResponse<dynamic> response = await forgotPasswordBloc
-        .requestResetPin(emailTextEditingController.text);
-    dismissProgressDialog();
-    if (response.status == Status.SUCCESSFUL) {
-      CustomToast.show(response.message, context);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResetPassword(),
-        ),
-      );
-    } else {
-      CustomToast.show(response.message, context);
-    }
+    forgotPasswordBloc.requestResetPin(emailTextEditingController.text);
   }
 
   void checkResetScreen() async {
@@ -276,10 +259,40 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     forgotPasswordBloc = ForgotPasswordBloc();
     checkResetScreen();
+    forgotPasswordBloc.forgotPasswordStream.listen((event) {
+      if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      } else if (event.loader == LOADER.HIDE) {
+        CustomToast.show(event.message, context);
+        Navigator.pop(context);
+      }
+      if (event.actions == ApiActions.SUCCESSFUL) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResetPassword(),
+          ),
+        );
+      } else {
+        CustomToast.show(event.message, context);
+        Navigator.pop(context);
+      }
+    });
   }
 }

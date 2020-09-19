@@ -23,10 +23,14 @@ class CouponProductsBloc implements BlocInterface {
     productModelList = List<CouponProductModel>();
     if (selectedIds != null) {
       selectedProductIds = selectedIds;
+      staticSelectedProductIds = selectedIds;
+    } else {
+      staticSelectedProductIds = List<int>();
     }
   }
 
   List<int> selectedProductIds = List<int>();
+  List<int> staticSelectedProductIds;
 
   getProducts(String search) async {
     if (alreadyExecuting) {
@@ -38,13 +42,20 @@ class CouponProductsBloc implements BlocInterface {
     }
     try {
       alreadyExecuting = true;
-      Response response =
-          await _repository.getProducts(productModelList.length, searchQuery);
+      Response response;
+      if (productModelList.length < staticSelectedProductIds.length &&
+          searchQuery == '') {
+        response = await _repository.getCouponProducts(
+            productModelList.length, staticSelectedProductIds);
+      } else {
+        response =
+            await _repository.getProducts(productModelList.length, searchQuery);
+      }
       var jsonResponse = jsonDecode(response.body);
       print(jsonResponse['data']['products'].length.toString());
       if (jsonResponse['data']['products'].length == 0) {
-        _productsFetcher.sink
-            .add(ApiResponse.successful('end', data: productModelList));
+        _productsFetcher.sink.add(ApiResponse.hasData('end',
+            data: productModelList, actions: ApiActions.INITIATED));
         alreadyExecuting = false;
         return;
       }
@@ -55,12 +66,13 @@ class CouponProductsBloc implements BlocInterface {
           productModelList.last.isSelected = true;
         }
       }
-      _productsFetcher.sink
-          .add(ApiResponse.successful('Done', data: productModelList));
+      _productsFetcher.sink.add(ApiResponse.hasData('Done',
+          data: productModelList, actions: ApiActions.INITIATED));
       alreadyExecuting = false;
     } catch (e) {
       print(e.toString());
-      _productsFetcher.sink.add(ApiResponse.error(e.toString()));
+      _productsFetcher.sink
+          .add(ApiResponse.error(e.toString(), actions: ApiActions.ERROR));
     }
   }
 
@@ -71,8 +83,8 @@ class CouponProductsBloc implements BlocInterface {
     } else {
       selectedProductIds.remove(productModelList[index].productModel.id);
     }
-    _productsFetcher.sink
-        .add(ApiResponse.successful('end', data: productModelList));
+    _productsFetcher.sink.add(ApiResponse.hasData('end',
+        data: productModelList, actions: ApiActions.SUCCESSFUL));
   }
 
   @override

@@ -6,6 +6,7 @@ import 'package:nextdoorpartner/bloc/login_bloc.dart';
 import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/forgot_password.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/ui/logged_in_unverified.dart';
 import 'package:nextdoorpartner/ui/sign_up.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
@@ -39,28 +40,42 @@ class _LoginState extends State<Login> {
         .hasMatch(value);
   }
 
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
+  }
+
   void login() async {
-    showProgressDialog(context: context, loadingText: 'Loading');
     AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
     print(androidDeviceInfo.id);
     loginBloc.doLogin(emailTextEditingController.text,
         passwordTextEditingController.text, androidDeviceInfo.id);
-    loginBloc.loginStream.listen((data) {
-      print(data.message);
-      dismissProgressDialog();
-      CustomToast.show(data.message, context);
-      if (data.status == Status.SUCCESSFUL) {
-        data.data.storeInSharedPreferences();
-        vendorModelGlobal = data.data;
+    loginBloc.loginStream.listen((event) {
+      if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      } else if (event.loader == LOADER.HIDE) {
+        CustomToast.show(event.message, context);
+        Navigator.pop(context);
+      }
+      if (event.actions == ApiActions.SUCCESSFUL) {
+        event.data.storeInSharedPreferences();
+
+        vendorModelGlobal = event.data;
+
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  data.data.isVerified ? Dashboard() : UnverifiedLoggedIn(),
+                  event.data.isVerified ? Dashboard() : UnverifiedLoggedIn(),
             ),
             (route) => false);
-      } else if (data.status == Status.UNSUCCESSFUL) {
-      } else {}
+      }
     });
   }
 

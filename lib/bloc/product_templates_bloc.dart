@@ -40,7 +40,7 @@ class ProductTemplatesBloc implements BlocInterface {
       print(jsonResponse);
       if (jsonResponse['data']['product_templates'].length == 0) {
         _productTemplatesFetcher.sink
-            .add(ApiResponse.successful('end', data: productTemplateModelList));
+            .add(ApiResponse.hasData('end', data: productTemplateModelList));
         alreadyExecuting = false;
         return;
       }
@@ -48,11 +48,12 @@ class ProductTemplatesBloc implements BlocInterface {
         productTemplateModelList.add(ProductTemplateModel.fromJson(i));
       }
       _productTemplatesFetcher.sink
-          .add(ApiResponse.successful('Done', data: productTemplateModelList));
+          .add(ApiResponse.hasData('Done', data: productTemplateModelList));
       alreadyExecuting = false;
     } catch (e) {
       print(e.toString());
-      _productTemplatesFetcher.sink.add(ApiResponse.error(e.toString()));
+      _productTemplatesFetcher.sink
+          .add(ApiResponse.hasData('Done', data: productTemplateModelList));
     }
   }
 

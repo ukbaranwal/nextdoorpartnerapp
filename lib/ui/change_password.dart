@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:nextdoorpartner/bloc/change_password_bloc.dart';
+import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
+import 'package:nextdoorpartner/ui/login.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
+import 'package:nextdoorpartner/util/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChangePassword extends StatefulWidget {
   @override
@@ -42,6 +47,17 @@ class _ChangePasswordState extends State<ChangePassword> {
     FocusScope.of(context).requestFocus(focusScopeNode2);
   }
 
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
+  }
+
   void checkForValidation() {
     if (currentPasswordTextEditingController.text.length < 8) {
       CustomToast.show('Old Password was of at least 8 characters', context);
@@ -55,14 +71,38 @@ class _ChangePasswordState extends State<ChangePassword> {
       CustomToast.show('Both password don\'t match', context);
       return;
     }
-
+    changePasswordBloc.changePassword(currentPasswordTextEditingController.text,
+        newPasswordTextEditingController.text);
+    changePasswordBloc.changePasswordStream.listen((event) {
+      if (event.loader == LOADER.HIDE) {
+        CustomToast.show(event.message, context);
+        Navigator.pop(context);
+      } else if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      }
+      if (event.actions == ApiActions.SUCCESSFUL) {
+        signOut();
+      }
+    });
   }
-
 
   @override
   void initState() {
     super.initState();
     changePasswordBloc = ChangePasswordBloc();
+  }
+
+  void signOut() async {
+    SharedPreferences sharedPreferences =
+        await SharedPreferencesManager.getInstance();
+    sharedPreferences.clear();
+    await Future.delayed(Duration(milliseconds: 1000));
+    CustomToast.show('You have successfully logged out', context);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+      builder: (context) {
+        return Login();
+      },
+    ), (route) => false);
   }
 
   @override
@@ -117,18 +157,24 @@ class _ChangePasswordState extends State<ChangePassword> {
                 ),
                 Align(
                   alignment: Alignment.bottomRight,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    margin: EdgeInsets.only(left: 30),
-                    decoration: BoxDecoration(
-                        color: AppTheme.secondary_color,
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    child: Text(
-                      'Change Password',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 22),
+                  child: InkWell(
+                    onTap: () {
+                      checkForValidation();
+                    },
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      margin: EdgeInsets.only(left: 30),
+                      decoration: BoxDecoration(
+                          color: AppTheme.secondary_color,
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      child: Text(
+                        'Change Password',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 22),
+                      ),
                     ),
                   ),
                 )

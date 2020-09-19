@@ -6,6 +6,7 @@ import 'package:nextdoorpartner/bloc/pending_order_bloc.dart';
 import 'package:nextdoorpartner/models/order_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/ui/pending_order.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
@@ -32,10 +33,24 @@ class _OrderPageState extends State<OrderPage> {
     orderPageBloc = OrderPageBloc();
     orderPageBloc.getOrder(widget.orderId);
     orderPageBloc.orderStream.listen((event) {
-      if (event.showToast) {
+      if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      } else if (event.loader == LOADER.HIDE) {
+        Navigator.pop(context);
         CustomToast.show(event.message, context);
       }
     });
+  }
+
+  showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Color(0X00FFFFFF),
+      builder: (context) {
+        return LoadingDialog();
+      },
+    );
   }
 
   String getStatus(OrderStatus orderStatus) {

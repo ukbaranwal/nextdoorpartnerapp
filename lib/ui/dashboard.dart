@@ -211,13 +211,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                       errorType: ErrorType.SERVER_ERROR,
                     )));
       }
-      if (event.showToast) {
-        CustomToast.show(event.message, context);
-      }
-      if (event.showLoader) {
+      if (event.loader == LOADER.SHOW) {
         showLoadingDialog();
-        isDialogLoading = true;
-      } else if (!event.showLoader && isDialogLoading) {
+      } else if (event.loader == LOADER.HIDE) {
+        CustomToast.show(event.message, context);
         Navigator.pop(context);
       }
     });
@@ -427,6 +424,46 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: AppTheme.secondary_color),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Coupons(),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Coupons',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.secondary_color),
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Banners(),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Banners',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.secondary_color),
+                    ),
                   ),
                 ),
                 InkWell(

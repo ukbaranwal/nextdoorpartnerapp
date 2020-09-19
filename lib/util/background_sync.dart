@@ -45,21 +45,24 @@ class BackgroundSync {
         ApiResponse<dynamic> response =
             await backgroundSyncBloc.syncProductCategories(
                 message.getInt(SharedPreferencesManager.vendorType));
-        List<ProductCategoryModel> productCategoryModelList =
-            List<ProductCategoryModel>();
-        for (var i in response.data) {
-          productCategoryModelList.add(ProductCategoryModel.fromJson(i));
+        if (response.status == Status.HAS_DATA) {
+          List<ProductCategoryModel> productCategoryModelList =
+              List<ProductCategoryModel>();
+          for (var i in response.data) {
+            productCategoryModelList.add(ProductCategoryModel.fromJson(i));
+          }
+          sendPort.send(productCategoryModelList);
         }
-        sendPort.send(productCategoryModelList);
         response = await backgroundSyncBloc.syncNotifications(
             message.getString(SharedPreferencesManager.authorisationToken));
-        List<NotificationModel> notificationModelList =
-            List<NotificationModel>();
-        for (var i in response.data) {
-          notificationModelList.add(NotificationModel.fromJson(i));
+        if (response.status == Status.HAS_DATA) {
+          List<NotificationModel> notificationModelList =
+              List<NotificationModel>();
+          for (var i in response.data) {
+            notificationModelList.add(NotificationModel.fromJson(i));
+          }
+          sendPort.send(notificationModelList);
         }
-        sendPort.send(notificationModelList);
-//        receivePort.close();
       }
     });
   }
