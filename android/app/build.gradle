@@ -49,6 +49,9 @@ android {
 
     buildTypes {
         release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            shrinkResources true
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
@@ -65,9 +68,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     implementation 'com.google.firebase:firebase-messaging:20.2.4'
-//    implementation 'com.google.firebase:firebase-inappmessaging-display:19.1.0'
-//    implementation 'com.google.firebase:firebase-core:17.4.4'
-//    implementation 'com.android.support:multidex:1.0.3'
 }
 
 apply plugin: 'io.fabric'
