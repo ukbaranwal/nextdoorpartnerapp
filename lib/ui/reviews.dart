@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:fswitch/fswitch.dart';
 import 'package:nextdoorpartner/bloc/products_bloc.dart';
 import 'package:nextdoorpartner/bloc/review_bloc.dart';
 import 'package:nextdoorpartner/models/product_model.dart';
@@ -102,7 +101,7 @@ class _ReviewsState extends State<Reviews> {
                             EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         margin: EdgeInsets.symmetric(vertical: 5),
                         child: Text(
-                          '${snapshot.data.data[noOfReviews]} USER REVIEWS',
+                          '${snapshot.data.data[noOfReviews]} ${Strings.userReviews}',
                           style: TextStyle(
                               color: AppTheme.secondary_color,
                               fontSize: 16,
@@ -145,7 +144,7 @@ class _ReviewsState extends State<Reviews> {
                       snapshot.data.data[reviewsList].length == 0
                           ? NoDataPlaceholderWidget(
                               imageUrl: 'review_placeholder.png',
-                              info: 'No Reviews',
+                              info: Strings.reviewPlaceholder,
                             )
                           : ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
@@ -347,13 +346,13 @@ class ReviewWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Order #1$orderNo(Bill Total Rs. $amount)',
+          Text('${Strings.order} #$orderNo(${Strings.billTotal} Rs. $amount)',
               style: TextStyle(
                   color: AppTheme.secondary_color,
                   fontSize: 16,
                   fontWeight: FontWeight.w800)),
           Text(
-              'Delivered at $deliveredAt | $units ${units == 1 ? 'Item' : 'Items'}',
+              '${Strings.deliveredAt} $deliveredAt | $units ${units == 1 ? 'Item' : 'Items'}',
               style: TextStyle(
                   color: Colors.black45,
                   fontSize: 16,
@@ -365,7 +364,7 @@ class ReviewWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Items : ',
+                '${Strings.items} : ',
                 style: TextStyle(
                     color: Colors.black45,
                     fontSize: 16,
@@ -385,7 +384,7 @@ class ReviewWidget extends StatelessWidget {
           Row(
             children: [
               Text(
-                'Rating : ',
+                '${Strings.rating} : ',
                 style: TextStyle(
                     color: Colors.black45,
                     fontSize: 16,
@@ -436,7 +435,7 @@ class ReviewWidget extends StatelessWidget {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (BuildContext context) => OrderPage(orderNo)));
             },
-            child: Text('VIEW ORDER DETAILS',
+            child: Text(Strings.viewOrderDetails,
                 style: TextStyle(
                     color: Colors.black45,
                     fontSize: 18,

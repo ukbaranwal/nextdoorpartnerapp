@@ -3,9 +3,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:fswitch/fswitch.dart';
 import 'package:http/http.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -73,8 +72,6 @@ class _ProductState extends State<Product> {
 
   bool isAlreadyPopulated = false;
 
-  ProgressDialog progressDialog;
-
   changeFocus(FocusScopeNode focusScopeNode) {
     focusScopeNode.unfocus();
     FocusScopeNode focusScopeNode2;
@@ -96,16 +93,16 @@ class _ProductState extends State<Product> {
 
   void checkForValidation() {
     if (nameTextEditingController.text.length == 0) {
-      CustomToast.show('name field can\'t be empty', context);
+      CustomToast.show(Strings.nameFieldValidation, context);
       return;
     } else if (mrpTextEditingController.text.length == 0) {
-      CustomToast.show('enter mrp', context);
+      CustomToast.show(Strings.mrpValidation, context);
       return;
     } else if (standardTextEditingController.text.length == 0) {
-      CustomToast.show('Choose the standard quality of selling', context);
+      CustomToast.show(Strings.standardQuantityValidation, context);
       return;
     } else if (files.length == 0 && widget.isNewProduct) {
-      CustomToast.show('Please upload a photo', context);
+      CustomToast.show(Strings.uploadPhotoValidation, context);
       return;
     }
     widget.isNewProduct
@@ -135,7 +132,7 @@ class _ProductState extends State<Product> {
               alignment: Alignment.center,
               color: Colors.red,
               child: Text(
-                'Delete Image',
+                Strings.deleteImage,
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -340,7 +337,7 @@ class _ProductState extends State<Product> {
                   color: Colors.black.withOpacity(0.4))
             ]),
             child: Text(
-              widget.isNewProduct ? Strings.addProduct : 'Update Product',
+              widget.isNewProduct ? Strings.addProduct : Strings.updateProduct,
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 20,
@@ -387,11 +384,9 @@ class _ProductState extends State<Product> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  FSwitch(
-                                    width: 40,
-                                    height: 20,
-                                    openColor: AppTheme.green,
-                                    open: snapshot
+                                  CupertinoSwitch(
+                                    activeColor: AppTheme.green,
+                                    value: snapshot
                                         .data.data[mapProductModel].inStock,
                                     onChanged: (value) {
                                       print(value);
@@ -407,7 +402,7 @@ class _ProductState extends State<Product> {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 10, vertical: 10),
                                       child: Text(
-                                        'product id : ${snapshot.data.data[mapProductModel].id}',
+                                        '${Strings.productId} : ${snapshot.data.data[mapProductModel].id}',
                                         style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.w700,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -26,6 +27,8 @@ void main() {
 
   /// Pass all uncaught errors to Crashlytics.
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
+
+//  FirebaseInAppMessaging().triggerEvent('eventName');
 
   ///Initialize LocalNotifications
   LocalNotifications.initialize();

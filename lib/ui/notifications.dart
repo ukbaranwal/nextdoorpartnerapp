@@ -7,6 +7,8 @@ import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/data_placeholder.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 
+import '../util/strings_en.dart';
+
 class Notifications extends StatefulWidget {
   @override
   _NotificationsState createState() => _NotificationsState();
@@ -44,7 +46,7 @@ class _NotificationsState extends State<Notifications> {
                         padding: const EdgeInsets.only(top: 50),
                         child: NoDataPlaceholderWidget(
                           imageUrl: 'notifications_placeholder.png',
-                          info: 'You have no new notifications',
+                          info: Strings.notificationPlaceholder,
                         ),
                       ),
                     )
@@ -53,7 +55,7 @@ class _NotificationsState extends State<Notifications> {
                         Padding(
                           padding: const EdgeInsets.only(top: 15, bottom: 5),
                           child: Text(
-                            '${snapshot.data.data.length} new notifications',
+                            '${snapshot.data.data.length} ${Strings.newNotifications}',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: AppTheme.secondary_color,

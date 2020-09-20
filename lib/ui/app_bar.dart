@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:fswitch/fswitch.dart';
 import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
@@ -50,7 +48,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 fontSize: 22,
                 fontWeight: FontWeight.w800),
           ),
-          Text(vendorModelGlobal.shopOpen ? Strings.online : 'Offline',
+          Text(vendorModelGlobal.shopOpen ? Strings.online : Strings.offline,
               style: TextStyle(
                   color:
                       vendorModelGlobal.shopOpen ? AppTheme.green : Colors.red,

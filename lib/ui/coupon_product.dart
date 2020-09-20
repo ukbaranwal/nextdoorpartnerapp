@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:fswitch/fswitch.dart';
 import 'package:nextdoorpartner/bloc/coupon_product_bloc.dart';
 import 'package:nextdoorpartner/bloc/product_templates_bloc.dart';
 import 'package:nextdoorpartner/bloc/products_bloc.dart';
@@ -316,7 +315,7 @@ class _CouponProductState extends State<CouponProduct> {
                           width: 5,
                         ),
                         Text(
-                          'Done',
+                          Strings.done,
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -417,14 +416,14 @@ class ProductTemplateWidget extends StatelessWidget {
                           fontSize: 14),
                     ),
                     Text(
-                      'MRP: Rs. ${couponProductModel.productModel.mrp}',
+                      '${Strings.mrp}: Rs. ${couponProductModel.productModel.mrp}',
                       style: TextStyle(
                           color: AppTheme.secondary_color,
                           fontWeight: FontWeight.w700,
                           fontSize: 14),
                     ),
                     Text(
-                      'Selling: Rs. ${(couponProductModel.productModel.mrp - (couponProductModel.productModel.mrp * couponProductModel.productModel.discountPercentage / 100)).toStringAsFixed(1)}',
+                      '${Strings.selling}: Rs. ${(couponProductModel.productModel.mrp - (couponProductModel.productModel.mrp * couponProductModel.productModel.discountPercentage / 100)).toStringAsFixed(1)}',
                       style: TextStyle(
                           color: AppTheme.secondary_color,
                           fontWeight: FontWeight.w700,

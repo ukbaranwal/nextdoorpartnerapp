@@ -1,19 +1,16 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nextdoorpartner/bloc/banner_bloc.dart';
-import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 import 'package:shimmer/shimmer.dart';
-
 import 'app_bar.dart';
 
 class Banners extends StatefulWidget {
@@ -75,7 +72,7 @@ class _BannersState extends State<Banners> {
               alignment: Alignment.center,
               color: Colors.red,
               child: Text(
-                'Delete Image',
+                Strings.deleteImage,
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -129,7 +126,7 @@ class _BannersState extends State<Banners> {
                       Padding(
                         padding: const EdgeInsets.only(left: 20, top: 15),
                         child: Text(
-                          'Live Banners(${snapshot.data.data.length})',
+                          '${Strings.liveBanners}(${snapshot.data.data.length})',
                           style: TextStyle(
                               color: AppTheme.secondary_color,
                               fontSize: 18,

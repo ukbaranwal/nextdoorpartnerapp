@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 
 class TabIconData {

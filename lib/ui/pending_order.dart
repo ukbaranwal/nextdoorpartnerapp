@@ -64,7 +64,7 @@ class _PendingOrderState extends State<PendingOrder> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Cancel Order',
+            title: Text(Strings.cancelOrder,
                 style: TextStyle(
                     color: AppTheme.secondary_color,
                     fontWeight: FontWeight.w700,
@@ -84,8 +84,7 @@ class _PendingOrderState extends State<PendingOrder> {
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.only(left: 10, right: 10),
-                  hintText:
-                      'Provide a reason for Cancellation, This may affect your ratings and you may be contact by Next Door',
+                  hintText: Strings.reasonCancellation,
                   hintStyle: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -100,7 +99,7 @@ class _PendingOrderState extends State<PendingOrder> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('Cancel'),
+                child: Text(Strings.cancel),
               ),
               FlatButton(
                 onPressed: () {
@@ -108,7 +107,7 @@ class _PendingOrderState extends State<PendingOrder> {
                       widget.orderId, textEditingController.text);
                   Navigator.pop(context);
                 },
-                child: Text('Yes'),
+                child: Text(Strings.yes),
               )
             ],
           );
@@ -134,7 +133,7 @@ class _PendingOrderState extends State<PendingOrder> {
                   color: Colors.black.withOpacity(0.4))
             ], color: AppTheme.green),
             child: Text(
-              'Confirm Order',
+              Strings.confirmOrder,
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: Colors.white,
@@ -190,7 +189,7 @@ class _PendingOrderState extends State<PendingOrder> {
                                     cancelOrder();
                                   },
                                   child: Text(
-                                    'Cancel',
+                                    Strings.cancel,
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,
@@ -210,7 +209,7 @@ class _PendingOrderState extends State<PendingOrder> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 5, vertical: 5),
                                 child: Text(
-                                  'Total units : ${snapshot.data.data.units}',
+                                  '${Strings.totalUnits} : ${snapshot.data.data.units}',
                                   style: TextStyle(
                                       color: AppTheme.secondary_color,
                                       fontWeight: FontWeight.w700,
@@ -236,7 +235,7 @@ class _PendingOrderState extends State<PendingOrder> {
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 5, horizontal: 10),
                                           child: Text(
-                                              'Ordered at ${snapshot.data.data.createdAt}',
+                                              '${Strings.orderedAt} ${snapshot.data.data.createdAt}',
                                               style: TextStyle(
                                                   color:
                                                       AppTheme.secondary_color,
@@ -250,7 +249,7 @@ class _PendingOrderState extends State<PendingOrder> {
                                           child: Text(
                                             snapshot.data.data.paid
                                                 ? Strings.paid
-                                                : 'cod',
+                                                : Strings.cod,
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 14,
@@ -283,8 +282,8 @@ class _PendingOrderState extends State<PendingOrder> {
                                                     .width *
                                                 0.6,
                                             child: Text(
-                                                'Expected delivery before ${snapshot.data.data.expectedDeliveryAt}\n'
-                                                'Total amount: ${snapshot.data.data.amount}\nDiscount applied: ${snapshot.data.data.discountApplied}\nAmount due: ${snapshot.data.data.amountDue}',
+                                                '${Strings.expectedDeliveryBefore} ${snapshot.data.data.expectedDeliveryAt}\n'
+                                                '${Strings.totalAmount}: ${snapshot.data.data.amount}\n${Strings.discountApplied}: ${snapshot.data.data.discountApplied}\n${Strings.amountDue}: ${snapshot.data.data.amountDue}',
                                                 style: TextStyle(
                                                     color: AppTheme
                                                         .secondary_color,
@@ -302,7 +301,7 @@ class _PendingOrderState extends State<PendingOrder> {
                                             Padding(
                                               padding:
                                                   const EdgeInsets.only(top: 3),
-                                              child: Text('Select All',
+                                              child: Text(Strings.selectAll,
                                                   style: TextStyle(
                                                       color: AppTheme
                                                           .secondary_color,
@@ -573,7 +572,7 @@ class PendingOrderProduct extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Product Id: ${orderProductModel.productId}',
+                        '${Strings.productId}: ${orderProductModel.productId}',
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontSize: 14,
@@ -587,21 +586,21 @@ class PendingOrderProduct extends StatelessWidget {
                             fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        'Selling Price : ${orderProductModel.amount}',
+                        '${Strings.sellingPrice} : ${orderProductModel.amount}',
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontSize: 14,
                             fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        'Discount Applied : ${orderProductModel.discountApplied}',
+                        '${Strings.discountApplied} : ${orderProductModel.discountApplied}',
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontSize: 14,
                             fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        'Total Price : ${orderProductModel.amount} x ${orderProductModel.quantity} = ${orderProductModel.amount * orderProductModel.quantity}',
+                        '${Strings.totalPrice} : ${orderProductModel.amount} x ${orderProductModel.quantity} = ${orderProductModel.amount * orderProductModel.quantity}',
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontSize: 14,
@@ -612,7 +611,7 @@ class PendingOrderProduct extends StatelessWidget {
                 ),
                 Column(
                   children: [
-                    Text('Quantity : ${orderProductModel.quantity}',
+                    Text('${Strings.quantity} : ${orderProductModel.quantity}',
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontSize: 14,

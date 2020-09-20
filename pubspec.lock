@@ -148,6 +148,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.1"
+  firebase_core:
+    dependency: transitive
+    description:
+      name: firebase_core
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.0"
+  firebase_core_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_core_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
+  firebase_core_web:
+    dependency: transitive
+    description:
+      name: firebase_core_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0"
   firebase_crashlytics:
     dependency: "direct main"
     description:
@@ -155,6 +176,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.4+1"
+  firebase_in_app_messaging:
+    dependency: "direct main"
+    description:
+      name: firebase_in_app_messaging
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0+1"
   firebase_messaging:
     dependency: "direct main"
     description:
@@ -188,13 +216,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
-  flutter_icons:
-    dependency: "direct main"
-    description:
-      name: flutter_icons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.0"
   flutter_local_notifications:
     dependency: "direct main"
     description:
@@ -216,13 +237,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.8"
-  flutter_progress_dialog:
-    dependency: "direct main"
-    description:
-      name: flutter_progress_dialog
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.0"
   flutter_rating_bar:
     dependency: "direct main"
     description:
@@ -247,20 +261,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  fluttertoast:
-    dependency: "direct main"
-    description:
-      name: fluttertoast
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "7.0.2"
-  fswitch:
-    dependency: "direct main"
-    description:
-      name: fswitch
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.1.2"
   html:
     dependency: transitive
     description:
@@ -436,6 +436,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.13"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.3"
   rxdart:
     dependency: "direct main"
     description:

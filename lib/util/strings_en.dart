@@ -88,4 +88,127 @@ class Strings {
   static const String longPressToSelectCategory =
       'Long Press to Select a Category';
   static const String proceed = 'Proceed';
+  static const String deleteImage = 'Delete Image';
+  static const String liveBanners = 'Live Banners';
+  static const String passwordValidation =
+      'Password should be of at least 8 characters';
+  static const String oldPasswordValidation =
+      'Old Password was of at least 8 characters';
+  static const String newPasswordValidation =
+      'New Password should be of at least 8 characters';
+  static const String bothPasswordValidation = 'Both password can\'t be same';
+  static const String successfullyLoggedOut =
+      'You have successfully logged out';
+  static const String loginAgain = 'Please login again';
+  static const String changePassword = 'Change Password';
+  static const String currentPassword = 'Current Password';
+  static const String confirmPassword = 'Confirm Password';
+  static const String nameFieldValidation = 'name field can\'t be empty';
+  static const String cityFieldValidation = 'City field can\'t be empty';
+  static const String couponCodeValidation =
+      'Coupon Code should be of at least 5 Digits';
+  static const String discountValidation =
+      'Discount should be in between 0-100';
+  static const String maxDiscountValidation = 'Provide the maximum discount';
+  static const String minOrderValidation = 'Provide the Minimum Order';
+  static const String applicabilityValidation = 'Select the type of coupon';
+  static const String addCoupon = 'Add Coupon';
+  static const String updateCoupon = 'Update Coupon';
+  static const String couponCode = 'Coupon Code';
+  static const String maxDiscount = 'Max Discount';
+  static const String minimumOrder = 'Minimum Order';
+  static const String allProducts = 'All Products';
+  static const String firstTimers = 'First Timers';
+  static const String productWise = 'Product Wise';
+  static const String done = 'Done';
+  static const String selling = 'Selling';
+  static const String noCampaigns = 'No Campaigns';
+  static const String runningCampaigns = 'Running Campaigns';
+  static const String noCouponsPlaceholder = 'You have no coupons running yet';
+  static const String tapOnGreen = 'Tap on Green button to add one';
+  static const String max = 'MAX';
+  static const String minOrder = 'MIN ORDER';
+  static const String startsOn = 'STARTS ON';
+  static const String expiresOn = 'EXPIRES ON';
+  static const String confirmationDialog = 'Confirmation Dialog';
+  static const String areYouSureLogOut = 'Are you sure you want to Sign Out';
+  static const String cancel = 'Cancel';
+  static const String yes = 'Yes';
+  static const String areYouSureWantToGo = 'Are you sure you want to go';
+  static const String coupons = 'Coupons';
+  static const String banners = 'Banners';
+  static const String thisMonth = 'This Month';
+  static const String completed = 'Completed';
+  static const String ratingPlaceholder = 'Your Ratings will be shown here';
+  static const String activeOrderPlaceholder = 'Your Orders will be shown here';
+  static const String all = 'All';
+  static const String pending = 'Pending';
+  static const String confirmed = 'Confirmed';
+  static const String errorScreenNoInternet = 'No Internet Connection';
+  static const String errorScreenNoInternetDetails =
+      'Please check your connection again or check your wifi';
+  static const String tryAgain = 'Try Again';
+  static const String errorScreenNotFound = 'Page Not Found';
+  static const String errorScreenNotFoundDetails =
+      'Looks like you have clicked on something that doesn\'t exist';
+  static const String errorScreenServerError = 'Server Error';
+  static const String errorScreenServerErrorDetails =
+      'Looks like something is broken. We are currently working on this issue';
+  static const String goBack = 'Go Back';
+  static const String enterValidEmail = 'Enter a valid email';
+  static const String congratsNewOrder =
+      'Congratulations,\nyou have received a new order';
+  static const String viewOrder = 'View Order';
+  static const String notificationPlaceholder = 'You have no new notifications';
+  static const String newNotifications = 'New Notifications';
+  static const String expectedDeliveryBefore = 'Expected Delivery before';
+  static const String orderedAt = 'Ordered At';
+  static const String deliveredAt = 'Delivered At';
+  static const String totalAmount = 'Total Amount';
+  static const String discountApplied = 'Discount Applied';
+  static const String amountDue = 'Amount Due';
+  static const String ordersPlaceholder = 'No Orders';
+  static const String cancelOrder = 'Cancel Order';
+  static const String reasonCancellation =
+      'Provide a reason for Cancellation, This may affect your ratings and you may be contact by Next Door';
+  static const String confirmOrder = 'Confirm Order';
+  static const String selectAll = 'Select All';
+  static const String quantity = 'Quantity';
+  static const String productId = 'Product Id';
+  static const String sellingPrice = 'Selling Price';
+  static const String totalPrice = 'Total Price';
+  static const String mrpValidation = 'Enter MRP';
+  static const String standardQuantityValidation =
+      'Choose the standard quality of selling';
+  static const String uploadPhotoValidation = 'Please upload a photo';
+  static const String updateProduct = 'Update Product';
+  static const String sortBy = 'Sort By';
+  static const String unitsSold = 'Units Sold';
+  static const String numberOfViews = 'Number of Views';
+  static const String productPlaceholder = 'You have no products added yet';
+  static const String pinValidation = 'Pin should be of at least 4 characters';
+  static const String userReviews = 'USER REVIEWS';
+  static const String reviewPlaceholder = 'No Reviews';
+  static const String viewOrderDetails = 'VIEW ORDER DETAILS';
+  static const String rating = 'Rating';
+  static const String items = 'Items';
+  static const String order = 'order';
+  static const String billTotal = 'Bill Total';
+  static const String selectReasonForContacting =
+      'please select your reason for contacting us';
+  static const String mobileNumberValidation = 'enter a valid mobile number';
+  static const String writeMoreFurther = 'Please Write more further';
+  static const String phone = 'Phone';
+  static const String sellerSupportWillResponse =
+      'seller support will response within 12 hours';
+  static const String sendMail = 'Send Mail';
+  static const String tellMoreAboutIssue = 'Tell us more about issue';
+  static const String contactReason = 'Contact Reason';
+  static const String yourEmail = 'Your Email';
+  static const String callMeNow = 'Call me now';
+  static const String weWillCallYou =
+      'We will now call you at the phone number listed below';
+  static const String acceptTerms = 'Accept Terms';
+  static const String youNeedToAcceptTerms =
+      'You need to Accept our Terms and Conditions to move forward';
 }

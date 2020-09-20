@@ -4,6 +4,8 @@ import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/seller_support_message.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 
+import '../util/strings_en.dart';
+
 class SellerSupport extends StatefulWidget {
   @override
   _SellerSupportState createState() => _SellerSupportState();
@@ -26,7 +28,7 @@ class _SellerSupportState extends State<SellerSupport> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Text(
-                  'please select your reason for contacting us',
+                  Strings.selectReasonForContacting,
                   style: TextStyle(
                       color: AppTheme.secondary_color,
                       fontSize: 18,

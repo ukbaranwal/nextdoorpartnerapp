@@ -94,13 +94,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Confirmation Dialog',
+            title: Text(Strings.confirmationDialog,
                 style: TextStyle(
                     color: AppTheme.secondary_color,
                     fontWeight: FontWeight.w700,
                     fontSize: 18)),
             content: Text(
-              'Are you sure you want to Sign Out',
+              Strings.areYouSureLogOut,
               style: TextStyle(
                   color: AppTheme.secondary_color,
                   fontWeight: FontWeight.w700,
@@ -111,21 +111,21 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('Cancel'),
+                child: Text(Strings.cancel),
               ),
               FlatButton(
                 onPressed: () async {
                   SharedPreferences sharedPreferences =
                       await SharedPreferencesManager.getInstance();
                   sharedPreferences.clear();
-                  CustomToast.show('You have successfully logged out', context);
+                  CustomToast.show(Strings.successfullyLoggedOut, context);
                   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
                     builder: (context) {
                       return Login();
                     },
                   ), (route) => false);
                 },
-                child: Text('Yes'),
+                child: Text(Strings.yes),
               )
             ],
           );
@@ -148,13 +148,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Confirmation Dialog',
+            title: Text(Strings.confirmationDialog,
                 style: TextStyle(
                     color: AppTheme.secondary_color,
                     fontWeight: FontWeight.w700,
                     fontSize: 18)),
             content: Text(
-              'Are you sure you want to go ${vendorModelGlobal.shopOpen ? 'Offline' : 'Online'}',
+              '${Strings.areYouSureWantToGo} ${vendorModelGlobal.shopOpen ? Strings.offline : Strings.online}',
               style: TextStyle(
                   color: AppTheme.secondary_color,
                   fontWeight: FontWeight.w700,
@@ -165,7 +165,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('Cancel'),
+                child: Text(Strings.cancel),
               ),
               FlatButton(
                 onPressed: () async {
@@ -176,7 +176,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                     });
                   }
                 },
-                child: Text('Yes'),
+                child: Text(Strings.yes),
               )
             ],
           );
@@ -191,7 +191,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    print('start');
     super.initState();
     runIsolate();
     dashboardBloc = DashboardBloc();
@@ -357,7 +356,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                         width: 10,
                       ),
                       Text(
-                        vendorModelGlobal.shopOpen ? Strings.online : 'Offline',
+                        vendorModelGlobal.shopOpen
+                            ? Strings.online
+                            : Strings.offline,
                         style: TextStyle(
                             color: vendorModelGlobal.shopOpen
                                 ? AppTheme.green
@@ -447,7 +448,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
-                      'Coupons',
+                      Strings.coupons,
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -467,7 +468,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
-                      'Banners',
+                      Strings.banners,
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -639,8 +640,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                           value: RevenueDuration.LAST7DAYS,
                                         ),
                                         DropdownMenuItem(
-                                          child:
-                                              DropDownTextWidget('This Month'),
+                                          child: DropDownTextWidget(
+                                              Strings.thisMonth),
                                           value: RevenueDuration.MONTH,
                                         ),
                                         DropdownMenuItem(
@@ -680,7 +681,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              Strings.orders + ' Completed',
+                                              Strings.orders +
+                                                  ' ' +
+                                                  Strings.completed,
                                               style: textStyleStats,
                                             ),
                                             Text(
@@ -749,7 +752,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                             width: 100,
                                           ),
                                           Text(
-                                            'Your Ratings will be shown here',
+                                            Strings.ratingPlaceholder,
                                             style: TextStyle(
                                                 color: AppTheme.secondary_color,
                                                 fontSize: 18,
@@ -792,7 +795,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                             width: 100,
                                           ),
                                           Text(
-                                            'Your active orders will be shown here',
+                                            Strings.activeOrderPlaceholder,
                                             style: TextStyle(
                                                 color: AppTheme.secondary_color,
                                                 fontSize: 18,
@@ -836,7 +839,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                                 Row(
                                                   children: [
                                                     ActiveOrderOptionWidget(
-                                                      text: 'All',
+                                                      text: Strings.all,
                                                       isSelected: orderFilter ==
                                                           OrderFilter.ALL,
                                                       orderFilter:
@@ -849,7 +852,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                                           horizontal: 5),
                                                       child:
                                                           ActiveOrderOptionWidget(
-                                                        text: 'Pending',
+                                                        text: Strings.pending,
                                                         isSelected:
                                                             orderFilter ==
                                                                 OrderFilter
@@ -860,7 +863,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                                       ),
                                                     ),
                                                     ActiveOrderOptionWidget(
-                                                      text: 'Confirmed',
+                                                      text: Strings.confirmed,
                                                       isSelected: orderFilter ==
                                                           OrderFilter.CONFIRMED,
                                                       orderFilter:

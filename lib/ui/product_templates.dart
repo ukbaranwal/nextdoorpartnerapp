@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:fswitch/fswitch.dart';
 import 'package:nextdoorpartner/bloc/product_templates_bloc.dart';
 import 'package:nextdoorpartner/bloc/products_bloc.dart';
 import 'package:nextdoorpartner/models/product_model.dart';

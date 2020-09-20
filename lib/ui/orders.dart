@@ -303,7 +303,7 @@ class _OrdersPageViewState extends State<OrdersPageView> {
             ),
             Container(
               child: Text(
-                '${widget.orderCount} orders',
+                '${widget.orderCount} ${Strings.orders}',
                 style: TextStyle(
                     color: AppTheme.secondary_color,
                     fontWeight: FontWeight.w700,
@@ -318,7 +318,7 @@ class _OrdersPageViewState extends State<OrdersPageView> {
             widget.orderModelList.length == 0
                 ? NoDataPlaceholderWidget(
                     imageUrl: 'order_placeholder.png',
-                    info: 'No Orders',
+                    info: Strings.ordersPlaceholder,
                   )
                 : ListView.builder(
                     physics: BouncingScrollPhysics(),
@@ -427,7 +427,8 @@ class OrderItemWidget extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             vertical: 5, horizontal: 10),
-                        child: Text('Total units : ${orderModel.units}',
+                        child: Text(
+                            '${Strings.totalUnits} : ${orderModel.units}',
                             style: TextStyle(
                                 color: AppTheme.secondary_color,
                                 fontWeight: FontWeight.w700,
@@ -438,7 +439,7 @@ class OrderItemWidget extends StatelessWidget {
                             EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         margin: EdgeInsets.only(left: 3),
                         child: Text(
-                          orderModel.paid ? Strings.paid : 'cod',
+                          orderModel.paid ? Strings.paid : Strings.cod,
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -459,9 +460,9 @@ class OrderItemWidget extends StatelessWidget {
                       horizontal: 10,
                     ),
                     child: Text(
-                        'Ordered at ${orderModel.createdAt}\nExpected delivery before ${orderModel.expectedDeliveryAt}\n'
-                        'Delivered at ${orderModel.deliveredAt}\nTotal amount: ${orderModel.amount}\n'
-                        'Discount applied: ${orderModel.discountApplied}\nAmount due: ${orderModel.amountDue}',
+                        '${Strings.orderedAt} ${orderModel.createdAt}\n${Strings.expectedDeliveryBefore} ${orderModel.expectedDeliveryAt}\n'
+                        '${Strings.deliveredAt} ${orderModel.deliveredAt}\n${Strings.totalAmount}: ${orderModel.amount}\n'
+                        '${Strings.discountApplied}: ${orderModel.discountApplied}\n${Strings.amountDue}: ${orderModel.amountDue}',
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontSize: 14,

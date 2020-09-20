@@ -9,6 +9,9 @@ import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../util/strings_en.dart';
+import '../util/strings_en.dart';
+
 class ChangePassword extends StatefulWidget {
   @override
   _ChangePasswordState createState() => _ChangePasswordState();
@@ -60,15 +63,14 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   void checkForValidation() {
     if (currentPasswordTextEditingController.text.length < 8) {
-      CustomToast.show('Old Password was of at least 8 characters', context);
+      CustomToast.show(Strings.oldPasswordValidation, context);
       return;
     } else if (newPasswordTextEditingController.text.length < 8) {
-      CustomToast.show(
-          'New password should be of at least 8 characters', context);
+      CustomToast.show(Strings.oldPasswordValidation, context);
       return;
     } else if (confirmPasswordTextEditingController.text !=
         newPasswordTextEditingController.text) {
-      CustomToast.show('Both password don\'t match', context);
+      CustomToast.show(Strings.bothPasswordValidation, context);
       return;
     }
     changePasswordBloc.changePassword(currentPasswordTextEditingController.text,
@@ -97,7 +99,7 @@ class _ChangePasswordState extends State<ChangePassword> {
         await SharedPreferencesManager.getInstance();
     sharedPreferences.clear();
     await Future.delayed(Duration(milliseconds: 1000));
-    CustomToast.show('You have successfully logged out', context);
+    CustomToast.show(Strings.loginAgain, context);
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
       builder: (context) {
         return Login();
@@ -122,7 +124,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                   height: 20,
                 ),
                 Text(
-                  'Change Password',
+                  Strings.changePassword,
                   style: TextStyle(
                       color: AppTheme.secondary_color,
                       fontWeight: FontWeight.w700,
@@ -132,21 +134,21 @@ class _ChangePasswordState extends State<ChangePassword> {
                   height: 20,
                 ),
                 ChangePasswordInputWidget(
-                  hintText: 'Current Password',
+                  hintText: Strings.currentPassword,
                   textEditingController: currentPasswordTextEditingController,
                   textInputAction: TextInputAction.next,
                   focusNode: currentPasswordFocusNode,
                   onFieldSubmitted: changeFocus,
                 ),
                 ChangePasswordInputWidget(
-                  hintText: 'New Password',
+                  hintText: Strings.newPassword,
                   textEditingController: newPasswordTextEditingController,
                   textInputAction: TextInputAction.next,
                   focusNode: newPasswordFocusNode,
                   onFieldSubmitted: changeFocus,
                 ),
                 ChangePasswordInputWidget(
-                  hintText: 'Confirm Password',
+                  hintText: Strings.confirmPassword,
                   textEditingController: confirmPasswordTextEditingController,
                   textInputAction: TextInputAction.done,
                   focusNode: confirmPasswordFocusNode,
@@ -169,7 +171,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                           color: AppTheme.secondary_color,
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       child: Text(
-                        'Change Password',
+                        Strings.changePassword,
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w800,

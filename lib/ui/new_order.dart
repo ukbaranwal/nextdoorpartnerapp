@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 
+import '../util/strings_en.dart';
+
 class NewOrder extends StatelessWidget {
   final int id;
 
@@ -20,7 +22,7 @@ class NewOrder extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  'Congratulations,\nyou have received a new order',
+                  Strings.congratsNewOrder,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: AppTheme.secondary_color,
@@ -36,7 +38,7 @@ class NewOrder extends StatelessWidget {
                       borderRadius: BorderRadius.all(Radius.circular(5))),
                   color: AppTheme.green,
                   child: Text(
-                    'view order',
+                    Strings.viewOrder,
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,

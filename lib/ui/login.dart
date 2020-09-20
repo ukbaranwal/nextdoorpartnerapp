@@ -1,7 +1,6 @@
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nextdoorpartner/bloc/login_bloc.dart';
 import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
@@ -60,10 +59,10 @@ class _LoginState extends State<Login> {
 
   void checkForValidation() {
     if (!isValidEmail(emailTextEditingController.text)) {
-      CustomToast.show('enter a valid email', context);
+      CustomToast.show(Strings.enterValidEmail, context);
       return;
     } else if (passwordTextEditingController.text.length < 8) {
-      CustomToast.show('password should be of at least 8 characters', context);
+      CustomToast.show(Strings.passwordValidation, context);
       return;
     }
     login();

@@ -8,6 +8,8 @@ import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
 
+import '../util/strings_en.dart';
+
 class SellerSupportMessage extends StatefulWidget {
   final String reason;
 
@@ -47,17 +49,17 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
   checkValidation() {
     if (pageNo == 0) {
       if (phoneTextEditingController.text.length != 10) {
-        CustomToast.show('enter a valid mobile number', context);
+        CustomToast.show(Strings.mobileNumberValidation, context);
         return;
       }
       sellerSupportBloc.registerComplaint(
           phoneTextEditingController.text, widget.reason, "");
     } else {
       if (!isValidEmail(emailTextEditingController.text)) {
-        CustomToast.show('enter a valid email', context);
+        CustomToast.show(Strings.enterValidEmail, context);
         return;
       } else if (issueTextEditingController.text.length < 20) {
-        CustomToast.show('Please write more further', context);
+        CustomToast.show(Strings.writeMoreFurther, context);
         return;
       }
       sellerSupportBloc.registerComplaint(emailTextEditingController.text,
@@ -121,7 +123,7 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                       child: Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: Text(
-                          'Phone',
+                          Strings.phone,
                           style: TextStyle(
                               color: AppTheme.secondary_color,
                               fontWeight: FontWeight.w700,
@@ -150,7 +152,7 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                       child: Padding(
                         padding: const EdgeInsets.all(15),
                         child: Text(
-                          'Email',
+                          Strings.email,
                           style: TextStyle(
                               color: AppTheme.secondary_color,
                               fontWeight: FontWeight.w700,
@@ -179,7 +181,7 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                         height: 25,
                       ),
                       Text(
-                        'We will now call you at the phone number listed below',
+                        Strings.weWillCallYou,
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontWeight: FontWeight.w700,
@@ -225,7 +227,7 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                             borderRadius: BorderRadius.all(Radius.circular(5))),
                         color: AppTheme.secondary_color,
                         child: Text(
-                          'call me now',
+                          Strings.callMeNow,
                           style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
@@ -246,7 +248,7 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                           height: 25,
                         ),
                         Text(
-                          'Your Email',
+                          Strings.yourEmail,
                           style: TextStyle(
                               color: AppTheme.secondary_color,
                               fontWeight: FontWeight.w700,
@@ -264,7 +266,7 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                           height: 25,
                         ),
                         Text(
-                          'Contact Reason',
+                          Strings.contactReason,
                           style: TextStyle(
                               color: AppTheme.secondary_color,
                               fontWeight: FontWeight.w700,
@@ -282,7 +284,7 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                           height: 25,
                         ),
                         Text(
-                          'Tell us more about issue',
+                          Strings.tellMoreAboutIssue,
                           style: TextStyle(
                               color: AppTheme.secondary_color,
                               fontWeight: FontWeight.w700,
@@ -309,7 +311,7 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                                     BorderRadius.all(Radius.circular(5))),
                             color: AppTheme.secondary_color,
                             child: Text(
-                              'send mail',
+                              Strings.sendMail,
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -323,7 +325,7 @@ class _SellerSupportMessageState extends State<SellerSupportMessage> {
                         Align(
                           alignment: Alignment.center,
                           child: Text(
-                            'seller support will response within 12 hours',
+                            Strings.sellerSupportWillResponse,
                             style:
                                 TextStyle(color: Colors.black45, fontSize: 12),
                           ),

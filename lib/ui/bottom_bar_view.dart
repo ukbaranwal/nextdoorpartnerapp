@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:nextdoorpartner/ui/orders.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/ui/reviews.dart';

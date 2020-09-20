@@ -5,6 +5,8 @@ import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../util/strings_en.dart';
+
 class TermsAndConditions extends StatefulWidget {
   @override
   _TermsAndConditionsState createState() => _TermsAndConditionsState();
@@ -53,7 +55,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
                       color: AppTheme.secondary_color,
                       borderRadius: BorderRadius.all(Radius.circular(10))),
                   child: Text(
-                    'Accept Terms',
+                    Strings.acceptTerms,
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
@@ -76,7 +78,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(10))),
                   child: Text(
-                    'Go Back',
+                    Strings.goBack,
                     style: TextStyle(
                         color: AppTheme.secondary_color,
                         fontWeight: FontWeight.w800,

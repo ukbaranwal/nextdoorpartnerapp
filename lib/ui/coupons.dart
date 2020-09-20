@@ -11,6 +11,8 @@ import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/date_converter.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../util/strings_en.dart';
+
 class Coupons extends StatefulWidget {
   @override
   _CouponsState createState() => _CouponsState();
@@ -75,7 +77,7 @@ class _CouponsState extends State<Coupons> {
                                         ));
                                   },
                                   child: Text(
-                                    'Add New Coupon',
+                                    Strings.addCoupon,
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,
@@ -99,8 +101,8 @@ class _CouponsState extends State<Coupons> {
                               left: 20, top: 15, bottom: 10),
                           child: Text(
                             snapshot.data.data.length == 0
-                                ? 'No Campaigns'
-                                : 'Running Campaigns',
+                                ? Strings.noCampaigns
+                                : Strings.runningCampaigns,
                             style: TextStyle(
                                 color: AppTheme.secondary_color,
                                 fontSize: 18,
@@ -110,8 +112,8 @@ class _CouponsState extends State<Coupons> {
                         snapshot.data.data.length == 0
                             ? NoDataPlaceholderWidget(
                                 imageUrl: 'coupon_placeholder.png',
-                                info: 'You have no coupons running yet',
-                                extraInfo: 'Tap on Green button to add one',
+                                info: Strings.noCouponsPlaceholder,
+                                extraInfo: Strings.tapOnGreen,
                               )
                             : ListView.builder(
                                 physics: BouncingScrollPhysics(),
@@ -261,14 +263,14 @@ class CouponWidget extends StatelessWidget {
                                 fontWeight: FontWeight.w800),
                           ),
                           Text(
-                            'MAX: Rs.${couponModel.maxDiscount}',
+                            '${Strings.max}: Rs.${couponModel.maxDiscount}',
                             style: TextStyle(
                                 color: Colors.black45,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w800),
                           ),
                           Text(
-                            'MIN ORDER: Rs.${couponModel.minOrder}',
+                            '${Strings.minOrder}: Rs.${couponModel.minOrder}',
                             style: TextStyle(
                                 color: Colors.black45,
                                 fontSize: 16,
@@ -287,7 +289,7 @@ class CouponWidget extends StatelessWidget {
                                 fontWeight: FontWeight.w900),
                           ),
                           Text(
-                            'STARTS ON ${DateConverter.convertMonthDate(couponModel.startDate).toUpperCase()}\nEXPIRES ON ${DateConverter.convertMonthDate(couponModel.endDate).toUpperCase()}',
+                            '${Strings.startsOn} ${DateConverter.convertMonthDate(couponModel.startDate).toUpperCase()}\n${Strings.expiresOn} ${DateConverter.convertMonthDate(couponModel.endDate).toUpperCase()}',
                             textAlign: TextAlign.end,
                             style: TextStyle(
                                 color: Colors.black,

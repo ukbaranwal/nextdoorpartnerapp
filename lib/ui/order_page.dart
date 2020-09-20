@@ -83,7 +83,7 @@ class _OrderPageState extends State<OrderPage> {
               alignment: Alignment.center,
               color: Colors.red,
               child: Text(
-                'Delete Image',
+                Strings.deleteImage,
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -169,7 +169,7 @@ class _OrderPageState extends State<OrderPage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Total units : ${snapshot.data.data.units}',
+                                      '${Strings.totalUnits} : ${snapshot.data.data.units}',
                                       style: TextStyle(
                                           color: AppTheme.secondary_color,
                                           fontWeight: FontWeight.w700,
@@ -209,7 +209,7 @@ class _OrderPageState extends State<OrderPage> {
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 5, horizontal: 10),
                                           child: Text(
-                                              'Ordered at ${snapshot.data.data.createdAt}',
+                                              '${Strings.orderedAt} ${snapshot.data.data.createdAt}',
                                               style: TextStyle(
                                                   color:
                                                       AppTheme.secondary_color,
@@ -223,7 +223,7 @@ class _OrderPageState extends State<OrderPage> {
                                           child: Text(
                                             snapshot.data.data.paid
                                                 ? Strings.paid
-                                                : 'cod',
+                                                : Strings.cod,
                                             style: TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 14,
@@ -249,8 +249,8 @@ class _OrderPageState extends State<OrderPage> {
                                             MediaQuery.of(context).size.width *
                                                 0.6,
                                         child: Text(
-                                            'Expected delivery before ${snapshot.data.data.expectedDeliveryAt}\nDelivered at Nov 24 2020, 5:00 pm'
-                                            'Total amount: ${snapshot.data.data.amount}\nDiscount applied: ${snapshot.data.data.discountApplied}\nAmount due: ${snapshot.data.data.amountDue}',
+                                            '${Strings.expectedDeliveryBefore} ${snapshot.data.data.expectedDeliveryAt}\n${Strings.deliveredAt} Nov 24 2020, 5:00 pm'
+                                            '${Strings.totalAmount}: ${snapshot.data.data.amount}\n${Strings.discountApplied}: ${snapshot.data.data.discountApplied}\n${Strings.amountDue}: ${snapshot.data.data.amountDue}',
                                             style: TextStyle(
                                                 color: AppTheme.secondary_color,
                                                 fontSize: 14,

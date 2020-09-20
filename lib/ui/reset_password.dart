@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nextdoorpartner/bloc/reset_password_bloc.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/loading_dialog.dart';
@@ -25,10 +24,10 @@ class _ResetPasswordState extends State<ResetPassword> {
 
   void checkForValidation() {
     if (pinTextEditingController.text.length < 4) {
-      CustomToast.show('password should be of at least 4 characters', context);
+      CustomToast.show(Strings.pinValidation, context);
       return;
     } else if (passwordTextEditingController.text.length < 8) {
-      CustomToast.show('password should be of at least 8 characters', context);
+      CustomToast.show(Strings.passwordValidation, context);
       return;
     }
     resetPasswordBloc.resetPassword(

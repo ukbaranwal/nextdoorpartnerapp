@@ -3,6 +3,8 @@ import 'package:nextdoorpartner/models/error_screen_model.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 
+import '../util/strings_en.dart';
+
 enum ErrorType { NO_INTERNET, SERVER_ERROR, PAGE_NOT_FOUND }
 
 class ErrorScreen extends StatefulWidget {
@@ -21,22 +23,22 @@ class _ErrorScreenState extends State<ErrorScreen> {
     super.initState();
     if (widget.errorType == ErrorType.NO_INTERNET) {
       errorScreenModel = ErrorScreenModel(
-          'No Internet Connection',
+          Strings.errorScreenNoInternet,
           'assets/images/no_network.png',
-          'Please check your connection again or check your wifi',
-          'Try Again');
+          Strings.errorScreenNoInternetDetails,
+          Strings.tryAgain);
     } else if (widget.errorType == ErrorType.PAGE_NOT_FOUND) {
       errorScreenModel = ErrorScreenModel(
-          'Page Not Found',
+          Strings.errorScreenNotFound,
           'assets/images/not_found.png',
-          'Looks like you have clicked on something that doesn\'t exist',
-          'Go Back');
+          Strings.errorScreenNotFoundDetails,
+          Strings.goBack);
     } else {
       errorScreenModel = ErrorScreenModel(
-          'Server Error',
+          Strings.errorScreenServerError,
           'assets/images/server_error.png',
-          'Looks like something is broken. We are currently working on this issue',
-          'Go Back');
+          Strings.errorScreenServerErrorDetails,
+          Strings.goBack);
     }
   }
 

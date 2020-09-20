@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nextdoorpartner/bloc/forgot_password_bloc.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/loading_dialog.dart';
@@ -27,7 +26,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   void checkForValidation() {
     if (!isValidEmail(emailTextEditingController.text)) {
-      CustomToast.show('enter a valid email', context);
+      CustomToast.show(Strings.enterValidEmail, context);
       return;
     }
     forgotPasswordBloc.requestResetPin(emailTextEditingController.text);

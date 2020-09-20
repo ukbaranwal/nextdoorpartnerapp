@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:fswitch/fswitch.dart';
 import 'package:nextdoorpartner/bloc/products_bloc.dart';
 import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
@@ -63,7 +62,7 @@ class _ProductsState extends State<Products> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Sort by',
+                                Strings.sortBy,
                                 style: TextStyle(
                                     color: AppTheme.secondary_color,
                                     fontWeight: FontWeight.w800,
@@ -118,7 +117,7 @@ class _ProductsState extends State<Products> {
                                 Navigator.pop(context);
                               },
                               child: Text(
-                                'Units Sold',
+                                Strings.unitsSold,
                                 style: TextStyle(
                                     color: AppTheme.secondary_color,
                                     fontWeight: FontWeight.w700,
@@ -163,7 +162,7 @@ class _ProductsState extends State<Products> {
                                 Navigator.pop(context);
                               },
                               child: Text(
-                                'Number of Views',
+                                Strings.numberOfViews,
                                 style: TextStyle(
                                     color: AppTheme.secondary_color,
                                     fontWeight: FontWeight.w700,
@@ -210,7 +209,7 @@ class _ProductsState extends State<Products> {
                                 Navigator.pop(context);
                               },
                               child: Text(
-                                'Rating',
+                                Strings.ratings,
                                 style: TextStyle(
                                     color: AppTheme.secondary_color,
                                     fontWeight: FontWeight.w700,
@@ -297,8 +296,8 @@ class _ProductsState extends State<Products> {
                       snapshot.data.data.length == 0
                           ? NoDataPlaceholderWidget(
                               imageUrl: 'product_placeholder.png',
-                              info: 'You have no products added yet',
-                              extraInfo: 'Tap on Green button to add one',
+                              info: Strings.productPlaceholder,
+                              extraInfo: Strings.tapOnGreen,
                             )
                           : Column(
                               children: [
@@ -405,7 +404,7 @@ class _ProductsState extends State<Products> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Text(
-                                            'Sort by',
+                                            Strings.sortBy,
                                             style: TextStyle(
                                                 color: AppTheme.secondary_color,
                                                 fontSize: 16,
@@ -657,7 +656,7 @@ class ProductWidget extends StatelessWidget {
                           fontSize: 14),
                     ),
                     Text(
-                      'Selling: Rs. ${(productModel.mrp - (productModel.mrp * productModel.discountPercentage / 100)).toStringAsFixed(1)}',
+                      '${Strings.selling}: Rs. ${(productModel.mrp - (productModel.mrp * productModel.discountPercentage / 100)).toStringAsFixed(1)}',
                       style: TextStyle(
                           color: AppTheme.secondary_color,
                           fontWeight: FontWeight.w700,
@@ -786,7 +785,7 @@ class ProductWidget extends StatelessWidget {
                   height: 5,
                 ),
                 Text(
-                  productModel.inStock ? Strings.inStock : 'Out of Stock',
+                  productModel.inStock ? Strings.inStock : Strings.outOfStock,
                   style: TextStyle(
                       fontSize: 14,
                       color: productModel.inStock ? AppTheme.green : Colors.red,

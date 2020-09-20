@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
-import 'package:fswitch/fswitch.dart';
 import 'package:nextdoorpartner/bloc/coupon_bloc.dart';
 import 'package:nextdoorpartner/models/coupon_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
@@ -51,8 +49,6 @@ class _CouponState extends State<Coupon> {
 
   Applicability applicability;
 
-  ProgressDialog progressDialog;
-
   FocusScopeNode nameFocusNode = FocusScopeNode();
   FocusScopeNode codeFocusNode = FocusScopeNode();
   FocusScopeNode descriptionFocusNode = FocusScopeNode();
@@ -87,22 +83,22 @@ class _CouponState extends State<Coupon> {
     maxDiscount = double.tryParse(maxDiscountTextEditingController.text) ?? 0;
     minOrder = double.tryParse(minOrderTextEditingController.text) ?? 0;
     if (nameTextEditingController.text.length == 0) {
-      CustomToast.show('name field can\'t be empty', context);
+      CustomToast.show(Strings.nameFieldValidation, context);
       return;
     } else if (codeTextEditingController.text.length < 5) {
-      CustomToast.show('Coupon Code should be of at least 5 Digits', context);
+      CustomToast.show(Strings.couponCodeValidation, context);
       return;
     } else if (discount <= 0 || discount >= 100) {
-      CustomToast.show('Discount should be in between 0-100', context);
+      CustomToast.show(Strings.discountValidation, context);
       return;
     } else if (maxDiscount <= 0) {
-      CustomToast.show('Provide the maximum discount', context);
+      CustomToast.show(Strings.maxDiscountValidation, context);
       return;
     } else if (minOrder <= 0) {
-      CustomToast.show('Provide the Minimum Order', context);
+      CustomToast.show(Strings.minOrderValidation, context);
       return;
     } else if (applicability == null) {
-      CustomToast.show('Select the type of coupon', context);
+      CustomToast.show(Strings.applicabilityValidation, context);
       return;
     }
     widget.isNewCoupon ? uploadToServer() : updateProduct();
@@ -233,7 +229,7 @@ class _CouponState extends State<Coupon> {
                   color: Colors.black.withOpacity(0.4))
             ]),
             child: Text(
-              widget.isNewCoupon ? 'Add Coupon' : 'Update Coupon',
+              widget.isNewCoupon ? Strings.addCoupon : Strings.updateCoupon,
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 20,
@@ -329,7 +325,7 @@ class _CouponState extends State<Coupon> {
                         boxDecoration: boxDecoration,
                         textInputAction: TextInputAction.next,
                         textEditingController: codeTextEditingController,
-                        labelText: 'Coupon Code',
+                        labelText: Strings.couponCode,
                         changeFocus: changeFocus,
                         focusNode: codeFocusNode,
                         textInputType: TextInputType.name,
@@ -340,7 +336,7 @@ class _CouponState extends State<Coupon> {
                         boxDecoration: boxDecoration,
                         textInputAction: TextInputAction.next,
                         textEditingController: discountTextEditingController,
-                        labelText: 'Discount',
+                        labelText: Strings.discount,
                         changeFocus: changeFocus,
                         focusNode: discountFocusNode,
                         textInputType: TextInputType.number,
@@ -351,7 +347,7 @@ class _CouponState extends State<Coupon> {
                         boxDecoration: boxDecoration,
                         textInputAction: TextInputAction.next,
                         textEditingController: maxDiscountTextEditingController,
-                        labelText: 'Max Discount',
+                        labelText: Strings.maxDiscount,
                         changeFocus: changeFocus,
                         focusNode: maxDiscountFocusNode,
                         textInputType: TextInputType.number,
@@ -362,7 +358,7 @@ class _CouponState extends State<Coupon> {
                         boxDecoration: boxDecoration,
                         textInputAction: TextInputAction.next,
                         textEditingController: minOrderTextEditingController,
-                        labelText: 'Minimum Order',
+                        labelText: Strings.minimumOrder,
                         changeFocus: changeFocus,
                         focusNode: minOrderFocusNode,
                         textInputType: TextInputType.number,
@@ -377,14 +373,14 @@ class _CouponState extends State<Coupon> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 AvailabilityWidget(
-                                  label: 'All Products',
+                                  label: Strings.allProducts,
                                   isSelected:
                                       applicability == Applicability.ALL,
                                   applicability: Applicability.ALL,
                                   callback: selectAvailability,
                                 ),
                                 AvailabilityWidget(
-                                  label: 'First Timers',
+                                  label: Strings.firstTimers,
                                   isSelected: applicability ==
                                       Applicability.FIRST_TIMER,
                                   applicability: Applicability.FIRST_TIMER,
@@ -396,7 +392,7 @@ class _CouponState extends State<Coupon> {
                               height: 10,
                             ),
                             AvailabilityWidget(
-                              label: 'Product Wise',
+                              label: Strings.productWise,
                               isSelected:
                                   applicability == Applicability.PRODUCT_WISE,
                               applicability: Applicability.PRODUCT_WISE,

@@ -1,7 +1,6 @@
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_progress_dialog/flutter_progress_dialog.dart';
 import 'package:nextdoorpartner/bloc/signup_bloc.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/loading_dialog.dart';
@@ -20,7 +19,6 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   SignUpBloc signUpBloc;
   final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-  ProgressDialog progressDialog;
   final TextEditingController nameTextEditingController =
       TextEditingController();
   final TextEditingController phoneTextEditingController =
@@ -52,9 +50,7 @@ class _SignUpState extends State<SignUp> {
         MaterialPageRoute(
             builder: (BuildContext context) => TermsAndConditions()));
     if (!hasAcceptedTerms) {
-      CustomToast.show(
-          'You need to Accept our Terms and Conditions to move forward',
-          context);
+      CustomToast.show(Strings.youNeedToAcceptTerms, context);
       return;
     }
     AndroidDeviceInfo androidDeviceInfo = await deviceInfoPlugin.androidInfo;
@@ -81,19 +77,19 @@ class _SignUpState extends State<SignUp> {
 
   void checkForValidation() {
     if (nameTextEditingController.text.length == 0) {
-      CustomToast.show('name field can\'t be empty', context);
+      CustomToast.show(Strings.nameFieldValidation, context);
       return;
     } else if (cityTextEditingController.text.length == 0) {
-      CustomToast.show('city field can\'t be empty', context);
+      CustomToast.show(Strings.cityFieldValidation, context);
       return;
     } else if (phoneTextEditingController.text.length != 10) {
-      CustomToast.show('enter a valid mobile number', context);
+      CustomToast.show(Strings.mobileNumberValidation, context);
       return;
     } else if (!isValidEmail(emailTextEditingController.text)) {
-      CustomToast.show('enter a valid email', context);
+      CustomToast.show(Strings.mobileNumberValidation, context);
       return;
     } else if (passwordTextEditingController.text.length < 8) {
-      CustomToast.show('password should of atleast 8 characters', context);
+      CustomToast.show(Strings.passwordValidation, context);
       return;
     }
     signUp();
