@@ -28,10 +28,13 @@ class PendingOrderBloc implements BlocInterface {
             data: _orderModel,
             actions: ApiActions.INITIATED,
             loader: LOADER.IDLE));
+      } else {
+        _orderFetcher.sink.add(
+            ApiResponse.error(jsonResponse['message'], loader: LOADER.IDLE));
       }
     } catch (e) {
-      _orderFetcher.sink
-          .add(ApiResponse.error(e.toString(), loader: LOADER.IDLE));
+      _orderFetcher.sink.add(ApiResponse.error(e.toString(),
+          loader: LOADER.IDLE, actions: ApiActions.ERROR));
     }
   }
 

@@ -34,19 +34,24 @@ class ProductsBloc implements BlocInterface {
       alreadyExecuting = true;
       Response response = await _repository
           .getProducts(productModelList.length, searchQuery, orderBy: orderBy);
-      var jsonResponse = jsonDecode(response.body);
-      print(jsonResponse['data']['products'].toString());
-      if (jsonResponse['data']['products'].length == 0) {
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        print(jsonResponse['data']['products'].toString());
+        if (jsonResponse['data']['products'].length == 0) {
+          _productsFetcher.sink
+              .add(ApiResponse.hasData('end', data: productModelList));
+          alreadyExecuting = false;
+          return;
+        }
+        for (var i in jsonResponse['data']['products']) {
+          productModelList.add(ProductModel.fromJson(i));
+        }
         _productsFetcher.sink
-            .add(ApiResponse.hasData('end', data: productModelList));
-        alreadyExecuting = false;
-        return;
+            .add(ApiResponse.hasData('Done', data: productModelList));
+      } else {
+        _productsFetcher.sink
+            .add(ApiResponse.hasData('Done', data: productModelList));
       }
-      for (var i in jsonResponse['data']['products']) {
-        productModelList.add(ProductModel.fromJson(i));
-      }
-      _productsFetcher.sink
-          .add(ApiResponse.hasData('Done', data: productModelList));
       alreadyExecuting = false;
     } catch (e) {
       print(e.toString());

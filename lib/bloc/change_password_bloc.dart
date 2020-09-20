@@ -33,7 +33,7 @@ class ChangePasswordBloc implements BlocInterface {
       } else if (response.statusCode == 401) {
         _changePasswordFetcher.sink.add(ApiResponse.hasData(
             jsonResponse['message'],
-            actions: ApiActions.WRONG_INFO,
+            actions: ApiActions.ERROR,
             loader: LOADER.HIDE));
       } else if (response.statusCode == 422) {
         _changePasswordFetcher.sink.add(ApiResponse.hasData(

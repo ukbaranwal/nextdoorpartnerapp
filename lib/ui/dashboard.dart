@@ -90,7 +90,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   void signOut() async {
-    showDialog(
+    showCupertinoDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -184,7 +184,14 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   @override
+  void dispose() {
+    dashboardBloc.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
+    print('start');
     super.initState();
     runIsolate();
     dashboardBloc = DashboardBloc();
@@ -227,9 +234,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
   }
 
   void setNoOfNotification(int count) {
-    setState(() {
-      noOfNotifications = count;
-    });
+    if (mounted) {
+      setState(() {
+        noOfNotifications = count;
+      });
+    }
   }
 
   Widget bottomBar() {
@@ -724,126 +733,200 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                       MainAxisAlignment.spaceEvenly,
                                 ),
                               ),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          ChangePassword()));
-                                },
-                                child: RatingCardDashboard(
-                                  boxDecoration: boxDecoration,
-                                  totalRatings: snapshot.data.data.noOfRatings,
-                                  avgRating: snapshot.data.data.rating,
-                                  ratingStars: snapshot.data.data.ratingStars,
-                                ),
-                              ),
-                              Container(
-                                decoration: boxDecoration,
-                                padding: EdgeInsets.only(top: 10),
-                                margin: EdgeInsets.symmetric(horizontal: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Row(
+                              snapshot.data.data.noOfRatings == 0
+                                  ? Container(
+                                      height: 200,
+                                      width: MediaQuery.of(context).size.width,
+                                      decoration: boxDecoration,
+                                      margin: EdgeInsets.all(10),
+                                      child: Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                            MainAxisAlignment.center,
                                         children: [
-                                          InkWell(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      NewOrder(),
+                                          Image.asset(
+                                            'assets/images/dashboard_rating.png',
+                                            height: 100,
+                                            width: 100,
+                                          ),
+                                          Text(
+                                            'Your Ratings will be shown here',
+                                            style: TextStyle(
+                                                color: AppTheme.secondary_color,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w700),
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  : InkWell(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        ChangePassword()));
+                                      },
+                                      child: RatingCardDashboard(
+                                        boxDecoration: boxDecoration,
+                                        totalRatings:
+                                            snapshot.data.data.noOfRatings,
+                                        avgRating: snapshot.data.data.rating,
+                                        ratingStars:
+                                            snapshot.data.data.ratingStars,
+                                      ),
+                                    ),
+                              snapshot.data.data.orderModelList.length == 0
+                                  ? Container(
+                                      height: 200,
+                                      width: MediaQuery.of(context).size.width,
+                                      decoration: boxDecoration,
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/dashboard_order.png',
+                                            height: 100,
+                                            width: 100,
+                                          ),
+                                          Text(
+                                            'Your active orders will be shown here',
+                                            style: TextStyle(
+                                                color: AppTheme.secondary_color,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w700),
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  : Container(
+                                      decoration: boxDecoration,
+                                      padding: EdgeInsets.only(top: 10),
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            NewOrder(1),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Text(
+                                                    Strings.activeOrders,
+                                                    style: textStyleStats,
+                                                  ),
                                                 ),
-                                              );
-                                            },
-                                            child: Text(
-                                              Strings.activeOrders,
-                                              style: textStyleStats,
+                                                Row(
+                                                  children: [
+                                                    ActiveOrderOptionWidget(
+                                                      text: 'All',
+                                                      isSelected: orderFilter ==
+                                                          OrderFilter.ALL,
+                                                      orderFilter:
+                                                          OrderFilter.ALL,
+                                                      callback: filterOrder,
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 5),
+                                                      child:
+                                                          ActiveOrderOptionWidget(
+                                                        text: 'Pending',
+                                                        isSelected:
+                                                            orderFilter ==
+                                                                OrderFilter
+                                                                    .PENDING,
+                                                        orderFilter:
+                                                            OrderFilter.PENDING,
+                                                        callback: filterOrder,
+                                                      ),
+                                                    ),
+                                                    ActiveOrderOptionWidget(
+                                                      text: 'Confirmed',
+                                                      isSelected: orderFilter ==
+                                                          OrderFilter.CONFIRMED,
+                                                      orderFilter:
+                                                          OrderFilter.CONFIRMED,
+                                                      callback: filterOrder,
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          Row(
-                                            children: [
-                                              ActiveOrderOptionWidget(
-                                                text: 'All',
-                                                isSelected: orderFilter ==
-                                                    OrderFilter.ALL,
-                                                orderFilter: OrderFilter.ALL,
-                                                callback: filterOrder,
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 5),
-                                                child: ActiveOrderOptionWidget(
-                                                  text: 'Pending',
-                                                  isSelected: orderFilter ==
-                                                      OrderFilter.PENDING,
-                                                  orderFilter:
-                                                      OrderFilter.PENDING,
-                                                  callback: filterOrder,
-                                                ),
-                                              ),
-                                              ActiveOrderOptionWidget(
-                                                text: 'Confirmed',
-                                                isSelected: orderFilter ==
-                                                    OrderFilter.CONFIRMED,
-                                                orderFilter:
-                                                    OrderFilter.CONFIRMED,
-                                                callback: filterOrder,
-                                              )
-                                            ],
+                                          Divider(
+                                            color: AppTheme.background_grey,
+                                            thickness: 2,
+                                            indent: 30,
+                                            endIndent: 30,
+                                          ),
+                                          ListView.builder(
+                                            physics: BouncingScrollPhysics(),
+                                            shrinkWrap: true,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 5, horizontal: 2),
+                                            itemCount: snapshot.data.data
+                                                .orderModelList.length,
+                                            scrollDirection: Axis.vertical,
+                                            itemBuilder: (BuildContext context,
+                                                int index) {
+                                              ///Return Single Widget
+                                              return RecentOrderWidget(
+                                                orderNo: snapshot.data.data
+                                                    .orderModelList[index].id,
+                                                orderValue: snapshot
+                                                    .data
+                                                    .data
+                                                    .orderModelList[index]
+                                                    .amount,
+                                                units: snapshot
+                                                    .data
+                                                    .data
+                                                    .orderModelList[index]
+                                                    .units,
+                                                discount: snapshot
+                                                    .data
+                                                    .data
+                                                    .orderModelList[index]
+                                                    .discountApplied,
+                                                date: snapshot
+                                                    .data
+                                                    .data
+                                                    .orderModelList[index]
+                                                    .createdAt,
+                                                isPaid: snapshot.data.data
+                                                    .orderModelList[index].paid,
+                                                name: 'Utkarsh',
+                                                address: 'B14/172 Kalyani',
+                                                orderStatus: snapshot
+                                                    .data
+                                                    .data
+                                                    .orderModelList[index]
+                                                    .status,
+                                              );
+                                            },
                                           ),
                                         ],
                                       ),
                                     ),
-                                    Divider(
-                                      color: AppTheme.background_grey,
-                                      thickness: 2,
-                                      indent: 30,
-                                      endIndent: 30,
-                                    ),
-                                    ListView.builder(
-                                      physics: BouncingScrollPhysics(),
-                                      shrinkWrap: true,
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 5, horizontal: 2),
-                                      itemCount: snapshot
-                                          .data.data.orderModelList.length,
-                                      scrollDirection: Axis.vertical,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        ///Return Single Widget
-                                        return RecentOrderWidget(
-                                          orderNo: snapshot.data.data
-                                              .orderModelList[index].id,
-                                          orderValue: snapshot.data.data
-                                              .orderModelList[index].amount,
-                                          units: snapshot.data.data
-                                              .orderModelList[index].units,
-                                          discount: snapshot
-                                              .data
-                                              .data
-                                              .orderModelList[index]
-                                              .discountApplied,
-                                          date: snapshot.data.data
-                                              .orderModelList[index].createdAt,
-                                          isPaid: snapshot.data.data
-                                              .orderModelList[index].paid,
-                                          name: 'Utkarsh',
-                                          address: 'B14/172 Kalyani',
-                                          orderStatus: snapshot.data.data
-                                              .orderModelList[index].status,
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
                               SizedBox(
                                 height: 95,
                               )

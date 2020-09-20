@@ -227,10 +227,12 @@ class _ProductState extends State<Product> {
         CustomToast.show(event.message, context);
       }
       if (event.actions == ApiActions.SUCCESSFUL) {
-        Navigator.pop(context);
-        Navigator.pop(context);
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (BuildContext context) => Products()));
+        if (widget.isNewProduct) {
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (BuildContext context) => Products()));
+        }
       }
     });
   }

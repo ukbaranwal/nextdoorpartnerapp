@@ -23,9 +23,6 @@ enum ApiActions {
   LOADING,
   INITIATED,
   SUCCESSFUL,
-  UNSUCCESSFUL,
-  WRONG_INFO,
-  NOT_FOUND,
   ERROR,
 }
 

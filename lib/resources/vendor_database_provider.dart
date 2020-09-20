@@ -63,6 +63,8 @@ class VendorDatabaseProvider {
   final String mapBody = 'body';
   final String mapReceivedAt = 'received_at';
   final String mapAction = 'action';
+  final String mapData = 'data';
+  final String mapScreen = 'screen';
 
   static const int MAX_NOTIFICATIONS = 5;
 
@@ -75,13 +77,10 @@ class VendorDatabaseProvider {
     var path = '$databasesPath/$dbName';
     db = await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
-//      await db.execute(
-//          'create table $orderTable ($columnId integer primary key autoincrement, $mapOrderId integer not null, $mapPaid integer not null, '
-//          '$mapAmount real not null, $mapAmountPaidByWallet real, $mapAmountDue real not null, $mapDiscountApplied real, $mapCouponApplied integer not null,'
-//          '$mapCouponId integer, $mapCouponDiscount real, $mapPaymentMethod text not null, $mapCashback real, $mapUnits integer not null,'
-//          '$mapTransactionId text, $mapInstructions text, $mapStatus text not null, $mapCancelled integer not null, $mapReview text, '
-//          '$mapRating real, $mapAddress text not null, $mapPackedAt text, $mapShippedAt text, $mapCreatedAt text not null, $mapDeliveredAt text,'
-//          '$mapExpectedDeliveryAt text, $mapProducts text not null)');
+      await db.execute(
+          'create table $notificationTable ($columnId integer primary key autoincrement, $mapTitle text not null, $mapBody text not null,'
+          ' $mapReceivedAt text not null, $mapData text)');
+
       await db.execute(
 
           ///TODO change mapId to mapProductCategoryId
@@ -89,9 +88,6 @@ class VendorDatabaseProvider {
           ' $mapName text not null,$mapParentId integer not null, $mapTags text not null, $mapQuantityByWeight integer not null, '
           '$mapQuantityByPiece integer not null, $mapImageUrl text, $mapHaveColorVariants integer not null, '
           '$mapHaveSizeVariants integer not null, $mapNoOfPhotos integer not null )');
-
-      await db.execute(
-          'create table $notificationTable ($columnId integer primary key autoincrement, $mapTitle text not null, $mapBody text not null, $mapReceivedAt text not null)');
     });
   }
 

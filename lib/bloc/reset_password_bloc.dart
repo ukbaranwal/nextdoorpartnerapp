@@ -28,7 +28,7 @@ class ResetPasswordBloc implements BlocInterface {
       if (response.statusCode == 204) {
         _resetPasswordFetcher.sink.add(ApiResponse.hasData(
             'No user exist with email $email',
-            actions: ApiActions.WRONG_INFO,
+            actions: ApiActions.ERROR,
             loader: LOADER.HIDE));
 
         ///For accepted password 202
@@ -42,7 +42,7 @@ class ResetPasswordBloc implements BlocInterface {
         } else if (response.statusCode == 406) {
           _resetPasswordFetcher.sink.add(ApiResponse.hasData(
               jsonResponse['message'],
-              actions: ApiActions.WRONG_INFO,
+              actions: ApiActions.ERROR,
               loader: LOADER.HIDE));
         } else {
           _resetPasswordFetcher.sink.add(ApiResponse.hasData(

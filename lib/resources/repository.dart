@@ -146,7 +146,7 @@ class Repository {
   Future<Response> deleteCoupon(int couponId) =>
       vendorApiProvider.deleteCoupon(couponId);
 
-  Future<Response> getCoupon() => vendorApiProvider.getCoupons();
+  Future<Response> getCoupons() => vendorApiProvider.getCoupons();
 
   Future<Response> toggleIsLive(int couponId, bool isLive) =>
       vendorApiProvider.toggleIsLive(couponId, isLive);

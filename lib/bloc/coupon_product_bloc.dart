@@ -51,23 +51,25 @@ class CouponProductsBloc implements BlocInterface {
         response =
             await _repository.getProducts(productModelList.length, searchQuery);
       }
-      var jsonResponse = jsonDecode(response.body);
-      print(jsonResponse['data']['products'].length.toString());
-      if (jsonResponse['data']['products'].length == 0) {
-        _productsFetcher.sink.add(ApiResponse.hasData('end',
-            data: productModelList, actions: ApiActions.INITIATED));
-        alreadyExecuting = false;
-        return;
-      }
-      for (var i in jsonResponse['data']['products']) {
-        productModelList.add(CouponProductModel(ProductModel.fromJson(i)));
-        if (selectedProductIds
-            .contains(productModelList.last.productModel.id)) {
-          productModelList.last.isSelected = true;
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        print(jsonResponse['data']['products'].length.toString());
+        if (jsonResponse['data']['products'].length == 0) {
+          _productsFetcher.sink.add(ApiResponse.hasData('end',
+              data: productModelList, actions: ApiActions.INITIATED));
+          alreadyExecuting = false;
+          return;
         }
+        for (var i in jsonResponse['data']['products']) {
+          productModelList.add(CouponProductModel(ProductModel.fromJson(i)));
+          if (selectedProductIds
+              .contains(productModelList.last.productModel.id)) {
+            productModelList.last.isSelected = true;
+          }
+        }
+        _productsFetcher.sink.add(ApiResponse.hasData('Done',
+            data: productModelList, actions: ApiActions.INITIATED));
       }
-      _productsFetcher.sink.add(ApiResponse.hasData('Done',
-          data: productModelList, actions: ApiActions.INITIATED));
       alreadyExecuting = false;
     } catch (e) {
       print(e.toString());

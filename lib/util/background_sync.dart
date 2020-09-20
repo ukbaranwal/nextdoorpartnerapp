@@ -29,6 +29,7 @@ class BackgroundSync {
       } else if (message is List<NotificationModel>) {
         callback(message.length);
         backgroundSyncBloc.insertNotificationsInDb(message);
+        receivePort.close();
       }
     }, onDone: () {
       print('Done');
@@ -63,6 +64,7 @@ class BackgroundSync {
           }
           sendPort.send(notificationModelList);
         }
+        receivePort.close();
       }
     });
   }

@@ -43,8 +43,8 @@ class DashboardBloc implements BlocInterface {
       }
     } catch (e) {
       if (e is FetchDataException) {
-        _dashboardFetcher.sink
-            .add(ApiResponse.socketError(loader: LOADER.IDLE));
+        _dashboardFetcher.sink.add(ApiResponse.socketError(
+            loader: LOADER.IDLE, actions: ApiActions.ERROR));
       } else {
         _dashboardFetcher.sink
             .add(ApiResponse.error(e.toString(), loader: LOADER.IDLE));
@@ -64,17 +64,19 @@ class DashboardBloc implements BlocInterface {
     try {
       Response response =
           await _repository.getDashboardRevenue(revenueDuration);
-      var jsonResponse = jsonDecode(response.body);
-      _dashboardModel.fromRevenueJson(jsonResponse['data']);
-      _dashboardModel.revenueDuration = revenueDuration;
-      _dashboardFetcher.sink.add(ApiResponse.hasData('Done',
-          data: _dashboardModel,
-          actions: ApiActions.SUCCESSFUL,
-          loader: LOADER.IDLE));
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        _dashboardModel.fromRevenueJson(jsonResponse['data']);
+        _dashboardModel.revenueDuration = revenueDuration;
+        _dashboardFetcher.sink.add(ApiResponse.hasData('Done',
+            data: _dashboardModel,
+            actions: ApiActions.SUCCESSFUL,
+            loader: LOADER.IDLE));
+      }
     } catch (e) {
       print(e.toString());
-      _dashboardFetcher.sink
-          .add(ApiResponse.error(e.toString(), loader: LOADER.IDLE));
+      _dashboardFetcher.sink.add(ApiResponse.error(e.toString(),
+          loader: LOADER.IDLE, actions: ApiActions.ERROR));
     }
   }
 

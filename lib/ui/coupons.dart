@@ -6,6 +6,7 @@ import 'package:nextdoorpartner/models/coupon_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/coupon.dart';
+import 'package:nextdoorpartner/ui/data_placeholder.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/date_converter.dart';
 import 'package:shimmer/shimmer.dart';
@@ -106,18 +107,25 @@ class _CouponsState extends State<Coupons> {
                                 fontWeight: FontWeight.w800),
                           ),
                         ),
-                        ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          shrinkWrap: true,
-                          padding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-                          itemCount: snapshot.data.data.length,
-                          scrollDirection: Axis.vertical,
-                          itemBuilder: (BuildContext context, int index) {
-                            ///Return Single Widget
-                            return CouponWidget(snapshot.data.data[index]);
-                          },
-                        ),
+                        snapshot.data.data.length == 0
+                            ? NoDataPlaceholderWidget(
+                                imageUrl: 'coupon_placeholder.png',
+                                info: 'You have no coupons running yet',
+                                extraInfo: 'Tap on Green button to add one',
+                              )
+                            : ListView.builder(
+                                physics: BouncingScrollPhysics(),
+                                shrinkWrap: true,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 2),
+                                itemCount: snapshot.data.data.length,
+                                scrollDirection: Axis.vertical,
+                                itemBuilder: (BuildContext context, int index) {
+                                  ///Return Single Widget
+                                  return CouponWidget(
+                                      snapshot.data.data[index]);
+                                },
+                              ),
                       ],
                     );
                   } else {

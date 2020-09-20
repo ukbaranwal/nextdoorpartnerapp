@@ -27,6 +27,9 @@ class OrderPageBloc implements BlocInterface {
             data: _orderModel,
             actions: ApiActions.INITIATED,
             loader: LOADER.IDLE));
+      } else {
+        _orderFetcher.sink.add(
+            ApiResponse.error(jsonResponse['message'], loader: LOADER.IDLE));
       }
     } catch (e) {
       _orderFetcher.sink

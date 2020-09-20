@@ -6,6 +6,7 @@ import 'package:nextdoorpartner/models/order_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/loading_dialog.dart';
+import 'package:nextdoorpartner/ui/orders.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
@@ -48,6 +49,11 @@ class _PendingOrderState extends State<PendingOrder> {
       } else if (event.loader == LOADER.HIDE) {
         CustomToast.show(event.message, context);
         Navigator.pop(context);
+      }
+      if (event.actions == ApiActions.SUCCESSFUL) {
+        Navigator.pop(context);
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (BuildContext context) => Orders()));
       }
     });
   }

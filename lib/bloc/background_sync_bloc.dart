@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:nextdoorpartner/bloc/bloc_interface.dart';
 import 'package:nextdoorpartner/models/notification_model.dart';
 import 'package:nextdoorpartner/models/product_category_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';

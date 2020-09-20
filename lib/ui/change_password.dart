@@ -73,6 +73,12 @@ class _ChangePasswordState extends State<ChangePassword> {
     }
     changePasswordBloc.changePassword(currentPasswordTextEditingController.text,
         newPasswordTextEditingController.text);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    changePasswordBloc = ChangePasswordBloc();
     changePasswordBloc.changePasswordStream.listen((event) {
       if (event.loader == LOADER.HIDE) {
         CustomToast.show(event.message, context);
@@ -84,12 +90,6 @@ class _ChangePasswordState extends State<ChangePassword> {
         signOut();
       }
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    changePasswordBloc = ChangePasswordBloc();
   }
 
   void signOut() async {

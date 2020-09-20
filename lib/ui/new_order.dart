@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 
 class NewOrder extends StatelessWidget {
+  final int id;
+
+  NewOrder(this.id);
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(

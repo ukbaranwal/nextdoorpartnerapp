@@ -62,22 +62,30 @@ class OrderBloc implements BlocInterface {
         response = await _repository.getOrders(
             orderModelBloc.ordersModelListPending.length, status);
         jsonResponse = jsonDecode(response.body);
-        orderModelBloc.parseOrderModelListPending(jsonResponse['data']);
+        if (response.statusCode == 200) {
+          orderModelBloc.parseOrderModelListPending(jsonResponse['data']);
+        }
       } else if (status == Constants.confirmed) {
         response = await _repository.getOrders(
             orderModelBloc.ordersModelListConfirmed.length, status);
         jsonResponse = jsonDecode(response.body);
-        orderModelBloc.parseOrderModelListConfirmed(jsonResponse['data']);
+        if (response.statusCode == 200) {
+          orderModelBloc.parseOrderModelListConfirmed(jsonResponse['data']);
+        }
       } else if (status == Constants.dispatched) {
         response = await _repository.getOrders(
             orderModelBloc.ordersModelListDispatched.length, status);
         jsonResponse = jsonDecode(response.body);
-        orderModelBloc.parseOrderModelListDispatched(jsonResponse['data']);
+        if (response.statusCode == 200) {
+          orderModelBloc.parseOrderModelListDispatched(jsonResponse['data']);
+        }
       } else {
         response = await _repository.getOrders(
             orderModelBloc.ordersModelListCompleted.length, status);
         jsonResponse = jsonDecode(response.body);
-        orderModelBloc.parseOrderModelListCompleted(jsonResponse['data']);
+        if (response.statusCode == 200) {
+          orderModelBloc.parseOrderModelListCompleted(jsonResponse['data']);
+        }
       }
 
       _orderFetcher.sink.add(ApiResponse.hasData('done', data: orderModelBloc));

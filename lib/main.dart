@@ -30,7 +30,12 @@ void main() {
   ///Initialize LocalNotifications
   LocalNotifications.initialize();
   runZoned(() {
-    runApp(MyApp());
+    runApp(MaterialApp(
+        theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
+          fontFamily: 'nunito',
+        ),
+        home: MyApp()));
 
     ///onError Will be called on every error to report error to firebase
   }, onError: Crashlytics.instance.recordError);
@@ -50,14 +55,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    super.initState();
     LocalNotifications.initialize();
     localNotifications.configureDidReceiveLocalNotificationSubject(context);
     localNotifications.configureSelectNotificationSubject(context);
     localNotifications.requestIOSPermissions();
 
     ///Setup Firebase
-    FirebaseNotifications().setUpFirebase(localNotifications);
+    FirebaseNotifications(context).setUpFirebase(localNotifications);
+    super.initState();
   }
 
   ///Function to Store data in global vendor model
@@ -91,28 +96,22 @@ class _MyAppState extends State<MyApp> {
       statusBarColor: Colors.white,
       statusBarIconBrightness: Brightness.dark,
     ));
-    return MaterialApp(
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,
-        fontFamily: 'nunito',
-      ),
-      home: FutureBuilder(
-        future: getStoredData(),
-        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            ///Show splashscreen while loading
-            return Splashscreen();
-          } else {
-            return snapshot.data
+    return FutureBuilder(
+      future: getStoredData(),
+      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          ///Show splashscreen while loading
+          return Splashscreen();
+        } else {
+          return snapshot.data
 
-                ///If vendor is verified take him to dashboard or take it Unverified Page
-                ? (isVerified ? Dashboard() : UnverifiedLoggedIn())
+              ///If vendor is verified take him to dashboard or take it Unverified Page
+              ? (isVerified ? Dashboard() : UnverifiedLoggedIn())
 
-                ///If not logged in Take them to Walkthrough
-                : WalkThrough();
-          }
-        },
-      ),
+              ///If not logged in Take them to Walkthrough
+              : WalkThrough();
+        }
+      },
     );
   }
 }

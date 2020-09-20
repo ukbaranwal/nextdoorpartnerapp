@@ -13,7 +13,6 @@ class SignUpBloc implements BlocInterface {
 
   doSignUp(String name, String email, String phone, String city,
       String password, String deviceId) async {
-    _signUpFetcher = PublishSubject<ApiResponse<String>>();
     try {
       _signUpFetcher.sink.add(ApiResponse.hasData('Loading',
           actions: ApiActions.LOADING, loader: LOADER.SHOW));
@@ -25,7 +24,7 @@ class SignUpBloc implements BlocInterface {
       ///already registered
       if (response.statusCode == 200) {
         _signUpFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
-            actions: ApiActions.UNSUCCESSFUL, loader: LOADER.HIDE));
+            actions: ApiActions.ERROR, loader: LOADER.HIDE));
 
         ///successful sign up
       } else if (response.statusCode == 201) {

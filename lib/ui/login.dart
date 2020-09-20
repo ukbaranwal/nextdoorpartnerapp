@@ -56,7 +56,25 @@ class _LoginState extends State<Login> {
     print(androidDeviceInfo.id);
     loginBloc.doLogin(emailTextEditingController.text,
         passwordTextEditingController.text, androidDeviceInfo.id);
+  }
+
+  void checkForValidation() {
+    if (!isValidEmail(emailTextEditingController.text)) {
+      CustomToast.show('enter a valid email', context);
+      return;
+    } else if (passwordTextEditingController.text.length < 8) {
+      CustomToast.show('password should be of at least 8 characters', context);
+      return;
+    }
+    login();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loginBloc = LoginBloc();
     loginBloc.loginStream.listen((event) {
+      print(event.loader);
       if (event.loader == LOADER.SHOW) {
         showLoadingDialog();
       } else if (event.loader == LOADER.HIDE) {
@@ -77,23 +95,6 @@ class _LoginState extends State<Login> {
             (route) => false);
       }
     });
-  }
-
-  void checkForValidation() {
-    if (!isValidEmail(emailTextEditingController.text)) {
-      CustomToast.show('enter a valid email', context);
-      return;
-    } else if (passwordTextEditingController.text.length < 8) {
-      CustomToast.show('password should be of at least 8 characters', context);
-      return;
-    }
-    login();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loginBloc = LoginBloc();
   }
 
   changeFocus(FocusScopeNode focusScopeNode) {

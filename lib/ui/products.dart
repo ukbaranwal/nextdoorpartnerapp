@@ -8,6 +8,7 @@ import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/data_placeholder.dart';
 import 'package:nextdoorpartner/ui/product.dart';
 import 'package:nextdoorpartner/ui/product_category.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
@@ -232,37 +233,6 @@ class _ProductsState extends State<Products> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: Container(
-          margin: EdgeInsets.only(bottom: 20),
-          height: 60,
-          width: 60,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(35)),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
-                  offset: const Offset(2, 4.0),
-                  blurRadius: 1.0),
-            ],
-          ),
-          child: FloatingActionButton(
-            onPressed: () {
-//            Navigator.push(
-//              context,
-//              MaterialPageRoute(
-//                builder: (context) => Products(),
-//              ),
-//            );
-            },
-            elevation: 10,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.tune,
-              color: AppTheme.secondary_color,
-              size: 32,
-            ),
-          ),
-        ),
         backgroundColor: AppTheme.background_grey,
         appBar: CustomAppBar(),
         body: NotificationListener<OverscrollIndicatorNotification>(
@@ -324,148 +294,168 @@ class _ProductsState extends State<Products> {
                                   BorderRadius.all(Radius.circular(10))),
                         ),
                       ),
-                      Container(
-                        margin:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        padding: EdgeInsets.symmetric(horizontal: 15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.search,
-                              color: AppTheme.grey,
-                            ),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              child: TextFormField(
-                                controller: searchTextEditingController,
-                                cursorColor: AppTheme.secondary_color,
-                                onFieldSubmitted: (value) => {},
-                                onChanged: (value) {
-                                  searchQuery = value;
-                                  productsBloc.getProducts(searchQuery,
-                                      orderBy: sortedBy);
-                                  isEnd = false;
-                                },
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: AppTheme.secondary_color,
-                                    fontSize: 18),
-                                keyboardType: TextInputType.text,
-                                decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    hintStyle: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        color: AppTheme.grey,
-                                        fontSize: 18),
-                                    errorBorder: InputBorder.none,
-                                    disabledBorder: InputBorder.none,
-                                    contentPadding: EdgeInsets.only(
-                                        left: 10,
-                                        bottom: 11,
-                                        top: 11,
-                                        right: 10),
-                                    hintText: Strings.search),
-                                onEditingComplete: () {},
-                              ),
-                            ),
-                            Expanded(
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.highlight_off,
-                                  color: AppTheme.grey,
-                                ),
-                                onPressed: () {
-                                  if (searchTextEditingController.text.trim() ==
-                                      '') {
-                                    return;
-                                  }
-                                  searchTextEditingController.clear();
-                                  productsBloc.getProducts('',
-                                      orderBy: sortedBy);
-                                  isEnd = false;
-                                },
-                              ),
+                      snapshot.data.data.length == 0
+                          ? NoDataPlaceholderWidget(
+                              imageUrl: 'product_placeholder.png',
+                              info: 'You have no products added yet',
+                              extraInfo: 'Tap on Green button to add one',
                             )
-                          ],
-                        ),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(50))),
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: InkWell(
-                          onTap: () {
-                            showFilterOption();
-                          },
-                          child: Container(
-                            width: 100,
-                            padding: EdgeInsets.symmetric(vertical: 5),
-                            margin: EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5))),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                          : Column(
                               children: [
-                                Text(
-                                  'Sort by',
-                                  style: TextStyle(
-                                      color: AppTheme.secondary_color,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800),
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  padding: EdgeInsets.symmetric(horizontal: 15),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.search,
+                                        color: AppTheme.grey,
+                                      ),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.7,
+                                        child: TextFormField(
+                                          controller:
+                                              searchTextEditingController,
+                                          cursorColor: AppTheme.secondary_color,
+                                          onFieldSubmitted: (value) => {},
+                                          onChanged: (value) {
+                                            searchQuery = value;
+                                            productsBloc.getProducts(
+                                                searchQuery,
+                                                orderBy: sortedBy);
+                                            isEnd = false;
+                                          },
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              color: AppTheme.secondary_color,
+                                              fontSize: 18),
+                                          keyboardType: TextInputType.text,
+                                          decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              focusedBorder: InputBorder.none,
+                                              enabledBorder: InputBorder.none,
+                                              hintStyle: TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppTheme.grey,
+                                                  fontSize: 18),
+                                              errorBorder: InputBorder.none,
+                                              disabledBorder: InputBorder.none,
+                                              contentPadding: EdgeInsets.only(
+                                                  left: 10,
+                                                  bottom: 11,
+                                                  top: 11,
+                                                  right: 10),
+                                              hintText: Strings.search),
+                                          onEditingComplete: () {},
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: IconButton(
+                                          icon: Icon(
+                                            Icons.highlight_off,
+                                            color: AppTheme.grey,
+                                          ),
+                                          onPressed: () {
+                                            if (searchTextEditingController.text
+                                                    .trim() ==
+                                                '') {
+                                              return;
+                                            }
+                                            searchTextEditingController.clear();
+                                            productsBloc.getProducts('',
+                                                orderBy: sortedBy);
+                                            isEnd = false;
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(50))),
                                 ),
                                 SizedBox(
-                                  width: 5,
+                                  height: 5,
                                 ),
-                                Icon(
-                                  Icons.sort,
-                                  size: 16,
-                                  color: AppTheme.secondary_color,
-                                )
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: InkWell(
+                                    onTap: () {
+                                      showFilterOption();
+                                    },
+                                    child: Container(
+                                      width: 100,
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 5),
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(5))),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Sort by',
+                                            style: TextStyle(
+                                                color: AppTheme.secondary_color,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w800),
+                                          ),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Icon(
+                                            Icons.sort,
+                                            size: 16,
+                                            color: AppTheme.secondary_color,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                ListView.builder(
+                                  physics: BouncingScrollPhysics(),
+                                  shrinkWrap: true,
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 2),
+                                  itemCount: snapshot.data.data.length + 1,
+                                  scrollDirection: Axis.vertical,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    ///Return Single Widget
+                                    return index == snapshot.data.data.length
+                                        ? isEnd
+                                            ? SizedBox()
+                                            : Container(
+                                                alignment: Alignment.center,
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 10),
+                                                child: SizedBox(
+                                                  height: 25,
+                                                  width: 25,
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                ),
+                                              )
+                                        : ProductWidget(
+                                            productModel:
+                                                snapshot.data.data[index],
+                                            index: index + 1);
+                                  },
+                                ),
                               ],
                             ),
-                          ),
-                        ),
-                      ),
-                      ListView.builder(
-                        physics: BouncingScrollPhysics(),
-                        shrinkWrap: true,
-                        padding:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-                        itemCount: snapshot.data.data.length + 1,
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (BuildContext context, int index) {
-                          ///Return Single Widget
-                          return index == snapshot.data.data.length
-                              ? isEnd
-                                  ? SizedBox()
-                                  : Container(
-                                      alignment: Alignment.center,
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 10),
-                                      child: SizedBox(
-                                        height: 25,
-                                        width: 25,
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    )
-                              : ProductWidget(
-                                  productModel: snapshot.data.data[index],
-                                  index: index + 1);
-                        },
-                      ),
                     ],
                   );
                 } else {

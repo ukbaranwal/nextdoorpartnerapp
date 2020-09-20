@@ -36,19 +36,24 @@ class ProductTemplatesBloc implements BlocInterface {
       alreadyExecuting = true;
       Response response = await _repository.getProductTemplates(
           productTemplateModelList.length, searchQuery, 17);
-      var jsonResponse = jsonDecode(response.body);
-      print(jsonResponse);
-      if (jsonResponse['data']['product_templates'].length == 0) {
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        print(jsonResponse);
+        if (jsonResponse['data']['product_templates'].length == 0) {
+          _productTemplatesFetcher.sink
+              .add(ApiResponse.hasData('end', data: productTemplateModelList));
+          alreadyExecuting = false;
+          return;
+        }
+        for (var i in jsonResponse['data']['product_templates']) {
+          productTemplateModelList.add(ProductTemplateModel.fromJson(i));
+        }
         _productTemplatesFetcher.sink
-            .add(ApiResponse.hasData('end', data: productTemplateModelList));
-        alreadyExecuting = false;
-        return;
+            .add(ApiResponse.hasData('Done', data: productTemplateModelList));
+      } else {
+        _productTemplatesFetcher.sink
+            .add(ApiResponse.hasData('Done', data: productTemplateModelList));
       }
-      for (var i in jsonResponse['data']['product_templates']) {
-        productTemplateModelList.add(ProductTemplateModel.fromJson(i));
-      }
-      _productTemplatesFetcher.sink
-          .add(ApiResponse.hasData('Done', data: productTemplateModelList));
       alreadyExecuting = false;
     } catch (e) {
       print(e.toString());

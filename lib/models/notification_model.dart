@@ -5,27 +5,22 @@ class NotificationModel {
   final String mapTitle = 'title';
   final String mapBody = 'body';
   final String mapAction = 'action';
+  final String mapData = 'data';
   final String mapReceivedAt = 'received_at';
   final String mapCreatedAt = 'createdAt';
+  final String mapScreen = 'screen';
   int id;
   String title;
   String body;
-  dynamic data;
-  //TODO: action set enum
-  String action;
+  PayloadData data;
   String receivedAt;
-
-//  NotificationModel.fromJson();
-
-  NotificationModel(
-      {this.title, this.body, this.data, this.action, this.receivedAt});
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       mapTitle: title,
       mapBody: body,
       mapReceivedAt: receivedAt,
-      mapAction: action
+      mapData: data,
     };
     if (id != null) {
       map[columnId] = id;
@@ -37,16 +32,35 @@ class NotificationModel {
     title = parsedJson[mapTitle];
     body = parsedJson[mapBody];
     receivedAt = parsedJson[mapReceivedAt];
+    data = PayloadData.fromJson(parsedJson[mapData]);
     id = parsedJson[columnId];
-    action = parsedJson[mapAction];
   }
 
   NotificationModel.fromJson(Map<String, dynamic> parsedJson) {
     title = parsedJson[mapTitle];
     body = parsedJson[mapBody];
     receivedAt = DateConverter.convert(parsedJson[mapCreatedAt]);
-    action = parsedJson[mapAction];
+    data = parsedJson[mapData];
   }
 }
 
-enum ACTION { ORDER_RECEIVED, ORDER_DELIVERED, CLEAR_DUES }
+class PayloadData {
+  int id;
+  String screen;
+  Action action;
+  PayloadData.fromJson(Map<String, dynamic> parsedJson) {
+    if (parsedJson.containsKey('id')) {
+      id = parsedJson['id'];
+    }
+    if (parsedJson.containsKey('screen')) {
+      screen = parsedJson['screen'];
+      if (screen == 'NEW_ORDER') {
+        action = Action.NEW_ORDER;
+      } else if (screen == 'ORDER') {
+        action = Action.ORDER;
+      }
+    }
+  }
+}
+
+enum Action { ORDER, NEW_ORDER }

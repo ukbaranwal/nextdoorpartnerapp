@@ -21,6 +21,8 @@ class HelpPageBloc implements BlocInterface {
       if (response.statusCode == 200) {
         _helpPageFetcher.sink.add(ApiResponse.hasData('Fetched',
             data: HelpModel.fromJson(jsonResponse['tabs'])));
+      } else {
+        _helpPageFetcher.sink.add(ApiResponse.error(jsonResponse['message']));
       }
     } catch (e) {
       print(e.toString());

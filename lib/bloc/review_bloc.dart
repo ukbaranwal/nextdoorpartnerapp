@@ -35,24 +35,26 @@ class ReviewsBloc implements BlocInterface {
       alreadyExecuting = true;
       Response response =
           await _repository.getReviews(reviewsModelList.length, selectedRating);
-      var jsonResponse = jsonDecode(response.body);
-      print(jsonResponse.toString());
-      if (jsonResponse['data']['reviews']['rows'].length == 0) {
-        _reviewsFetcher.sink.add(ApiResponse.hasData('end', data: {
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        print(jsonResponse.toString());
+        if (jsonResponse['data']['reviews']['rows'].length == 0) {
+          _reviewsFetcher.sink.add(ApiResponse.hasData('end', data: {
+            'noOfReviews': jsonResponse['data']['reviews']['count'],
+            'reviewsList': reviewsModelList
+          }));
+          alreadyExecuting = false;
+          return;
+        }
+        for (var i in jsonResponse['data']['reviews']['rows']) {
+          print(i);
+          reviewsModelList.add(ReviewModel.fromJson(i));
+        }
+        _reviewsFetcher.sink.add(ApiResponse.hasData('done', data: {
           'noOfReviews': jsonResponse['data']['reviews']['count'],
           'reviewsList': reviewsModelList
         }));
-        alreadyExecuting = false;
-        return;
       }
-      for (var i in jsonResponse['data']['reviews']['rows']) {
-        print(i);
-        reviewsModelList.add(ReviewModel.fromJson(i));
-      }
-      _reviewsFetcher.sink.add(ApiResponse.hasData('done', data: {
-        'noOfReviews': jsonResponse['data']['reviews']['count'],
-        'reviewsList': reviewsModelList
-      }));
       alreadyExecuting = false;
     } catch (e) {
       print(e);

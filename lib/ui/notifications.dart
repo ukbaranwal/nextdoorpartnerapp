@@ -4,6 +4,7 @@ import 'package:nextdoorpartner/models/notification_model.dart';
 import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/data_placeholder.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 
 class Notifications extends StatefulWidget {
@@ -37,36 +38,47 @@ class _NotificationsState extends State<Notifications> {
                 ),
               );
             } else {
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15, bottom: 5),
-                    child: Text(
-                      '${snapshot.data.data.length} new notifications',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: AppTheme.secondary_color,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800),
-                    ),
-                  ),
-                  ListView.builder(
-                    physics: BouncingScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(vertical: 2, horizontal: 2),
-                    itemCount: snapshot.data.data.length,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (BuildContext context, int index) {
-                      ///Return Single Widget
-                      return NotificationWidget(
-                        title: snapshot.data.data[index].title,
-                        body: snapshot.data.data[index].body,
-                        date: snapshot.data.data[index].receivedAt,
-                      );
-                    },
-                  ),
-                ],
-              );
+              return snapshot.data.data.length == 0
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 50),
+                        child: NoDataPlaceholderWidget(
+                          imageUrl: 'notifications_placeholder.png',
+                          info: 'You have no new notifications',
+                        ),
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15, bottom: 5),
+                          child: Text(
+                            '${snapshot.data.data.length} new notifications',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: AppTheme.secondary_color,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                        ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          shrinkWrap: true,
+                          padding:
+                              EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+                          itemCount: snapshot.data.data.length,
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (BuildContext context, int index) {
+                            ///Return Single Widget
+                            return NotificationWidget(
+                              title: snapshot.data.data[index].title,
+                              body: snapshot.data.data[index].body,
+                              date: snapshot.data.data[index].receivedAt,
+                            );
+                          },
+                        ),
+                      ],
+                    );
             }
           },
         ),

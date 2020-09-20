@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/strings_en.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class TermsAndConditions extends StatefulWidget {
@@ -18,7 +19,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
           alignment: Alignment.bottomCenter,
           children: [
             WebView(
-              initialUrl: 'https://ukbaranwal.github.io',
+              initialUrl: Strings.hostUrl + 'terms',
             ),
             ClipRect(
               child: BackdropFilter(

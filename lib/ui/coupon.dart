@@ -292,14 +292,12 @@ class _CouponState extends State<Coupon> {
                               ? Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 10),
-                                  child: FSwitch(
-                                    width: 60,
-                                    height: 35,
-                                    openColor: AppTheme.green,
-                                    open: snapshot.data.data.isLive,
-                                    onChanged: (value) {
+                                  child: CupertinoSwitch(
+                                    onChanged: (bool value) {
                                       couponBloc.toggleIsLive();
                                     },
+                                    value: snapshot.data.data.isLive,
+                                    activeColor: AppTheme.green,
                                   ),
                                 )
                               : SizedBox()

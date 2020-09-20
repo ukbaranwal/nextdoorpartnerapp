@@ -5,6 +5,7 @@ import 'package:nextdoorpartner/models/order_model.dart';
 import 'package:nextdoorpartner/models/order_model_bloc.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/data_placeholder.dart';
 import 'package:nextdoorpartner/ui/order_page.dart';
 import 'package:nextdoorpartner/ui/pending_order.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
@@ -314,29 +315,35 @@ class _OrdersPageViewState extends State<OrdersPageView> {
                   color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(5))),
             ),
-            ListView.builder(
-              physics: BouncingScrollPhysics(),
-              shrinkWrap: true,
-              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 2),
-              itemCount: widget.orderModelList.length + 1,
-              scrollDirection: Axis.vertical,
-              itemBuilder: (BuildContext context, int index) {
-                ///Return Single Widget
-                return index == widget.orderModelList.length
-                    ? widget.isEnd
-                        ? SizedBox()
-                        : Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            child: SizedBox(
-                              height: 25,
-                              width: 25,
-                              child: CircularProgressIndicator(),
-                            ),
-                          )
-                    : OrderItemWidget(orderModel: widget.orderModelList[index]);
-              },
-            )
+            widget.orderModelList.length == 0
+                ? NoDataPlaceholderWidget(
+                    imageUrl: 'order_placeholder.png',
+                    info: 'No Orders',
+                  )
+                : ListView.builder(
+                    physics: BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+                    itemCount: widget.orderModelList.length + 1,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      ///Return Single Widget
+                      return index == widget.orderModelList.length
+                          ? widget.isEnd
+                              ? SizedBox()
+                              : Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  child: SizedBox(
+                                    height: 25,
+                                    width: 25,
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                )
+                          : OrderItemWidget(
+                              orderModel: widget.orderModelList[index]);
+                    },
+                  )
           ],
         ),
       ),

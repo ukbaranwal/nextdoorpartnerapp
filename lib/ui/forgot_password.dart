@@ -289,9 +289,6 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             builder: (context) => ResetPassword(),
           ),
         );
-      } else {
-        CustomToast.show(event.message, context);
-        Navigator.pop(context);
       }
     });
   }

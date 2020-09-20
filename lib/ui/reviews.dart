@@ -9,6 +9,7 @@ import 'package:nextdoorpartner/models/review_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/data_placeholder.dart';
 import 'package:nextdoorpartner/ui/order_page.dart';
 import 'package:nextdoorpartner/ui/product.dart';
 import 'package:nextdoorpartner/ui/product_category.dart';
@@ -141,50 +142,61 @@ class _ReviewsState extends State<Reviews> {
                           ],
                         ),
                       ),
-                      ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: snapshot.data.data[reviewsList].length + 1,
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (BuildContext context, int index) {
-                          if (snapshot.data.message == 'end' ||
-                              snapshot.data.data[reviewsList].length < 5) {
-                            isEnd = true;
-                          }
+                      snapshot.data.data[reviewsList].length == 0
+                          ? NoDataPlaceholderWidget(
+                              imageUrl: 'review_placeholder.png',
+                              info: 'No Reviews',
+                            )
+                          : ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount:
+                                  snapshot.data.data[reviewsList].length + 1,
+                              scrollDirection: Axis.vertical,
+                              itemBuilder: (BuildContext context, int index) {
+                                if (snapshot.data.message == 'end' ||
+                                    snapshot.data.data[reviewsList].length <
+                                        5) {
+                                  isEnd = true;
+                                }
 
-                          ///Return Single Widget
-                          return index == snapshot.data.data[reviewsList].length
-                              ? isEnd
-                                  ? SizedBox()
-                                  : Container(
-                                      alignment: Alignment.center,
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 10),
-                                      child: SizedBox(
-                                        height: 25,
-                                        width: 25,
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    )
-                              : ReviewWidget(
-                                  boxDecoration: boxDecoration,
-                                  orderNo: snapshot
-                                      .data.data[reviewsList][index].orderNo,
-                                  amount: snapshot
-                                      .data.data[reviewsList][index].amount,
-                                  deliveredAt: snapshot.data
-                                      .data[reviewsList][index].deliveredAt,
-                                  units: snapshot
-                                      .data.data[reviewsList][index].units,
-                                  products: snapshot
-                                      .data.data[reviewsList][index].products,
-                                  rating: snapshot
-                                      .data.data[reviewsList][index].rating,
-                                  review: snapshot
-                                      .data.data[reviewsList][index].review,
-                                  index: index + 1);
-                        },
-                      ),
+                                ///Return Single Widget
+                                return index ==
+                                        snapshot.data.data[reviewsList].length
+                                    ? isEnd
+                                        ? SizedBox()
+                                        : Container(
+                                            alignment: Alignment.center,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            child: SizedBox(
+                                              height: 25,
+                                              width: 25,
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ),
+                                          )
+                                    : ReviewWidget(
+                                        boxDecoration: boxDecoration,
+                                        orderNo: snapshot.data
+                                            .data[reviewsList][index].orderNo,
+                                        amount: snapshot.data
+                                            .data[reviewsList][index].amount,
+                                        deliveredAt: snapshot
+                                            .data
+                                            .data[reviewsList][index]
+                                            .deliveredAt,
+                                        units: snapshot.data
+                                            .data[reviewsList][index].units,
+                                        products: snapshot.data
+                                            .data[reviewsList][index].products,
+                                        rating: snapshot.data
+                                            .data[reviewsList][index].rating,
+                                        review: snapshot.data
+                                            .data[reviewsList][index].review,
+                                        index: index + 1);
+                              },
+                            ),
                       SizedBox(
                         height: 5,
                       )

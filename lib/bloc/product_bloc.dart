@@ -79,7 +79,7 @@ class ProductBloc implements BlocInterface {
             'productCategoryModel': _productCategoryModel
           },
           actions: ApiActions.LOADING,
-          loader: LOADER.IDLE));
+          loader: LOADER.SHOW));
       Response response = await _repository.updateProduct(
           _productModel.id,
           name,

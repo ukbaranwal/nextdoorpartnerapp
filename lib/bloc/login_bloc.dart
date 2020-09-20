@@ -13,7 +13,6 @@ class LoginBloc implements BlocInterface {
   Stream<ApiResponse<String>> get loginStream => _loginFetcher.stream;
 
   doLogin(String email, String password, String deviceId) async {
-    _loginFetcher = PublishSubject<ApiResponse<String>>();
     _loginFetcher.sink.add(ApiResponse.hasData('Loading',
         actions: ApiActions.LOADING, loader: LOADER.SHOW));
     try {
@@ -29,7 +28,7 @@ class LoginBloc implements BlocInterface {
         ///For Wrong Password 401
         if (response.statusCode == 401) {
           _loginFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
-              actions: ApiActions.WRONG_INFO, loader: LOADER.HIDE));
+              actions: ApiActions.ERROR, loader: LOADER.HIDE));
 
           ///For accepted password 202
         } else if (response.statusCode == 202) {

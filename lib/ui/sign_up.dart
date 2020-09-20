@@ -66,22 +66,6 @@ class _SignUpState extends State<SignUp> {
         cityTextEditingController.text,
         passwordTextEditingController.text,
         androidDeviceInfo.id);
-    signUpBloc.signUpStream.listen((event) {
-      if (event.loader == LOADER.SHOW) {
-        showLoadingDialog();
-      } else if (event.loader == LOADER.HIDE) {
-        CustomToast.show(event.message, context);
-        Navigator.pop(context);
-      }
-      if (event.actions == ApiActions.SUCCESSFUL) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Login(),
-          ),
-        );
-      }
-    });
   }
 
   showLoadingDialog() {
@@ -124,6 +108,22 @@ class _SignUpState extends State<SignUp> {
   void initState() {
     super.initState();
     signUpBloc = SignUpBloc();
+    signUpBloc.signUpStream.listen((event) {
+      if (event.loader == LOADER.SHOW) {
+        showLoadingDialog();
+      } else if (event.loader == LOADER.HIDE) {
+        CustomToast.show(event.message, context);
+        Navigator.pop(context);
+      }
+      if (event.actions == ApiActions.SUCCESSFUL) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Login(),
+          ),
+        );
+      }
+    });
   }
 
   changeFocus(FocusScopeNode focusScopeNode) {

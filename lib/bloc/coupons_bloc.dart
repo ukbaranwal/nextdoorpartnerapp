@@ -23,14 +23,18 @@ class CouponsBloc implements BlocInterface {
 
   getCoupons() async {
     try {
-      Response response = await _repository.getCoupon();
+      Response response = await _repository.getCoupons();
       var jsonResponse = jsonDecode(response.body);
       print(jsonResponse);
-      for (var i in jsonResponse['data']['coupons']) {
-        couponModelList.add(CouponModel.fromJson(i));
+      if (response.statusCode == 200) {
+        for (var i in jsonResponse['data']['coupons']) {
+          couponModelList.add(CouponModel.fromJson(i));
+        }
+        _couponsFetcher.sink
+            .add(ApiResponse.hasData('Done', data: couponModelList));
+      } else {
+        _couponsFetcher.sink.add(ApiResponse.error(jsonResponse['message']));
       }
-      _couponsFetcher.sink
-          .add(ApiResponse.hasData('Done', data: couponModelList));
     } catch (e) {
       print(e.toString());
       _couponsFetcher.sink.add(ApiResponse.error(e.toString()));
