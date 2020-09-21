@@ -253,44 +253,45 @@ class _ProductsState extends State<Products> {
                   }
                   return Column(
                     children: [
-                      Card(
-                        margin:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        elevation: 10,
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        child: Container(
-                          padding: EdgeInsets.all(18),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ProductCategory(),
-                                      ));
-                                },
-                                child: Text(
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductCategory(),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          margin: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 10),
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Container(
+                            padding: EdgeInsets.all(18),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
                                   Strings.addNewProduct,
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w700,
                                       fontSize: 22),
                                 ),
-                              ),
-                              Icon(
-                                Icons.add,
-                                color: Colors.white,
-                              )
-                            ],
+                                Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                )
+                              ],
+                            ),
+                            decoration: BoxDecoration(
+                                color: AppTheme.green,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
                           ),
-                          decoration: BoxDecoration(
-                              color: AppTheme.green,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
                         ),
                       ),
                       snapshot.data.data.length == 0
@@ -620,7 +621,6 @@ class ProductWidget extends StatelessWidget {
                 ClipRRect(
                   child: CachedNetworkImage(
                     imageUrl: Strings.hostUrl + productModel.images[0].imageUrl,
-//                  imageUrl,
                     height: 80,
                     width: 80,
                   ),
@@ -634,7 +634,6 @@ class ProductWidget extends StatelessWidget {
                   children: [
                     Text(
                       productModel.name,
-//                      name,
                       style: TextStyle(
                           color: AppTheme.secondary_color,
                           fontWeight: FontWeight.w700,
@@ -642,21 +641,20 @@ class ProductWidget extends StatelessWidget {
                     ),
                     Text(
                       productModel.brand,
-//                      brand,
                       style: TextStyle(
                           color: AppTheme.grey,
                           fontWeight: FontWeight.w700,
                           fontSize: 14),
                     ),
                     Text(
-                      'MRP: Rs. ${productModel.mrp}',
+                      '${Strings.mrp}: Rs. ${productModel.mrp.round()}',
                       style: TextStyle(
                           color: AppTheme.secondary_color,
                           fontWeight: FontWeight.w700,
                           fontSize: 14),
                     ),
                     Text(
-                      '${Strings.selling}: Rs. ${(productModel.mrp - (productModel.mrp * productModel.discountPercentage / 100)).toStringAsFixed(1)}',
+                      '${Strings.selling}: Rs. ${(productModel.mrp - (productModel.mrp * productModel.discountPercentage / 100)).round()}',
                       style: TextStyle(
                           color: AppTheme.secondary_color,
                           fontWeight: FontWeight.w700,

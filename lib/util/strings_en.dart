@@ -41,8 +41,8 @@ class Strings {
   static const String orderValue = 'Order Value';
   static const String totalUnits = 'Total Units';
   static const String totalDiscount = 'Total Discount';
-  static const String paid = 'paid';
-  static const String cod = 'cod';
+  static const String paid = 'Paid';
+  static const String cod = 'COD';
   static const String email = 'Email';
   static const String password = 'Password';
   static const String forgotPasswordLogin = 'Forgot Password?';
@@ -103,7 +103,7 @@ class Strings {
   static const String changePassword = 'Change Password';
   static const String currentPassword = 'Current Password';
   static const String confirmPassword = 'Confirm Password';
-  static const String nameFieldValidation = 'name field can\'t be empty';
+  static const String nameFieldValidation = 'Name field can\'t be empty';
   static const String cityFieldValidation = 'City field can\'t be empty';
   static const String couponCodeValidation =
       'Coupon Code should be of at least 5 Digits';
@@ -192,7 +192,7 @@ class Strings {
   static const String viewOrderDetails = 'VIEW ORDER DETAILS';
   static const String rating = 'Rating';
   static const String items = 'Items';
-  static const String order = 'order';
+  static const String order = 'Order';
   static const String billTotal = 'Bill Total';
   static const String selectReasonForContacting =
       'please select your reason for contacting us';

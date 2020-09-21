@@ -346,7 +346,8 @@ class ReviewWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${Strings.order} #$orderNo(${Strings.billTotal} Rs. $amount)',
+          Text(
+              '${Strings.order} #$orderNo(${Strings.billTotal} Rs. ${amount.round()})',
               style: TextStyle(
                   color: AppTheme.secondary_color,
                   fontSize: 16,

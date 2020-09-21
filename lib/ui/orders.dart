@@ -370,6 +370,17 @@ class OrderItemWidget extends StatelessWidget {
     return temp.substring(0, temp.length - 2);
   }
 
+  String getDetails() {
+    String temp = '${Strings.orderedAt} ${orderModel.createdAt}\n';
+    temp = temp + orderModel.deliveredAt != null
+        ? '${Strings.deliveredAt} ${orderModel.deliveredAt}\n'
+        : '${Strings.expectedDeliveryBefore} ${orderModel.expectedDeliveryAt}\n';
+    temp = temp +
+        '${Strings.totalAmount}: ${orderModel.amount.round()}\n'
+            '${Strings.discountApplied}: ${orderModel.discountApplied.round()}\n${Strings.amountDue}: ${orderModel.amountDue.round()}';
+    return temp;
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -448,7 +459,7 @@ class OrderItemWidget extends StatelessWidget {
                         decoration: BoxDecoration(
                             color: orderModel.paid
                                 ? AppTheme.green
-                                : Colors.yellow,
+                                : Colors.orange,
                             borderRadius: BorderRadius.only(
                                 topRight: Radius.circular(5),
                                 bottomLeft: Radius.circular(5))),
@@ -459,10 +470,7 @@ class OrderItemWidget extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
                     ),
-                    child: Text(
-                        '${Strings.orderedAt} ${orderModel.createdAt}\n${Strings.expectedDeliveryBefore} ${orderModel.expectedDeliveryAt}\n'
-                        '${Strings.deliveredAt} ${orderModel.deliveredAt}\n${Strings.totalAmount}: ${orderModel.amount}\n'
-                        '${Strings.discountApplied}: ${orderModel.discountApplied}\n${Strings.amountDue}: ${orderModel.amountDue}',
+                    child: Text(getDetails(),
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontSize: 14,

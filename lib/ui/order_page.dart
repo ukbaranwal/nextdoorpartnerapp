@@ -63,6 +63,17 @@ class _OrderPageState extends State<OrderPage> {
     }
   }
 
+  String getDetails(OrderModel orderModel) {
+    String temp = '${Strings.orderedAt} ${orderModel.createdAt}\n';
+    temp = temp + orderModel.deliveredAt != null
+        ? '${Strings.deliveredAt} ${orderModel.deliveredAt}\n'
+        : '${Strings.expectedDeliveryBefore} ${orderModel.expectedDeliveryAt}\n';
+    temp = temp +
+        '${Strings.totalAmount}: ${orderModel.amount.round()}\n'
+            '${Strings.discountApplied}: ${orderModel.discountApplied.round()}\n${Strings.amountDue}: ${orderModel.amountDue.round()}';
+    return temp;
+  }
+
   void showCancelDialog(int index, String imageUrl) {
     Dialog dialog;
     dialog = Dialog(
@@ -232,7 +243,7 @@ class _OrderPageState extends State<OrderPage> {
                                           decoration: BoxDecoration(
                                               color: snapshot.data.data.paid
                                                   ? AppTheme.green
-                                                  : Colors.yellowAccent,
+                                                  : Colors.orange,
                                               borderRadius: BorderRadius.only(
                                                   topRight: Radius.circular(5),
                                                   bottomLeft:
@@ -249,8 +260,7 @@ class _OrderPageState extends State<OrderPage> {
                                             MediaQuery.of(context).size.width *
                                                 0.6,
                                         child: Text(
-                                            '${Strings.expectedDeliveryBefore} ${snapshot.data.data.expectedDeliveryAt}\n${Strings.deliveredAt} Nov 24 2020, 5:00 pm'
-                                            '${Strings.totalAmount}: ${snapshot.data.data.amount}\n${Strings.discountApplied}: ${snapshot.data.data.discountApplied}\n${Strings.amountDue}: ${snapshot.data.data.amountDue}',
+                                            getDetails(snapshot.data.data),
                                             style: TextStyle(
                                                 color: AppTheme.secondary_color,
                                                 fontSize: 14,

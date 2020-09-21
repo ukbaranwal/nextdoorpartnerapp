@@ -248,13 +248,18 @@ class ProductBloc implements BlocInterface {
 
   init(int id) async {
     _productCategoryModel = await _repository.getProductCategory(id);
-    _productFetcher.sink.add(ApiResponse.hasData('Initiated',
-        data: {
-          'productModel': _productModel,
-          'productCategoryModel': _productCategoryModel
-        },
-        actions: ApiActions.INITIATED,
-        loader: LOADER.IDLE));
+    if (_productCategoryModel != null) {
+      _productFetcher.sink.add(ApiResponse.hasData('Initiated',
+          data: {
+            'productModel': _productModel,
+            'productCategoryModel': _productCategoryModel
+          },
+          actions: ApiActions.INITIATED,
+          loader: LOADER.IDLE));
+    } else {
+      _productFetcher.sink.add(ApiResponse.error('Initiated',
+          actions: ApiActions.ERROR, loader: LOADER.IDLE));
+    }
   }
 
   @override

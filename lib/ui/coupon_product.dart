@@ -17,6 +17,8 @@ import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 import 'package:shimmer/shimmer.dart';
 
+import 'data_placeholder.dart';
+
 class CouponProduct extends StatefulWidget {
   final List<int> selectedProductIds;
 
@@ -45,37 +47,6 @@ class _CouponProductState extends State<CouponProduct> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: Container(
-          margin: EdgeInsets.only(bottom: 20),
-          height: 60,
-          width: 60,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(35)),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
-                  offset: const Offset(2, 4.0),
-                  blurRadius: 1.0),
-            ],
-          ),
-          child: FloatingActionButton(
-            onPressed: () {
-//            Navigator.push(
-//              context,
-//              MaterialPageRoute(
-//                builder: (context) => Products(),
-//              ),
-//            );
-            },
-            elevation: 10,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.tune,
-              color: AppTheme.secondary_color,
-              size: 32,
-            ),
-          ),
-        ),
         backgroundColor: AppTheme.background_grey,
         appBar: CustomAppBar(),
         body: NotificationListener<OverscrollIndicatorNotification>(
@@ -178,116 +149,127 @@ class _CouponProductState extends State<CouponProduct> {
                           snapshot.data.data.length < 6) {
                         isEnd = true;
                       }
-                      return Column(
-                        children: [
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            padding: EdgeInsets.symmetric(horizontal: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                      return snapshot.data.data.length == 0
+                          ? Center(
+                              child: NoDataPlaceholderWidget(
+                                imageUrl: 'product_placeholder.png',
+                                info: Strings.productPlaceholder,
+                              ),
+                            )
+                          : Column(
                               children: [
-                                Icon(
-                                  Icons.search,
-                                  color: AppTheme.grey,
+                                SizedBox(
+                                  height: 10,
                                 ),
                                 Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.7,
-                                  child: TextFormField(
-                                    controller: searchTextEditingController,
-                                    cursorColor: AppTheme.secondary_color,
-                                    onFieldSubmitted: (value) => {},
-                                    onChanged: (value) {
-                                      searchQuery = value;
-                                      couponProductsBloc
-                                          .getProducts(searchQuery);
-                                      isEnd = false;
-                                    },
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        color: AppTheme.secondary_color,
-                                        fontSize: 18),
-                                    keyboardType: TextInputType.text,
-                                    decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        focusedBorder: InputBorder.none,
-                                        enabledBorder: InputBorder.none,
-                                        hintStyle: TextStyle(
-                                            fontWeight: FontWeight.w700,
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  padding: EdgeInsets.symmetric(horizontal: 15),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.search,
+                                        color: AppTheme.grey,
+                                      ),
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.7,
+                                        child: TextFormField(
+                                          controller:
+                                              searchTextEditingController,
+                                          cursorColor: AppTheme.secondary_color,
+                                          onFieldSubmitted: (value) => {},
+                                          onChanged: (value) {
+                                            searchQuery = value;
+                                            couponProductsBloc
+                                                .getProducts(searchQuery);
+                                            isEnd = false;
+                                          },
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              color: AppTheme.secondary_color,
+                                              fontSize: 18),
+                                          keyboardType: TextInputType.text,
+                                          decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              focusedBorder: InputBorder.none,
+                                              enabledBorder: InputBorder.none,
+                                              hintStyle: TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppTheme.grey,
+                                                  fontSize: 18),
+                                              errorBorder: InputBorder.none,
+                                              disabledBorder: InputBorder.none,
+                                              contentPadding: EdgeInsets.only(
+                                                  left: 10,
+                                                  bottom: 11,
+                                                  top: 11,
+                                                  right: 10),
+                                              hintText: Strings.search),
+                                          onEditingComplete: () {},
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: IconButton(
+                                          icon: Icon(
+                                            Icons.highlight_off,
                                             color: AppTheme.grey,
-                                            fontSize: 18),
-                                        errorBorder: InputBorder.none,
-                                        disabledBorder: InputBorder.none,
-                                        contentPadding: EdgeInsets.only(
-                                            left: 10,
-                                            bottom: 11,
-                                            top: 11,
-                                            right: 10),
-                                        hintText: Strings.search),
-                                    onEditingComplete: () {},
-                                  ),
-                                ),
-                                Expanded(
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.highlight_off,
-                                      color: AppTheme.grey,
-                                    ),
-                                    onPressed: () {
-                                      if (searchTextEditingController.text
-                                              .trim() ==
-                                          '') {
-                                        return;
-                                      }
-                                      searchTextEditingController.clear();
-                                      couponProductsBloc.getProducts('');
-                                      isEnd = false;
-                                    },
-                                  ),
-                                )
-                              ],
-                            ),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(50))),
-                          ),
-                          ListView.builder(
-                            physics: BouncingScrollPhysics(),
-                            shrinkWrap: true,
-                            padding: EdgeInsets.symmetric(
-                                vertical: 5, horizontal: 2),
-                            itemCount: snapshot.data.data.length + 1,
-                            scrollDirection: Axis.vertical,
-                            itemBuilder: (BuildContext context, int index) {
-                              ///Return Single Widget
-                              return index == snapshot.data.data.length
-                                  ? isEnd
-                                      ? SizedBox()
-                                      : Container(
-                                          alignment: Alignment.center,
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 10),
-                                          child: SizedBox(
-                                            height: 25,
-                                            width: 25,
-                                            child: CircularProgressIndicator(),
                                           ),
-                                        )
-                                  : ProductTemplateWidget(
-                                      index: index,
-                                      callback: select,
-                                      couponProductModel:
-                                          snapshot.data.data[index],
-                                    );
-                            },
-                          ),
-                        ],
-                      );
+                                          onPressed: () {
+                                            if (searchTextEditingController.text
+                                                    .trim() ==
+                                                '') {
+                                              return;
+                                            }
+                                            searchTextEditingController.clear();
+                                            couponProductsBloc.getProducts('');
+                                            isEnd = false;
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(50))),
+                                ),
+                                ListView.builder(
+                                  physics: BouncingScrollPhysics(),
+                                  shrinkWrap: true,
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 2),
+                                  itemCount: snapshot.data.data.length + 1,
+                                  scrollDirection: Axis.vertical,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    ///Return Single Widget
+                                    return index == snapshot.data.data.length
+                                        ? isEnd
+                                            ? SizedBox()
+                                            : Container(
+                                                alignment: Alignment.center,
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 10),
+                                                child: SizedBox(
+                                                  height: 25,
+                                                  width: 25,
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                ),
+                                              )
+                                        : ProductTemplateWidget(
+                                            index: index,
+                                            callback: select,
+                                            couponProductModel:
+                                                snapshot.data.data[index],
+                                          );
+                                  },
+                                ),
+                              ],
+                            );
                     }
                   },
                 ),

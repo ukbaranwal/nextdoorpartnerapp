@@ -9,6 +9,9 @@ import 'package:nextdoorpartner/ui/seller_support_message.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../util/strings_en.dart';
+import 'change_password.dart';
+
 class HelpPage extends StatefulWidget {
   @override
   _HelpPageState createState() => _HelpPageState();
@@ -58,19 +61,30 @@ class _HelpPageState extends State<HelpPage> {
                         padding: EdgeInsets.symmetric(
                           vertical: 5,
                         ),
-                        itemCount: snapshot.data.data.tabs.length,
+                        itemCount: snapshot.data.data.tabs.length + 1,
                         scrollDirection: Axis.vertical,
                         itemBuilder: (BuildContext context, int index) {
-                          return InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      HelpContentPage(index)));
-                            },
-                            child: HelpWidget(
-                              snapshot.data.data.tabs[index],
-                            ),
-                          );
+                          return index != snapshot.data.data.tabs.length
+                              ? InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                HelpContentPage(index)));
+                                  },
+                                  child: HelpWidget(
+                                    snapshot.data.data.tabs[index],
+                                  ),
+                                )
+                              : InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                ChangePassword()));
+                                  },
+                                  child: HelpWidget(Strings.changePassword),
+                                );
                         },
                       ));
                 } else {

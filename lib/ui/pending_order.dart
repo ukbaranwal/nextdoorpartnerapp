@@ -283,7 +283,8 @@ class _PendingOrderState extends State<PendingOrder> {
                                                 0.6,
                                             child: Text(
                                                 '${Strings.expectedDeliveryBefore} ${snapshot.data.data.expectedDeliveryAt}\n'
-                                                '${Strings.totalAmount}: ${snapshot.data.data.amount}\n${Strings.discountApplied}: ${snapshot.data.data.discountApplied}\n${Strings.amountDue}: ${snapshot.data.data.amountDue}',
+                                                '${Strings.totalAmount}: ${snapshot.data.data.amount.round()}\n${Strings.discountApplied}: '
+                                                '${snapshot.data.data.discountApplied.round()}\n${Strings.amountDue}: ${snapshot.data.data.amountDue.round()}',
                                                 style: TextStyle(
                                                     color: AppTheme
                                                         .secondary_color,
@@ -586,21 +587,21 @@ class PendingOrderProduct extends StatelessWidget {
                             fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        '${Strings.sellingPrice} : ${orderProductModel.amount}',
+                        '${Strings.sellingPrice} : ${orderProductModel.amount.round()}',
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontSize: 14,
                             fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        '${Strings.discountApplied} : ${orderProductModel.discountApplied}',
+                        '${Strings.discountApplied} : ${orderProductModel.discountApplied.round()}',
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontSize: 14,
                             fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        '${Strings.totalPrice} : ${orderProductModel.amount} x ${orderProductModel.quantity} = ${orderProductModel.amount * orderProductModel.quantity}',
+                        '${Strings.totalPrice} : ${orderProductModel.amount.round()} x ${orderProductModel.quantity} = ${(orderProductModel.amount * orderProductModel.quantity).round()}',
                         style: TextStyle(
                             color: AppTheme.secondary_color,
                             fontSize: 14,

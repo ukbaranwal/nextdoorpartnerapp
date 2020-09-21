@@ -41,7 +41,13 @@ import 'package:nextdoorpartner/util/strings_en.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../models/vendor_model.dart';
+import '../util/app_theme.dart';
+import '../util/custom_toast.dart';
 import 'banners.dart';
+import 'orders.dart';
+import 'product_category.dart';
+import 'reviews.dart';
 
 enum RevenueDuration {
   TODAY,
@@ -248,9 +254,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         ),
         BottomBarView(
           tabIconsList: tabIconsList,
-          addClick: () {
-            print(5);
-          },
+          addClick: () {},
           scaffoldKey: scaffoldKey,
           changeIndex: (int index) {
             if (index == 0 || index == 2) {
@@ -277,274 +281,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
     return SafeArea(
       child: Scaffold(
         key: scaffoldKey,
-        endDrawer: Drawer(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: CachedNetworkImage(
-                        imageUrl: Strings.hostUrl + vendorModelGlobal.imageUrl,
-                        height: 100,
-                        width: 100,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            vendorModelGlobal.shopName,
-                            style: TextStyle(
-                                color: AppTheme.secondary_color,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 18),
-                          ),
-                          Text(vendorModelGlobal.address,
-                              style: TextStyle(
-                                  color: AppTheme.secondary_color,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 18)),
-                          Text(vendorModelGlobal.email,
-                              style: TextStyle(
-                                  color: AppTheme.secondary_color,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16)),
-                          Text(vendorModelGlobal.phone,
-                              style: TextStyle(
-                                  color: AppTheme.secondary_color,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16))
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                InkWell(
-                  onTap: () {
-                    changeShopStatus();
-                  },
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                          margin: EdgeInsets.only(top: 5),
-                          padding: EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                              color: vendorModelGlobal.shopOpen
-                                  ? AppTheme.green
-                                  : Colors.red,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(25))),
-                          child: Icon(
-                            Icons.power_settings_new,
-                            color: Colors.white,
-                            size: 28,
-                          )),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        vendorModelGlobal.shopOpen
-                            ? Strings.online
-                            : Strings.offline,
-                        style: TextStyle(
-                            color: vendorModelGlobal.shopOpen
-                                ? AppTheme.green
-                                : Colors.red,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 18),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Divider(
-                  color: AppTheme.background_grey,
-                  thickness: 2,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    Strings.home,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.secondary_color),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    Strings.products,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.secondary_color),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    Strings.addNewProduct,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.secondary_color),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    Strings.orders,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.secondary_color),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    Strings.payments,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.secondary_color),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    Strings.accountHealth,
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.secondary_color),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Coupons(),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      Strings.coupons,
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.secondary_color),
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Banners(),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      Strings.banners,
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.secondary_color),
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HelpPage(),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      Strings.help,
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.secondary_color),
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SellerSupport(),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      Strings.sellerSupport,
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.secondary_color),
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: () {
-                    signOut();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      Strings.signOut,
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.secondary_color),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Text(
-                        '${Strings.sellingSince}\n${vendorModelGlobal.createdAt}',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.secondary_color)),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        endDrawer: EndDrawerWidget(
+          signOut: signOut,
+          changeShopStatus: changeShopStatus,
         ),
         floatingActionButton: Stack(
           alignment: Alignment.topRight,
@@ -597,7 +336,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
           ],
         ),
         backgroundColor: Colors.white,
-        appBar: CustomAppBar(),
+        appBar: CustomAppBar(
+          isHome: true,
+        ),
         body: StreamBuilder<ApiResponse<DashboardModel>>(
             stream: dashboardBloc.dashboardStream,
             builder:
@@ -606,70 +347,78 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 if (snapshot.data.status == Status.HAS_DATA) {
                   return Stack(
                     children: [
-                      SingleChildScrollView(
-                        child: Container(
-                          height: MediaQuery.of(context).size.height,
-                          color: AppTheme.background_grey,
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  DropdownButtonHideUnderline(
-                                    child: DropdownButton<RevenueDuration>(
-                                      value: snapshot.data.data.revenueDuration,
-                                      items: [
-                                        DropdownMenuItem(
-                                          child: DropDownTextWidget(
-                                              Strings.lifeTime),
-                                          value: RevenueDuration.LIFETIME,
-                                        ),
-                                        DropdownMenuItem(
-                                          child:
-                                              DropDownTextWidget(Strings.today),
-                                          value: RevenueDuration.TODAY,
-                                        ),
-                                        DropdownMenuItem(
-                                          child: DropDownTextWidget(
-                                              Strings.yesterday),
-                                          value: RevenueDuration.YESTERDAY,
-                                        ),
-                                        DropdownMenuItem(
-                                          child: DropDownTextWidget(
-                                              Strings.lastWeek),
-                                          value: RevenueDuration.LAST7DAYS,
-                                        ),
-                                        DropdownMenuItem(
-                                          child: DropDownTextWidget(
-                                              Strings.thisMonth),
-                                          value: RevenueDuration.MONTH,
-                                        ),
-                                        DropdownMenuItem(
-                                          value: RevenueDuration.LAST_MONTH,
-                                          child: DropDownTextWidget(
-                                              Strings.lastMonth),
-                                        )
-                                      ],
-                                      icon: Icon(Icons.keyboard_arrow_down),
-                                      onChanged: (value) {
-                                        dashboardBloc
-                                            .getDashboardRevenue(value);
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  )
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0),
-                                child: Row(
+                      RefreshIndicator(
+                        onRefresh: () async {
+                          dashboardBloc.getDashboard();
+                          return await Future.delayed(
+                              Duration(milliseconds: 1000));
+                        },
+                        strokeWidth: 3,
+                        color: AppTheme.secondary_color,
+                        child: SingleChildScrollView(
+                          physics: BouncingScrollPhysics(),
+                          child: Container(
+                            height: MediaQuery.of(context).size.height,
+                            color: AppTheme.background_grey,
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Container(
+                                    DropdownButtonHideUnderline(
+                                      child: DropdownButton<RevenueDuration>(
+                                        value:
+                                            snapshot.data.data.revenueDuration,
+                                        items: [
+                                          DropdownMenuItem(
+                                            child: DropDownTextWidget(
+                                                Strings.lifeTime),
+                                            value: RevenueDuration.LIFETIME,
+                                          ),
+                                          DropdownMenuItem(
+                                            child: DropDownTextWidget(
+                                                Strings.today),
+                                            value: RevenueDuration.TODAY,
+                                          ),
+                                          DropdownMenuItem(
+                                            child: DropDownTextWidget(
+                                                Strings.yesterday),
+                                            value: RevenueDuration.YESTERDAY,
+                                          ),
+                                          DropdownMenuItem(
+                                            child: DropDownTextWidget(
+                                                Strings.lastWeek),
+                                            value: RevenueDuration.LAST7DAYS,
+                                          ),
+                                          DropdownMenuItem(
+                                            child: DropDownTextWidget(
+                                                Strings.thisMonth),
+                                            value: RevenueDuration.MONTH,
+                                          ),
+                                          DropdownMenuItem(
+                                            value: RevenueDuration.LAST_MONTH,
+                                            child: DropDownTextWidget(
+                                                Strings.lastMonth),
+                                          )
+                                        ],
+                                        icon: Icon(Icons.keyboard_arrow_down),
+                                        onChanged: (value) {
+                                          dashboardBloc
+                                              .getDashboardRevenue(value);
+                                        },
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    )
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0),
+                                  child: Row(
+                                    children: [
+                                      Container(
                                         width:
                                             MediaQuery.of(context).size.width *
                                                     0.50 -
@@ -694,21 +443,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                         ),
                                         decoration: boxDecoration,
                                       ),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                ProductCategory(),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Container(
                                         width:
                                             MediaQuery.of(context).size.width *
                                                     0.50 -
@@ -724,52 +462,45 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                               style: textStyleStats,
                                             ),
                                             Text(
-                                                'Rs. ${snapshot.data.data.revenue}',
+                                                'Rs. ${snapshot.data.data.revenue.round()}',
                                                 style: textStyleStats)
                                           ],
                                         ),
                                         decoration: boxDecoration,
-                                      ),
-                                    )
-                                  ],
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                      )
+                                    ],
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                  ),
                                 ),
-                              ),
-                              snapshot.data.data.noOfRatings == 0
-                                  ? Container(
-                                      height: 200,
-                                      width: MediaQuery.of(context).size.width,
-                                      decoration: boxDecoration,
-                                      margin: EdgeInsets.all(10),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Image.asset(
-                                            'assets/images/dashboard_rating.png',
-                                            height: 100,
-                                            width: 100,
-                                          ),
-                                          Text(
-                                            Strings.ratingPlaceholder,
-                                            style: TextStyle(
-                                                color: AppTheme.secondary_color,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w700),
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  : InkWell(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder:
-                                                    (BuildContext context) =>
-                                                        ChangePassword()));
-                                      },
-                                      child: RatingCardDashboard(
+                                snapshot.data.data.noOfRatings == 0
+                                    ? Container(
+                                        height: 200,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        decoration: boxDecoration,
+                                        margin: EdgeInsets.all(10),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/dashboard_rating.png',
+                                              height: 100,
+                                              width: 100,
+                                            ),
+                                            Text(
+                                              Strings.ratingPlaceholder,
+                                              style: TextStyle(
+                                                  color:
+                                                      AppTheme.secondary_color,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    : RatingCardDashboard(
                                         boxDecoration: boxDecoration,
                                         totalRatings:
                                             snapshot.data.data.noOfRatings,
@@ -777,163 +508,164 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                         ratingStars:
                                             snapshot.data.data.ratingStars,
                                       ),
-                                    ),
-                              snapshot.data.data.orderModelList.length == 0
-                                  ? Container(
-                                      height: 200,
-                                      width: MediaQuery.of(context).size.width,
-                                      decoration: boxDecoration,
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 10),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Image.asset(
-                                            'assets/images/dashboard_order.png',
-                                            height: 100,
-                                            width: 100,
-                                          ),
-                                          Text(
-                                            Strings.activeOrderPlaceholder,
-                                            style: TextStyle(
-                                                color: AppTheme.secondary_color,
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w700),
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  : Container(
-                                      decoration: boxDecoration,
-                                      padding: EdgeInsets.only(top: 10),
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 10),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            NewOrder(1),
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: Text(
+                                snapshot.data.data.allOrderModelList.length == 0
+                                    ? Container(
+                                        height: 200,
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        decoration: boxDecoration,
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/dashboard_order.png',
+                                              height: 100,
+                                              width: 100,
+                                            ),
+                                            Text(
+                                              Strings.activeOrderPlaceholder,
+                                              style: TextStyle(
+                                                  color:
+                                                      AppTheme.secondary_color,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    : Container(
+                                        decoration: boxDecoration,
+                                        padding: EdgeInsets.only(top: 10),
+                                        margin: EdgeInsets.symmetric(
+                                            horizontal: 10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
                                                     Strings.activeOrders,
                                                     style: textStyleStats,
                                                   ),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    ActiveOrderOptionWidget(
-                                                      text: Strings.all,
-                                                      isSelected: orderFilter ==
-                                                          OrderFilter.ALL,
-                                                      orderFilter:
-                                                          OrderFilter.ALL,
-                                                      callback: filterOrder,
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .symmetric(
-                                                          horizontal: 5),
-                                                      child:
-                                                          ActiveOrderOptionWidget(
-                                                        text: Strings.pending,
+                                                  Row(
+                                                    children: [
+                                                      ActiveOrderOptionWidget(
+                                                        text: Strings.all,
+                                                        isSelected:
+                                                            orderFilter ==
+                                                                OrderFilter.ALL,
+                                                        orderFilter:
+                                                            OrderFilter.ALL,
+                                                        callback: filterOrder,
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal: 5),
+                                                        child:
+                                                            ActiveOrderOptionWidget(
+                                                          text: Strings.pending,
+                                                          isSelected:
+                                                              orderFilter ==
+                                                                  OrderFilter
+                                                                      .PENDING,
+                                                          orderFilter:
+                                                              OrderFilter
+                                                                  .PENDING,
+                                                          callback: filterOrder,
+                                                        ),
+                                                      ),
+                                                      ActiveOrderOptionWidget(
+                                                        text: Strings.confirmed,
                                                         isSelected:
                                                             orderFilter ==
                                                                 OrderFilter
-                                                                    .PENDING,
-                                                        orderFilter:
-                                                            OrderFilter.PENDING,
+                                                                    .CONFIRMED,
+                                                        orderFilter: OrderFilter
+                                                            .CONFIRMED,
                                                         callback: filterOrder,
-                                                      ),
-                                                    ),
-                                                    ActiveOrderOptionWidget(
-                                                      text: Strings.confirmed,
-                                                      isSelected: orderFilter ==
-                                                          OrderFilter.CONFIRMED,
-                                                      orderFilter:
-                                                          OrderFilter.CONFIRMED,
-                                                      callback: filterOrder,
-                                                    )
-                                                  ],
-                                                ),
-                                              ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                          Divider(
-                                            color: AppTheme.background_grey,
-                                            thickness: 2,
-                                            indent: 30,
-                                            endIndent: 30,
-                                          ),
-                                          ListView.builder(
-                                            physics: BouncingScrollPhysics(),
-                                            shrinkWrap: true,
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 5, horizontal: 2),
-                                            itemCount: snapshot.data.data
-                                                .orderModelList.length,
-                                            scrollDirection: Axis.vertical,
-                                            itemBuilder: (BuildContext context,
-                                                int index) {
-                                              ///Return Single Widget
-                                              return RecentOrderWidget(
-                                                orderNo: snapshot.data.data
-                                                    .orderModelList[index].id,
-                                                orderValue: snapshot
-                                                    .data
-                                                    .data
-                                                    .orderModelList[index]
-                                                    .amount,
-                                                units: snapshot
-                                                    .data
-                                                    .data
-                                                    .orderModelList[index]
-                                                    .units,
-                                                discount: snapshot
-                                                    .data
-                                                    .data
-                                                    .orderModelList[index]
-                                                    .discountApplied,
-                                                date: snapshot
-                                                    .data
-                                                    .data
-                                                    .orderModelList[index]
-                                                    .createdAt,
-                                                isPaid: snapshot.data.data
-                                                    .orderModelList[index].paid,
-                                                name: 'Utkarsh',
-                                                address: 'B14/172 Kalyani',
-                                                orderStatus: snapshot
-                                                    .data
-                                                    .data
-                                                    .orderModelList[index]
-                                                    .status,
-                                              );
-                                            },
-                                          ),
-                                        ],
+                                            Divider(
+                                              color: AppTheme.background_grey,
+                                              thickness: 2,
+                                              indent: 30,
+                                              endIndent: 30,
+                                            ),
+                                            ListView.builder(
+                                              physics: BouncingScrollPhysics(),
+                                              shrinkWrap: true,
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 5, horizontal: 2),
+                                              itemCount: snapshot.data.data
+                                                  .orderModelList.length,
+                                              scrollDirection: Axis.vertical,
+                                              itemBuilder:
+                                                  (BuildContext context,
+                                                      int index) {
+                                                ///Return Single Widget
+                                                return RecentOrderWidget(
+                                                  orderNo: snapshot.data.data
+                                                      .orderModelList[index].id,
+                                                  orderValue: snapshot
+                                                      .data
+                                                      .data
+                                                      .orderModelList[index]
+                                                      .amount,
+                                                  units: snapshot
+                                                      .data
+                                                      .data
+                                                      .orderModelList[index]
+                                                      .units,
+                                                  discount: snapshot
+                                                      .data
+                                                      .data
+                                                      .orderModelList[index]
+                                                      .discountApplied,
+                                                  date: snapshot
+                                                      .data
+                                                      .data
+                                                      .orderModelList[index]
+                                                      .createdAt,
+                                                  isPaid: snapshot
+                                                      .data
+                                                      .data
+                                                      .orderModelList[index]
+                                                      .paid,
+                                                  name: 'Utkarsh',
+                                                  address: 'B14/172 Kalyani',
+                                                  orderStatus: snapshot
+                                                      .data
+                                                      .data
+                                                      .orderModelList[index]
+                                                      .status,
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                              SizedBox(
-                                height: 95,
-                              )
-                            ],
+                                SizedBox(
+                                  height: 95,
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -1087,6 +819,330 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                 );
               }
             }),
+      ),
+    );
+  }
+}
+
+class EndDrawerWidget extends StatelessWidget {
+  final Function signOut;
+  final Function changeShopStatus;
+
+  EndDrawerWidget({this.signOut, this.changeShopStatus});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: CachedNetworkImage(
+                    imageUrl: Strings.hostUrl + vendorModelGlobal.imageUrl,
+                    height: 100,
+                    width: 100,
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        vendorModelGlobal.shopName,
+                        style: TextStyle(
+                            color: AppTheme.secondary_color,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 18),
+                      ),
+                      Text(
+                          vendorModelGlobal.address +
+                              ', ' +
+                              vendorModelGlobal.city,
+                          style: TextStyle(
+                              color: AppTheme.secondary_color,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 18)),
+                      Text(vendorModelGlobal.email,
+                          style: TextStyle(
+                              color: AppTheme.secondary_color,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16)),
+                      Text(vendorModelGlobal.phone,
+                          style: TextStyle(
+                              color: AppTheme.secondary_color,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16))
+                    ],
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                changeShopStatus();
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                      margin: EdgeInsets.only(top: 5),
+                      padding: EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                          color: vendorModelGlobal.shopOpen
+                              ? AppTheme.green
+                              : Colors.red,
+                          borderRadius: BorderRadius.all(Radius.circular(25))),
+                      child: Icon(
+                        Icons.power_settings_new,
+                        color: Colors.white,
+                        size: 28,
+                      )),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    vendorModelGlobal.shopOpen
+                        ? Strings.online
+                        : Strings.offline,
+                    style: TextStyle(
+                        color: vendorModelGlobal.shopOpen
+                            ? AppTheme.green
+                            : Colors.red,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Divider(
+              color: AppTheme.background_grey,
+              thickness: 2,
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                width: MediaQuery.of(context).size.width,
+                child: Text(
+                  Strings.home,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.secondary_color),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Products(),
+                  ),
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  Strings.products,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.secondary_color),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Orders(),
+                  ),
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  Strings.orders,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.secondary_color),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                CustomToast.show('Yet to be decided', context);
+                Navigator.pop(context);
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  Strings.payments,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.secondary_color),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Reviews(),
+                  ),
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  Strings.accountHealth,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.secondary_color),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Coupons(),
+                  ),
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  Strings.coupons,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.secondary_color),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Banners(),
+                  ),
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  Strings.banners,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.secondary_color),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HelpPage(),
+                  ),
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  Strings.help,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.secondary_color),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SellerSupport(),
+                  ),
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  Strings.sellerSupport,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.secondary_color),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                signOut();
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  Strings.signOut,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.secondary_color),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                    '${Strings.sellingSince}\n${vendorModelGlobal.createdAt}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.secondary_color)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1295,7 +1351,7 @@ class RecentOrderWidget extends StatelessWidget {
                         color: AppTheme.secondary_color),
                   ),
                   Text(
-                    '${Strings.orderValue}:\nRs. $orderValue',
+                    '${Strings.orderValue}:\nRs. ${orderValue.round()}',
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -1317,7 +1373,7 @@ class RecentOrderWidget extends StatelessWidget {
                         color: AppTheme.secondary_color),
                   ),
                   Text(
-                    '${Strings.totalDiscount}:\nRs. $discount',
+                    '${Strings.totalDiscount}:\nRs. ${discount.round()}',
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,

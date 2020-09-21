@@ -115,6 +115,9 @@ class VendorDatabaseProvider {
     }
     List<Map> map = await db
         .query(productCategoryTable, where: '$mapId = ?', whereArgs: [id]);
+    if (map.length == 0) {
+      return null;
+    }
     ProductCategoryModel productCategoryModel =
         ProductCategoryModel.fromMap(map.first);
     print(map.first);
