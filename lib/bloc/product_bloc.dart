@@ -9,6 +9,7 @@ import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for specific Product
 class ProductBloc implements BlocInterface {
   final _repository = Repository();
   var _productFetcher = PublishSubject<ApiResponse<ProductModel>>();
@@ -20,6 +21,8 @@ class ProductBloc implements BlocInterface {
     _productModel = productModel;
   }
 
+  ///Uploads a product to server
+  ///Files are images
   addProduct(ProductModel productModel, List<File> files) async {
     try {
       _productFetcher.sink.add(ApiResponse.hasData('Loading',
@@ -29,6 +32,8 @@ class ProductBloc implements BlocInterface {
           },
           actions: ApiActions.LOADING,
           loader: LOADER.SHOW));
+
+      ///Streamed Response because of multipart form data request
       StreamedResponse streamedResponse =
           await _repository.addProduct(productModel, files);
       streamedResponse.stream.listen((value) async {
@@ -64,6 +69,7 @@ class ProductBloc implements BlocInterface {
     }
   }
 
+  ///Updates product
   updateProduct(
       String name,
       String brand,
@@ -119,6 +125,7 @@ class ProductBloc implements BlocInterface {
     }
   }
 
+  ///Delete a specific Product image
   deleteProductImage(int index) async {
     try {
       _productFetcher.sink.add(ApiResponse.hasData('Loading',
@@ -132,6 +139,7 @@ class ProductBloc implements BlocInterface {
           _productModel.id, _productModel.images[index - 1].imageUrl);
       var jsonResponse = jsonDecode(response.body);
       if (response.statusCode == 200) {
+        ///Remove that product from variable
         _productModel.images.removeAt(index - 1);
         _productFetcher.sink.add(ApiResponse.hasData(jsonResponse['message'],
             data: {
@@ -160,6 +168,7 @@ class ProductBloc implements BlocInterface {
     }
   }
 
+  /// Add a product image to server
   addProductImage(File file) async {
     try {
       _productFetcher.sink.add(ApiResponse.hasData('Loading',
@@ -205,6 +214,7 @@ class ProductBloc implements BlocInterface {
     }
   }
 
+  ///Updates if the product is in stock or out of stock
   toggleInStock() async {
     try {
       _productFetcher.sink.add(ApiResponse.hasData('Loading',
@@ -246,6 +256,9 @@ class ProductBloc implements BlocInterface {
     }
   }
 
+  ///Initialise the product bloc
+  ///Passed Product Category id
+  ///request product category details from db
   init(int id) async {
     _productCategoryModel = await _repository.getProductCategory(id);
     if (_productCategoryModel != null) {

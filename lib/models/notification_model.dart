@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:nextdoorpartner/util/date_converter.dart';
 
 class NotificationModel {
@@ -47,20 +48,22 @@ class NotificationModel {
 class PayloadData {
   int id;
   String screen;
-  Action action;
+  NotificationAction action;
   PayloadData.fromJson(Map<String, dynamic> parsedJson) {
     if (parsedJson.containsKey('id')) {
-      id = parsedJson['id'];
+      id = int.tryParse(parsedJson['id']);
     }
     if (parsedJson.containsKey('screen')) {
       screen = parsedJson['screen'];
       if (screen == 'NEW_ORDER') {
-        action = Action.NEW_ORDER;
+        action = NotificationAction.NEW_ORDER;
       } else if (screen == 'ORDER') {
-        action = Action.ORDER;
+        action = NotificationAction.ORDER;
+      } else {
+        action = NotificationAction.IDLE;
       }
     }
   }
 }
 
-enum Action { ORDER, NEW_ORDER }
+enum NotificationAction { ORDER, NEW_ORDER, IDLE }

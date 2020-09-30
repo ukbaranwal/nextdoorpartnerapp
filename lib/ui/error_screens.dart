@@ -46,7 +46,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          appBar: CustomAppBar(),
+//          appBar: CustomAppBar(),
           backgroundColor: Colors.white,
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -84,9 +84,9 @@ class _ErrorScreenState extends State<ErrorScreen> {
               ),
               FlatButton(
                 onPressed: () {
-                  if (widget.errorType != ErrorType.NO_INTERNET) {
-                    Navigator.pop(context);
-                  }
+//                  if (widget.errorType != ErrorType.NO_INTERNET) {
+//                    Navigator.pop(context);
+//                  }
                 },
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 25),
                 child: Text(

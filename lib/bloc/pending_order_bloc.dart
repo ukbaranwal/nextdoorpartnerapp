@@ -10,13 +10,17 @@ import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for Pending Specific Order
 class PendingOrderBloc implements BlocInterface {
   final _repository = Repository();
   var _orderFetcher = PublishSubject<ApiResponse<OrderModel>>();
   Stream<ApiResponse<OrderModel>> get orderStream => _orderFetcher.stream;
+
+  ///TODO:
   int selectCount = 0;
   OrderModel _orderModel;
 
+  ///Get Order Details
   getOrder(int orderId) async {
     try {
       Response response = await _repository.getOrder(orderId);
@@ -38,6 +42,7 @@ class PendingOrderBloc implements BlocInterface {
     }
   }
 
+  ///Confirm the order
   confirmOrder(int orderId) async {
     try {
       _orderFetcher.sink.add(ApiResponse.hasData('Loading',
@@ -57,10 +62,10 @@ class PendingOrderBloc implements BlocInterface {
     } catch (e) {
       _orderFetcher.sink.add(ApiResponse.hasData(e.toString(),
           data: _orderModel, actions: ApiActions.ERROR, loader: LOADER.HIDE));
-//      _orderFetcher.sink.add(ApiResponse.error(e.toString()));
     }
   }
 
+  ///Cancels the order
   cancelOrder(int orderId, String cancellationReason) async {
     try {
       _orderFetcher.sink.add(ApiResponse.hasData('Loading',
@@ -84,6 +89,7 @@ class PendingOrderBloc implements BlocInterface {
     }
   }
 
+  ///TODO: The need of this
   select(int index, bool isSelected) {
     _orderModel.products[index].isSelected = isSelected;
     if (isSelected == true) {
@@ -98,6 +104,7 @@ class PendingOrderBloc implements BlocInterface {
         loader: LOADER.IDLE));
   }
 
+  ///TODO:
   selectAll(bool selectAll) {
     _orderModel.allProductSelected = selectAll;
     if (selectAll) {

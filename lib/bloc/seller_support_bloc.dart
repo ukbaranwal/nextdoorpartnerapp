@@ -6,11 +6,13 @@ import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for seller support
 class SellerSupportBloc implements BlocInterface {
   final _repository = Repository();
   var _sellerSupportFetcher = PublishSubject<ApiResponse<String>>();
   Stream<ApiResponse<String>> get supportStream => _sellerSupportFetcher.stream;
 
+  ///Register a complaint
   registerComplaint(String contactInfo, String reason, String complaint) async {
     try {
       _sellerSupportFetcher.sink.add(ApiResponse.hasData('Loading',

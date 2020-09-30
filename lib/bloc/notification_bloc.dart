@@ -4,6 +4,7 @@ import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for Notifications
 class NotificationBloc implements BlocInterface {
   final _repository = Repository();
   var _notificationFetcher =
@@ -11,6 +12,7 @@ class NotificationBloc implements BlocInterface {
   Stream<DbResponse<List<NotificationModel>>> get notificationStream =>
       _notificationFetcher.stream;
 
+  ///Insert notification in DB
   insertNotificationInDb(NotificationModel notificationModel) async {
     try {
       await _repository.insertNotificationInDb(notificationModel);
@@ -20,6 +22,7 @@ class NotificationBloc implements BlocInterface {
     }
   }
 
+  ///Get notification from Database
   getNotifications() async {
     _notificationFetcher =
         PublishSubject<DbResponse<List<NotificationModel>>>();

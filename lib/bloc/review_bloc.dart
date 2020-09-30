@@ -9,6 +9,7 @@ import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for reviews
 class ReviewsBloc implements BlocInterface {
   bool alreadyExecuting = false;
   final _repository = Repository();
@@ -16,6 +17,8 @@ class ReviewsBloc implements BlocInterface {
   List<ReviewModel> reviewsModelList;
   Stream<ApiResponse<List<ReviewModel>>> get reviewsStream =>
       _reviewsFetcher.stream;
+
+  ///-1 when no filter has been selected
   int selectedRating = -1;
 
   ReviewsBloc() {
@@ -27,6 +30,7 @@ class ReviewsBloc implements BlocInterface {
       return;
     }
     try {
+      ///if selected rating is not same as previous reinitialise the list
       if (rating != selectedRating) {
         print(selectedRating);
         selectedRating = rating;

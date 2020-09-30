@@ -16,6 +16,7 @@ import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/bottom_bar_view.dart';
 import 'package:nextdoorpartner/ui/change_password.dart';
+import 'package:nextdoorpartner/ui/color_variants_list.dart';
 import 'package:nextdoorpartner/ui/coupons.dart';
 import 'package:nextdoorpartner/ui/error_screens.dart';
 import 'package:nextdoorpartner/ui/help_page.dart';
@@ -29,6 +30,7 @@ import 'package:nextdoorpartner/ui/product_category.dart';
 import 'package:nextdoorpartner/ui/product_templates.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/ui/seller_support.dart';
+import 'package:nextdoorpartner/ui/size_variants_list.dart';
 import 'package:nextdoorpartner/ui/terms_and_conditions.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
@@ -254,23 +256,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
         ),
         BottomBarView(
           tabIconsList: tabIconsList,
-          addClick: () {},
           scaffoldKey: scaffoldKey,
-          changeIndex: (int index) {
-            if (index == 0 || index == 2) {
-              animationController.reverse().then<dynamic>((data) {
-                if (!mounted) {
-                  return;
-                }
-              });
-            } else if (index == 1 || index == 3) {
-              animationController.reverse().then<dynamic>((data) {
-                if (!mounted) {
-                  return;
-                }
-              });
-            }
-          },
         ),
       ],
     );
@@ -648,8 +634,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin {
                                                       .data
                                                       .orderModelList[index]
                                                       .paid,
-                                                  name: 'Utkarsh',
-                                                  address: 'B14/172 Kalyani',
+                                                  expectedDeliveryAt: snapshot
+                                                      .data
+                                                      .data
+                                                      .orderModelList[index]
+                                                      .expectedDeliveryAt,
                                                   orderStatus: snapshot
                                                       .data
                                                       .data
@@ -843,11 +832,18 @@ class EndDrawerWidget extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: CachedNetworkImage(
-                    imageUrl: Strings.hostUrl + vendorModelGlobal.imageUrl,
-                    height: 100,
-                    width: 100,
-                  ),
+                  child: vendorModelGlobal.imageUrl == null
+                      ? Image.asset(
+                          'assets/images/a.jpg',
+                          height: 100,
+                          width: 100,
+                        )
+                      : CachedNetworkImage(
+                          imageUrl:
+                              Strings.hostUrl + vendorModelGlobal.imageUrl,
+                          height: 100,
+                          width: 100,
+                        ),
                 ),
                 SizedBox(
                   width: 10,
@@ -1300,8 +1296,7 @@ class RecentOrderWidget extends StatelessWidget {
   final double discount;
   final String date;
   final bool isPaid;
-  final String name;
-  final String address;
+  final String expectedDeliveryAt;
   final OrderStatus orderStatus;
 
   RecentOrderWidget(
@@ -1311,9 +1306,8 @@ class RecentOrderWidget extends StatelessWidget {
       this.discount,
       this.date,
       this.isPaid,
-      this.name,
-      this.address,
-      this.orderStatus});
+      this.orderStatus,
+      this.expectedDeliveryAt});
 
   @override
   Widget build(BuildContext context) {
@@ -1403,7 +1397,9 @@ class RecentOrderWidget extends StatelessWidget {
                         child: Text(
                           isPaid ? Strings.paid : Strings.cod,
                           style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w700),
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12),
                         ),
                         decoration: BoxDecoration(
                             color: isPaid ? AppTheme.green : Colors.orange,
@@ -1412,20 +1408,13 @@ class RecentOrderWidget extends StatelessWidget {
                     ],
                   ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.3,
-                    child: Tooltip(
-                      message: '$name\n$address',
-                      padding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      child: Text(
-                        '$name\n$address',
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.secondary_color),
-                      ),
+                    child: Text(
+                      'Deliver Before\n$expectedDeliveryAt',
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.secondary_color),
                     ),
                   ),
                 ],

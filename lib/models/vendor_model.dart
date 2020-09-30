@@ -55,7 +55,7 @@ class VendorModel {
     openingTime = parsedJson['opening_time'];
     closingTime = parsedJson['closing_time'];
     deliveryBoy = parsedJson['delivery_boy'];
-    rating = parsedJson['rating'];
+    rating = parsedJson['rating'].toDouble();
     DateTime date = DateTime.parse(parsedJson['createdAt']).toLocal();
     createdAt = Jiffy(date, 'yyyy-MM-dd hh:mm:ss.ms').yMMMd;
   }

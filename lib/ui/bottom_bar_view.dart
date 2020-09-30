@@ -4,20 +4,14 @@ import 'package:nextdoorpartner/ui/orders.dart';
 import 'package:nextdoorpartner/ui/products.dart';
 import 'package:nextdoorpartner/ui/reviews.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
+import 'package:nextdoorpartner/util/custom_toast.dart';
 import 'package:nextdoorpartner/util/strings_en.dart';
 import '../models/tabIcon_data.dart';
 
 class BottomBarView extends StatefulWidget {
-  const BottomBarView(
-      {Key key,
-      this.tabIconsList,
-      this.changeIndex,
-      this.addClick,
-      this.scaffoldKey})
+  const BottomBarView({Key key, this.tabIconsList, this.scaffoldKey})
       : super(key: key);
 
-  final Function(int index) changeIndex;
-  final Function addClick;
   final List<TabIconData> tabIconsList;
   final GlobalKey<ScaffoldState> scaffoldKey;
 
@@ -76,34 +70,23 @@ class _BottomBarViewState extends State<BottomBarView>
                           children: <Widget>[
                             Expanded(
                               child: TabIcons(
-                                  callback: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                Products()));
-                                  },
-                                  tabIconData: widget.tabIconsList[0],
-                                  removeAllSelect: () {
-                                    setRemoveAllSelection(
-                                        widget.tabIconsList[0]);
-                                    widget.changeIndex(0);
-                                  }),
+                                callback: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          Products()));
+                                },
+                                tabIconData: widget.tabIconsList[0],
+                              ),
                             ),
                             Expanded(
                               child: TabIcons(
-                                  callback: () {
-                                    print(5);
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                Reviews()));
-                                  },
-                                  tabIconData: widget.tabIconsList[1],
-                                  removeAllSelect: () {
-                                    setRemoveAllSelection(
-                                        widget.tabIconsList[1]);
-                                    widget.changeIndex(1);
-                                  }),
+                                callback: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          Reviews()));
+                                },
+                                tabIconData: widget.tabIconsList[1],
+                              ),
                             ),
                             SizedBox(
                               width: Tween<double>(begin: 0.0, end: 1.0)
@@ -115,31 +98,21 @@ class _BottomBarViewState extends State<BottomBarView>
                             ),
                             Expanded(
                               child: TabIcons(
-                                  callback: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                Products()));
-                                  },
-                                  tabIconData: widget.tabIconsList[2],
-                                  removeAllSelect: () {
-                                    setRemoveAllSelection(
-                                        widget.tabIconsList[2]);
-                                    widget.changeIndex(2);
-                                  }),
+                                callback: () {
+                                  CustomToast.show(
+                                      'Not Yet Completed', context);
+                                },
+                                tabIconData: widget.tabIconsList[2],
+                              ),
                             ),
                             Expanded(
                               child: TabIcons(
-                                  callback: () {
-                                    widget.scaffoldKey.currentState
-                                        .openEndDrawer();
-                                  },
-                                  tabIconData: widget.tabIconsList[3],
-                                  removeAllSelect: () {
-//                                    setRemoveAllSelection(
-//                                        widget.tabIconsList[3]);
-//                                    widget.changeIndex(3);
-                                  }),
+                                callback: () {
+                                  widget.scaffoldKey.currentState
+                                      .openEndDrawer();
+                                },
+                                tabIconData: widget.tabIconsList[3],
+                              ),
                             ),
                           ],
                         ),
@@ -175,7 +148,6 @@ class _BottomBarViewState extends State<BottomBarView>
                             parent: animationController,
                             curve: Curves.fastOutSlowIn)),
                     child: Container(
-                      // alignment: Alignment.center,s
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
@@ -193,7 +165,6 @@ class _BottomBarViewState extends State<BottomBarView>
                           highlightColor: Colors.transparent,
                           focusColor: Colors.transparent,
                           onTap: () {
-                            widget.addClick();
                             Navigator.of(context).push(MaterialPageRoute(
                                 builder: (context) => Orders()));
                           },
@@ -247,12 +218,9 @@ class _BottomBarViewState extends State<BottomBarView>
 }
 
 class TabIcons extends StatefulWidget {
-  const TabIcons(
-      {Key key, this.tabIconData, this.removeAllSelect, this.callback})
-      : super(key: key);
+  const TabIcons({Key key, this.tabIconData, this.callback}) : super(key: key);
 
   final TabIconData tabIconData;
-  final Function removeAllSelect;
   final Function callback;
   @override
   _TabIconsState createState() => _TabIconsState();
@@ -267,7 +235,6 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
     )..addStatusListener((AnimationStatus status) {
         if (status == AnimationStatus.completed) {
           if (!mounted) return;
-          widget.removeAllSelect();
           widget.tabIconData.animationController.reverse();
         }
       });
@@ -295,10 +262,8 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
           highlightColor: Colors.transparent,
           hoverColor: Colors.transparent,
           onTap: () {
-//            if (!widget.tabIconData.isSelected) {
             setAnimation();
             widget.callback();
-//            }
           },
           child: IgnorePointer(
             child: Stack(
@@ -325,69 +290,6 @@ class _TabIconsState extends State<TabIcons> with TickerProviderStateMixin {
                             color: AppTheme.secondary_color),
                       )
                     ],
-                  ),
-                ),
-                Positioned(
-                  top: 4,
-                  left: 6,
-                  right: 0,
-                  child: ScaleTransition(
-                    alignment: Alignment.center,
-                    scale: Tween<double>(begin: 0.0, end: 1.0).animate(
-                        CurvedAnimation(
-                            parent: widget.tabIconData.animationController,
-                            curve: Interval(0.2, 1.0,
-                                curve: Curves.fastOutSlowIn))),
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: AppTheme.walk_through_color_2,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 0,
-                  left: 6,
-                  bottom: 8,
-                  child: ScaleTransition(
-                    alignment: Alignment.center,
-                    scale: Tween<double>(begin: 0.0, end: 1.0).animate(
-                        CurvedAnimation(
-                            parent: widget.tabIconData.animationController,
-                            curve: Interval(0.5, 0.8,
-                                curve: Curves.fastOutSlowIn))),
-                    child: Container(
-                      width: 4,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppTheme.walk_through_color_2,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 6,
-                  right: 8,
-                  bottom: 0,
-                  child: ScaleTransition(
-                    alignment: Alignment.center,
-                    scale: Tween<double>(begin: 0.0, end: 1.0).animate(
-                        CurvedAnimation(
-                            parent: widget.tabIconData.animationController,
-                            curve: Interval(0.5, 0.6,
-                                curve: Curves.fastOutSlowIn))),
-                    child: Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: AppTheme.walk_through_color_2,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
                   ),
                 ),
               ],

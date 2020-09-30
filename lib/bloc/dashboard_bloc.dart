@@ -3,17 +3,16 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:nextdoorpartner/bloc/bloc_interface.dart';
 import 'package:nextdoorpartner/models/dashboard_model.dart';
-import 'package:nextdoorpartner/models/product_model.dart';
 import 'package:nextdoorpartner/models/vendor_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/app_exception.dart';
-import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:nextdoorpartner/ui/dashboard.dart';
 import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+///Bloc for Homepage or Dashboard
 class DashboardBloc implements BlocInterface {
   final _repository = Repository();
   var _dashboardFetcher = PublishSubject<ApiResponse<DashboardModel>>();
@@ -22,16 +21,24 @@ class DashboardBloc implements BlocInterface {
 
   DashboardModel _dashboardModel;
 
+  ///Get Dashboard Details
   getDashboard() async {
     try {
       Response response = await _repository.getDashboard();
+
+      ///Order Count and Revenue
       Response revenueResponse =
           await _repository.getDashboardRevenue(RevenueDuration.LIFETIME);
       var jsonResponse = jsonDecode(response.body);
       var jsonRevenueResponse = jsonDecode(revenueResponse.body);
+      print(response.statusCode);
+      print(jsonResponse);
       if (response.statusCode == 200) {
         _dashboardModel = DashboardModel.fromJson(jsonResponse['data']);
         _dashboardModel.fromRevenueJson(jsonRevenueResponse['data']);
+
+        ///selected duration of revenue and order count
+        ///for dropdown
         _dashboardModel.revenueDuration = RevenueDuration.LIFETIME;
         _dashboardFetcher.sink.add(ApiResponse.hasData('Done',
             data: _dashboardModel,
@@ -42,6 +49,7 @@ class DashboardBloc implements BlocInterface {
             actions: ApiActions.ERROR, loader: LOADER.IDLE));
       }
     } catch (e) {
+      print(e);
       if (e is FetchDataException) {
         _dashboardFetcher.sink.add(ApiResponse.socketError(
             loader: LOADER.IDLE, actions: ApiActions.ERROR));
@@ -52,6 +60,7 @@ class DashboardBloc implements BlocInterface {
     }
   }
 
+  ///Filter Active Orders Confirmed or Pending
   filter(OrderFilter orderFilter) {
     _dashboardModel.filter(orderFilter);
     _dashboardFetcher.sink.add(ApiResponse.hasData('Done',
@@ -60,6 +69,7 @@ class DashboardBloc implements BlocInterface {
         loader: LOADER.IDLE));
   }
 
+  ///Get Dashboard Revenue for specific Duration
   getDashboardRevenue(RevenueDuration revenueDuration) async {
     try {
       Response response =
@@ -80,6 +90,8 @@ class DashboardBloc implements BlocInterface {
     }
   }
 
+  ///Change status of Shop
+  ///if shop is open or closed
   Future<bool> changeShopStatus() async {
     try {
       _dashboardFetcher.sink.add(ApiResponse.hasData('Done',

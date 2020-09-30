@@ -9,6 +9,7 @@ import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for productTemplates
 class ProductTemplatesBloc implements BlocInterface {
   bool alreadyExecuting = false;
   final _repository = Repository();
@@ -24,10 +25,14 @@ class ProductTemplatesBloc implements BlocInterface {
     productTemplateModelList = List<ProductTemplateModel>();
   }
 
+  ///Gets products according to search query
+  ///Search Query can be null too
   getProductTemplates(String search) async {
     if (alreadyExecuting) {
       return;
     }
+
+    ///When search query is changed reinitialise the list
     if (searchQuery != search) {
       productTemplateModelList = List<ProductTemplateModel>();
       searchQuery = search;

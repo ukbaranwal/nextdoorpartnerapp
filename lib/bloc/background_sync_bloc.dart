@@ -1,13 +1,13 @@
 import 'dart:convert';
-
 import 'package:http/http.dart';
-import 'package:nextdoorpartner/bloc/bloc_interface.dart';
 import 'package:nextdoorpartner/models/notification_model.dart';
 import 'package:nextdoorpartner/models/product_category_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 
+///30/09/20
+///Used to sync notifications and product Categories
 class BackgroundSyncBloc {
   final _repository = Repository();
 
@@ -38,6 +38,9 @@ class BackgroundSyncBloc {
     }
   }
 
+  ///Check if any new notifications has been made on server
+  ///Notifications are still received, it is being used to make sure that
+  ///App has notifications stored in db
   Future<ApiResponse> syncNotifications(String authorisationToken) async {
     try {
       Response response =
@@ -63,6 +66,9 @@ class BackgroundSyncBloc {
         return DbResponse.successful('Loaded');
       }
       await _repository.insertNotifications(notificationModelList);
+
+      ///Once notifications has been inserted in local DB
+      ///make an api call to delete notifications
       await _repository.deleteNotifications();
       return DbResponse.successful('Loaded');
     } catch (e) {

@@ -9,18 +9,19 @@ import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for List of Coupons
 class CouponsBloc implements BlocInterface {
   final _repository = Repository();
   var _couponsFetcher = PublishSubject<ApiResponse<List<CouponModel>>>();
   List<CouponModel> couponModelList = List<CouponModel>();
   Stream<ApiResponse<List<CouponModel>>> get couponsStream =>
       _couponsFetcher.stream;
-  String searchQuery = '';
 
   CouponsBloc() {
     couponModelList = List<CouponModel>();
   }
 
+  ///Get all coupons that are created by user
   getCoupons() async {
     try {
       Response response = await _repository.getCoupons();

@@ -14,7 +14,7 @@ class DashboardModel {
   RevenueDuration revenueDuration;
 
   DashboardModel.fromJson(Map<String, dynamic> parsedJson) {
-    rating = parsedJson['rating']['rating'];
+    rating = parsedJson['rating']['rating'].toDouble();
     noOfRatings = parsedJson['rating']['no_of_ratings'];
     ratingStars = List<int>();
     for (var i in parsedJson['rating']['rating_stars']) {

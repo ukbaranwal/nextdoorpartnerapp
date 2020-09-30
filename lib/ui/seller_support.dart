@@ -139,7 +139,7 @@ class _SellerSupportWidgetState extends State<SellerSupportWidget> {
                     style: TextStyle(
                         color: AppTheme.secondary_color,
                         fontSize: 18,
-                        fontWeight: FontWeight.w800)),
+                        fontWeight: FontWeight.w700)),
                 isVisible
                     ? Icon(Icons.keyboard_arrow_up)
                     : Icon(Icons.keyboard_arrow_down)

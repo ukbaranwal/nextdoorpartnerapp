@@ -6,6 +6,7 @@ import 'package:nextdoorpartner/models/help_model.dart';
 import 'package:nextdoorpartner/models/seller_support_model.dart';
 import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
+import 'package:nextdoorpartner/ui/loading_dialog.dart';
 import 'package:nextdoorpartner/ui/seller_support_message.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 import 'package:shimmer/shimmer.dart';
@@ -47,14 +48,14 @@ class _HelpContentPageState extends State<HelpContentPage> {
                   ),
                 );
               } else {
-                return Center(
-                  child: Container(
-                    height: 100,
-                    padding: EdgeInsets.symmetric(vertical: 30, horizontal: 5),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 5,
+                return Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Center(
+                    child: RefreshProgressIndicator(
+                      strokeWidth: 3,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                          AppTheme.secondary_color),
+                        AppTheme.secondary_color,
+                      ),
                     ),
                   ),
                 );

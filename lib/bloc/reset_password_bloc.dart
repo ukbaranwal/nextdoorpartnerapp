@@ -8,6 +8,9 @@ import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+///Bloc for reset password
+///Called after user has requested a pin
+///that will be valid for an hour
 class ResetPasswordBloc implements BlocInterface {
   final _repository = Repository();
   SharedPreferences sharedPreferences;
@@ -15,6 +18,7 @@ class ResetPasswordBloc implements BlocInterface {
   Stream<ApiResponse<bool>> get resetPasswordStream =>
       _resetPasswordFetcher.stream;
 
+  ///Resets password
   resetPassword(String pin, String password) async {
     try {
       _resetPasswordFetcher.sink.add(ApiResponse.hasData('Loading',

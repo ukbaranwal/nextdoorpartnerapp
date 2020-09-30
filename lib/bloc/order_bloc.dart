@@ -11,12 +11,16 @@ import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:nextdoorpartner/util/constants.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for OrderPage
 class OrderBloc implements BlocInterface {
+  ///check coupon_product_bloc for details about already executing
   bool alreadyExecuting = false;
   final _repository = Repository();
   var _orderFetcher = PublishSubject<ApiResponse<OrderModelBloc>>();
 
   Stream<ApiResponse<OrderModelBloc>> get ordersStream => _orderFetcher.stream;
+
+  ///Variable to Store the selected status of order
   String statusSelected;
 
   OrderModelBloc orderModelBloc;
@@ -25,6 +29,7 @@ class OrderBloc implements BlocInterface {
     orderModelBloc = OrderModelBloc();
   }
 
+  ///Get Orders
   getOrders(int pageNo, {bool fromPagerView = false}) async {
     if (alreadyExecuting) {
       return;
@@ -63,6 +68,7 @@ class OrderBloc implements BlocInterface {
             orderModelBloc.ordersModelListPending.length, status);
         jsonResponse = jsonDecode(response.body);
         if (response.statusCode == 200) {
+          ///Parse response to be stored in PendingOrderList
           orderModelBloc.parseOrderModelListPending(jsonResponse['data']);
         }
       } else if (status == Constants.confirmed) {

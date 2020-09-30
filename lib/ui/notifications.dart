@@ -5,6 +5,8 @@ import 'package:nextdoorpartner/resources/db_operation_response.dart';
 import 'package:nextdoorpartner/resources/vendor_database_provider.dart';
 import 'package:nextdoorpartner/ui/app_bar.dart';
 import 'package:nextdoorpartner/ui/data_placeholder.dart';
+import 'package:nextdoorpartner/ui/order_page.dart';
+import 'package:nextdoorpartner/ui/pending_order.dart';
 import 'package:nextdoorpartner/util/app_theme.dart';
 
 import '../util/strings_en.dart';
@@ -73,10 +75,10 @@ class _NotificationsState extends State<Notifications> {
                           itemBuilder: (BuildContext context, int index) {
                             ///Return Single Widget
                             return NotificationWidget(
-                              title: snapshot.data.data[index].title,
-                              body: snapshot.data.data[index].body,
-                              date: snapshot.data.data[index].receivedAt,
-                            );
+                                title: snapshot.data.data[index].title,
+                                body: snapshot.data.data[index].body,
+                                date: snapshot.data.data[index].receivedAt,
+                                data: snapshot.data.data[index].data);
                           },
                         ),
                       ],
@@ -91,75 +93,83 @@ class _NotificationsState extends State<Notifications> {
   @override
   void initState() {
     super.initState();
-//    showNoti();
     notificationBloc = NotificationBloc();
     notificationBloc.getNotifications();
   }
-
-//  void showNoti() async {
-//    VendorDatabaseProvider vendorDatabaseProvider = VendorDatabaseProvider();
-//    await vendorDatabaseProvider.open();
-//    dynamic response =
-//        await vendorDatabaseProvider.db.rawQuery('SELECT * FROM notification');
-//    print(response.toString());
-//  }
 }
 
 class NotificationWidget extends StatelessWidget {
   final String title;
   final String date;
   final String body;
-  final Action action;
+  final PayloadData data;
 
-  NotificationWidget({this.title, this.date, this.body, this.action});
+  NotificationWidget({this.title, this.date, this.body, this.data});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(5))),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Image.asset(
-                    'assets/images/orders.png',
-                    height: 25,
-                    width: 25,
-                  ),
-                  SizedBox(
-                    width: 15,
-                  ),
-                  Text(title,
-                      style: TextStyle(
-                          color: AppTheme.secondary_color,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800)),
-                ],
-              ),
-              Text(date,
+    return InkWell(
+      onTap: () {
+        switch (data.action) {
+          case NotificationAction.NEW_ORDER:
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => PendingOrder(data.id)));
+            break;
+          case NotificationAction.ORDER:
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => OrderPage(data.id)));
+            break;
+          case NotificationAction.IDLE:
+            // TODO: Handle this case.
+            break;
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(5))),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Image.asset(
+                      'assets/images/orders.png',
+                      height: 25,
+                      width: 25,
+                    ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    Text(title,
+                        style: TextStyle(
+                            color: AppTheme.secondary_color,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800)),
+                  ],
+                ),
+                Text(date,
+                    style: TextStyle(
+                        color: Colors.black45,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600))
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+              child: Text(body,
                   style: TextStyle(
                       color: Colors.black45,
                       fontSize: 14,
-                      fontWeight: FontWeight.w600))
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
-            child: Text(body,
-                style: TextStyle(
-                    color: Colors.black45,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600)),
-          )
-        ],
+                      fontWeight: FontWeight.w600)),
+            )
+          ],
+        ),
       ),
     );
   }

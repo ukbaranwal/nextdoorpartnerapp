@@ -42,7 +42,6 @@ class BackgroundSync {
     sendPort.send(receivePort.sendPort);
     receivePort.listen((message) async {
       if (message is SharedPreferences) {
-        print(message.getInt(SharedPreferencesManager.vendorType));
         ApiResponse<dynamic> response =
             await backgroundSyncBloc.syncProductCategories(
                 message.getInt(SharedPreferencesManager.vendorType));

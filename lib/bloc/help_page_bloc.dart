@@ -7,17 +7,19 @@ import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for Help Page
 class HelpPageBloc implements BlocInterface {
   final _repository = Repository();
   var _helpPageFetcher = PublishSubject<ApiResponse<HelpModel>>();
   Stream<ApiResponse<HelpModel>> get helpPageStream => _helpPageFetcher.stream;
 
+  ///Get list of HelpTabs
+  ///Example FAQs, Terms and Conditions, Privacy policy, Guidelines
   getHelpTabs() async {
     try {
       Response response = await _repository.getHelpTabs();
       var jsonResponse = jsonDecode(response.body);
 
-      ///already registered
       if (response.statusCode == 200) {
         _helpPageFetcher.sink.add(ApiResponse.hasData('Fetched',
             data: HelpModel.fromJson(jsonResponse['tabs'])));

@@ -1,6 +1,6 @@
 ///String for English
 class Strings {
-  static const String hostUrl = 'http://192.168.0.5:3003/';
+  static const String hostUrl = 'https://nextdooor.herokuapp.com/';
   static const String supportLocalBusiness =
       'Support your nearby Local Businesses:';
   static const String orderDailyEssentials =
@@ -195,12 +195,12 @@ class Strings {
   static const String order = 'Order';
   static const String billTotal = 'Bill Total';
   static const String selectReasonForContacting =
-      'please select your reason for contacting us';
-  static const String mobileNumberValidation = 'enter a valid mobile number';
+      'Please select your reason for contacting us';
+  static const String mobileNumberValidation = 'Enter a valid mobile number';
   static const String writeMoreFurther = 'Please Write more further';
   static const String phone = 'Phone';
   static const String sellerSupportWillResponse =
-      'seller support will response within 12 hours';
+      'Seller support will response within 12 hours';
   static const String sendMail = 'Send Mail';
   static const String tellMoreAboutIssue = 'Tell us more about issue';
   static const String contactReason = 'Contact Reason';

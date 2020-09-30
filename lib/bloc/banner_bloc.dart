@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:http/http.dart';
 import 'package:nextdoorpartner/bloc/bloc_interface.dart';
 import 'package:nextdoorpartner/models/vendor_model.dart';
@@ -10,17 +9,21 @@ import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+///Bloc for Banners
 class BannerBloc implements BlocInterface {
   final _repository = Repository();
   var _bannerFetcher = PublishSubject<ApiResponse<List<String>>>();
   Stream<ApiResponse<List<String>>> get bannerStream => _bannerFetcher.stream;
 
+  ///Initialise the Bloc
+  ///await is being used to make sure that it is properly initiated
   init() async {
     await Future.delayed(Duration(microseconds: 100));
     _bannerFetcher.sink
         .add(ApiResponse.hasData('Initiated', data: vendorModelGlobal.banners));
   }
 
+  ///This function as name suggests uploads banners to server
   addBanner(File file) async {
     try {
       _bannerFetcher.sink.add(ApiResponse.hasData('Loading',
@@ -28,14 +31,20 @@ class BannerBloc implements BlocInterface {
           actions: ApiActions.LOADING,
           loader: LOADER.SHOW));
       StreamedResponse streamedResponse = await _repository.addBanner(file);
+
+      ///Streamed Response since request was a multipart request
       streamedResponse.stream.listen((value) async {
         dynamic response =
             jsonDecode(await ByteStream.fromBytes(value).bytesToString());
         print(response.toString());
+
+        ///201 for successful resource creation
         if (streamedResponse.statusCode == 201) {
           vendorModelGlobal.banners.add(response['data']['banner_url']);
           SharedPreferences sharedPreferences =
               await SharedPreferencesManager.getInstance();
+
+          ///Store list of banners in Shared Preferences
           sharedPreferences.setStringList(
               SharedPreferencesManager.banners, vendorModelGlobal.banners);
           _bannerFetcher.sink.add(ApiResponse.hasData(response['message'],
@@ -57,6 +66,7 @@ class BannerBloc implements BlocInterface {
     }
   }
 
+  ///Remove banner from server
   deleteBanner(int index) async {
     try {
       _bannerFetcher.sink.add(ApiResponse.hasData('Deleting',
@@ -67,6 +77,8 @@ class BannerBloc implements BlocInterface {
           await _repository.deleteBanner(vendorModelGlobal.banners[index]);
       var jsonResponse = jsonDecode(response.body);
       if (response.statusCode == 200) {
+        ///Remove banner from global variable
+        ///Then store it in sharedPreferences
         vendorModelGlobal.banners.removeAt(index);
         SharedPreferences sharedPreferences =
             await SharedPreferencesManager.getInstance();

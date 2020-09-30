@@ -16,7 +16,7 @@ class VendorApiProvider {
   Client client = Client();
 //  final String _baseUrl =
 //      'http://nextdoor-dev.ap-south-1.elasticbeanstalk.com/vendors';
-  static final String _baseUrl = 'http://192.168.0.5:3003/vendors';
+  static final String _baseUrl = 'https://nextdooor.herokuapp.com/vendors';
   Future<Response> doSignUp(String name, String email, String phone,
       String city, String password, String deviceId) async {
     Map<String, dynamic> data = {
@@ -804,6 +804,32 @@ class VendorApiProvider {
     try {
       response = await client.patch('$_baseUrl/couponStatus',
           headers: headers, body: jsonEncode(data));
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> getColorVariants() async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+    };
+    var response;
+    try {
+      response = await client.get('$_baseUrl/colorVariants', headers: headers);
+    } on SocketException {
+      throw FetchDataException('No Internet connection');
+    }
+    return response;
+  }
+
+  Future<Response> getSizeVariants() async {
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+    };
+    var response;
+    try {
+      response = await client.get('$_baseUrl/sizeVariants', headers: headers);
     } on SocketException {
       throw FetchDataException('No Internet connection');
     }

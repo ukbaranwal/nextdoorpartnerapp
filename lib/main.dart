@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_in_app_messaging/firebase_in_app_messaging.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -23,12 +22,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   ///manage for IOS
   ///Enable it to record error in firebase crashlytics
-  Crashlytics.instance.enableInDevMode = false;
+  Crashlytics.instance.enableInDevMode = true;
 
   /// Pass all uncaught errors to Crashlytics.
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
-
-//  FirebaseInAppMessaging().triggerEvent('eventName');
 
   ///Initialize LocalNotifications
   LocalNotifications.initialize();

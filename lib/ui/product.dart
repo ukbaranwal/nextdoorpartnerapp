@@ -656,98 +656,98 @@ class _ProductState extends State<Product> {
                       SizedBox(
                         height: 10,
                       ),
-                      snapshot.data.data[mapProductCategoryModel]
-                                  .haveColorVariants &&
-                              !widget.isNewProduct
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: MediaQuery.of(context).size.width - 20,
-                                  decoration: boxDecoration,
-                                  padding: EdgeInsets.all(10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(Strings.addColorVariant,
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppTheme.secondary_color)),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Icon(
-                                        Icons.add_box,
-                                        size: 16,
-                                        color: AppTheme.secondary_color,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width - 20,
-                                  child: Wrap(
-                                    alignment: WrapAlignment.center,
-                                    runSpacing: 5,
-                                    spacing: 5,
-                                    children: [
-                                      ColorWidget(
-                                        color: Colors.teal,
-                                      )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            )
-                          : SizedBox(),
-                      snapshot.data.data[mapProductCategoryModel]
-                                  .haveSizeVariants &&
-                              !widget.isNewProduct
-                          ? Column(
-                              children: [
-                                Container(
-                                  width: MediaQuery.of(context).size.width - 20,
-                                  margin: EdgeInsets.only(top: 10),
-                                  decoration: boxDecoration,
-                                  padding: EdgeInsets.all(10),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(Strings.addSizeVariant,
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppTheme.secondary_color)),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Icon(
-                                        Icons.add_box,
-                                        size: 16,
-                                        color: AppTheme.secondary_color,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Container(
-                                  width: MediaQuery.of(context).size.width - 20,
-                                  child: Wrap(
-                                    alignment: WrapAlignment.center,
-                                    spacing: 5,
-                                    runSpacing: 5,
-                                    children: [SizeWidget(size: 'XXL')],
-                                  ),
-                                )
-                              ],
-                            )
-                          : SizedBox(),
+//                      snapshot.data.data[mapProductCategoryModel]
+//                                  .haveColorVariants &&
+//                              !widget.isNewProduct
+//                          ? Column(
+//                              mainAxisAlignment: MainAxisAlignment.start,
+//                              children: [
+//                                Container(
+//                                  width: MediaQuery.of(context).size.width - 20,
+//                                  decoration: boxDecoration,
+//                                  padding: EdgeInsets.all(10),
+//                                  child: Row(
+//                                    mainAxisAlignment: MainAxisAlignment.center,
+//                                    children: [
+//                                      Text(Strings.addColorVariant,
+//                                          style: TextStyle(
+//                                              fontSize: 16,
+//                                              fontWeight: FontWeight.w700,
+//                                              color: AppTheme.secondary_color)),
+//                                      SizedBox(
+//                                        width: 5,
+//                                      ),
+//                                      Icon(
+//                                        Icons.add_box,
+//                                        size: 16,
+//                                        color: AppTheme.secondary_color,
+//                                      )
+//                                    ],
+//                                  ),
+//                                ),
+//                                SizedBox(
+//                                  height: 5,
+//                                ),
+//                                Container(
+//                                  width: MediaQuery.of(context).size.width - 20,
+//                                  child: Wrap(
+//                                    alignment: WrapAlignment.center,
+//                                    runSpacing: 5,
+//                                    spacing: 5,
+//                                    children: [
+//                                      ColorWidget(
+//                                        color: Colors.teal,
+//                                      )
+//                                    ],
+//                                  ),
+//                                )
+//                              ],
+//                            )
+//                          : SizedBox(),
+//                      snapshot.data.data[mapProductCategoryModel]
+//                                  .haveSizeVariants &&
+//                              !widget.isNewProduct
+//                          ? Column(
+//                              children: [
+//                                Container(
+//                                  width: MediaQuery.of(context).size.width - 20,
+//                                  margin: EdgeInsets.only(top: 10),
+//                                  decoration: boxDecoration,
+//                                  padding: EdgeInsets.all(10),
+//                                  child: Row(
+//                                    mainAxisAlignment: MainAxisAlignment.center,
+//                                    children: [
+//                                      Text(Strings.addSizeVariant,
+//                                          style: TextStyle(
+//                                              fontSize: 16,
+//                                              fontWeight: FontWeight.w700,
+//                                              color: AppTheme.secondary_color)),
+//                                      SizedBox(
+//                                        width: 5,
+//                                      ),
+//                                      Icon(
+//                                        Icons.add_box,
+//                                        size: 16,
+//                                        color: AppTheme.secondary_color,
+//                                      )
+//                                    ],
+//                                  ),
+//                                ),
+//                                SizedBox(
+//                                  height: 5,
+//                                ),
+//                                Container(
+//                                  width: MediaQuery.of(context).size.width - 20,
+//                                  child: Wrap(
+//                                    alignment: WrapAlignment.center,
+//                                    spacing: 5,
+//                                    runSpacing: 5,
+//                                    children: [SizeWidget(size: 'XXL')],
+//                                  ),
+//                                )
+//                              ],
+//                            )
+//                          : SizedBox(),
                       SizedBox(
                         height: 100,
                       )

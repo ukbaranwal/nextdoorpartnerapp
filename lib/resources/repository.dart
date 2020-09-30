@@ -150,4 +150,8 @@ class Repository {
 
   Future<Response> toggleIsLive(int couponId, bool isLive) =>
       vendorApiProvider.toggleIsLive(couponId, isLive);
+
+  Future<Response> getColorVariants() => vendorApiProvider.getColorVariants();
+
+  Future<Response> getSizeVariants() => vendorApiProvider.getSizeVariants();
 }

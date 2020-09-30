@@ -8,12 +8,16 @@ import 'package:nextdoorpartner/util/shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+///Bloc for ForgotPassword
 class ForgotPasswordBloc implements BlocInterface {
   final _repository = Repository();
   var _forgotPasswordFetcher = PublishSubject<ApiResponse<bool>>();
   Stream<ApiResponse<bool>> get forgotPasswordStream =>
       _forgotPasswordFetcher.stream;
 
+  ///Requests reset pin
+  ///pin will be received on registered email id
+  ///this pin will be used to reset password
   requestResetPin(String email) async {
     try {
       _forgotPasswordFetcher.sink.add(ApiResponse.hasData('Loading',

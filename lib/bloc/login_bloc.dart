@@ -7,16 +7,20 @@ import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for Login
 class LoginBloc implements BlocInterface {
   final _repository = Repository();
   var _loginFetcher = PublishSubject<ApiResponse<String>>();
   Stream<ApiResponse<String>> get loginStream => _loginFetcher.stream;
 
+  ///Requests login process
   doLogin(String email, String password, String deviceId) async {
     _loginFetcher.sink.add(ApiResponse.hasData('Loading',
         actions: ApiActions.LOADING, loader: LOADER.SHOW));
     try {
       Response response = await _repository.doLogin(email, password, deviceId);
+
+      ///No User found
       if (response.statusCode == 204) {
         _loginFetcher.sink.add(ApiResponse.hasData(
             'No user exist with email $email',

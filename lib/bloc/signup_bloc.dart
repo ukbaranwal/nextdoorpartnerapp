@@ -6,11 +6,13 @@ import 'package:nextdoorpartner/resources/api_response.dart';
 import 'package:nextdoorpartner/resources/repository.dart';
 import 'package:rxdart/rxdart.dart';
 
+///Bloc for sign up
 class SignUpBloc implements BlocInterface {
   final _repository = Repository();
   var _signUpFetcher = PublishSubject<ApiResponse<String>>();
   Stream<ApiResponse<String>> get signUpStream => _signUpFetcher.stream;
 
+  ///Requests signup
   doSignUp(String name, String email, String phone, String city,
       String password, String deviceId) async {
     try {
